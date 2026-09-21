@@ -29,3 +29,20 @@ the starter bot:
 | Trophy 25×25 | 53 vs 2 | 4 | Team A wins on round 239 |
 
 The matching Python replays are in `replays/`.
+
+## Medium practice opponent
+
+`practice_bot/` is a stronger Python opponent built from the same safety,
+flood-fill, pearl-scoring, and collision logic. It expands to roughly 12–32
+dragons, protects a small flagship group, and sends short-lived scouts toward
+safe head trades when turn order makes them favourable.
+
+Run a practice match with:
+
+```sh
+unswbc run maps/default.map . practice_bot
+```
+
+The numbered replay sets are named `1 (easy).replay` through
+`20 (easy).replay` and `1 (medium).replay` through `20 (medium).replay`.
+The medium batch produced 15 wins from 20 matches (75%).
