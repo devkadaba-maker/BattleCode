@@ -1,48 +1,54 @@
-# BattleCode Python Flagship Bot
+# UNSW Battlecode Python sonar bot
 
-This is a Python-only UNSW Battlecode bot project. Run it from this directory:
+The production bot is `main.py`; `helper.py` implements the engine protocol.
+Run commands from this directory:
 
 ```sh
 unswbc run maps/default.map . .
-```
-
-The bot uses the flagship-and-scout strategy: a map-size target of 30–60
-dragons, four or five protected flagship roles, pearl-guided movement,
-visible-area flood fill, collision avoidance, controlled splitting, and late
-survival behaviour.
-
-## C++ parity proof
-
-`tests/test_strategy.py` verifies the Python population targets, flagship
-targets, and 32-bit role hash against values emitted by the C++ reference.
-
-```sh
-python3 tests/test_strategy.py
-```
-
-Engine verification also produced identical C++ and Python outcomes against
-the starter bot:
-
-| Map | Peak dragons | Self-collisions | Result |
-| --- | ---: | ---: | --- |
-| Default 32×32 | 60 vs 4 | 8 | Team A wins on round 453 |
-| Trophy 25×25 | 53 vs 2 | 4 | Team A wins on round 239 |
-
-The matching Python replays are in `replays/`.
-
-## Medium practice opponent
-
-`practice_bot/` is a stronger Python opponent built from the same safety,
-flood-fill, pearl-scoring, and collision logic. It expands to roughly 12–32
-dragons, protects a small flagship group, and sends short-lived scouts toward
-safe head trades when turn order makes them favourable.
-
-Run a practice match with:
-
-```sh
 unswbc run maps/default.map . practice_bot
 ```
 
-The numbered replay sets are named `1 (easy).replay` through
-`20 (easy).replay` and `1 (medium).replay` through `20 (medium).replay`.
-The medium batch produced 15 wins from 20 matches (75%).
+The strategy combines a protected flagship swarm with 50/50 collector and
+hunter roles. It uses pearl seeking, flood-fill and mobility safety checks,
+controlled splitting, late survival priorities, and compact validated sonar
+target reports. Sonar is only a hint: local occupancy, turn order, and reachable
+space checks always take priority. Portal use remains conservative.
+
+## Final acceptance matrix
+
+The fixed matrix contains 20 games per opponent, with no timeouts or crashes:
+
+| Opponent | Wins | Losses | Rate |
+| --- | ---: | ---: | ---: |
+| baseline | 20 | 0 | 100% |
+| practice | 18 | 2 | 90% |
+| hard | 17 | 3 | 85% |
+| hard v2 | 20 | 0 | 100% |
+| unseen | 20 | 0 | 100% |
+
+All five opponents pass the 80% acceptance gate. The 100 replay files and the
+full report are in `replays/sonar-final/`:
+
+- `easy (100%)/`
+- `medium (90%)/`
+- `hard (85%)/`
+- `hard v2 (100%)/`
+- `unseen (100%)/`
+- `full-report.txt`
+
+Each score-labelled folder contains 20 numbered `.replay` files. A copy is
+also stored at `~/Desktop/applications/battlecode/replays/sonar-final/`.
+
+## Verification
+
+From `BattleCode/`:
+
+```sh
+python3 tests/test_strategy.py
+python3 -m py_compile main.py helper.py
+git diff --check
+graft build
+```
+
+These final gates passed after the acceptance matrix. Replay validation was
+structural and marker-scanned; visual viewer inspection remains optional.
