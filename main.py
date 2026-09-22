@@ -525,7 +525,7 @@ def special_friendly_pressure(controller: Controller, game_state: Game, start: P
 
 def population_target(game_state: Game) -> int:
     area = game_state.width * game_state.height
-    if game_state.width <= 10 and game_state.height <= 10:
+    if area <= 144:
         return min(game_state.get_unit_limit(), 8)
     return min(game_state.get_unit_limit(), max(36, min(60, area // 10 + 24)))
 
@@ -533,7 +533,7 @@ def population_target(game_state: Game) -> int:
 def special_population_target(game_state: Game) -> int:
     """Match v2's pressure population only on the two gated boards."""
     area = game_state.width * game_state.height
-    if game_state.width <= 10 and game_state.height <= 10:
+    if area <= 144:
         return min(game_state.get_unit_limit(), 12)
     return min(game_state.get_unit_limit(), max(36, min(60, area // 10 + 24)))
 
@@ -928,16 +928,41 @@ def execute_turn() -> None:
                 best, emergency_score = direction, score
         if emergency_score != INT_MIN:
             best_score = emergency_score
+    # A high score is not enough to justify a move: head trades and pressure
+    # bonuses can intentionally score a collision.  Re-check the winner using
+    # the same immediate safety guard used by the fallback path.
+    if best_score != INT_MIN and not safe_step(ct, game, ct.get_position(), best):
+        best_score = INT_MIN
     if best_score == INT_MIN:
+        # First recover with a move that is safe now and does not immediately
+        # retrace the dragon's recent body path.
         for direction in Direction.get_direction_list():
             here, target = ct.get_tile(ct.get_position()), ct.get_position().add_dir(direction)
             ahead = ct.get_tile(target)
-            if here is not None and here.get_edge(direction).is_passable() and ahead is not None and not occupied(ahead) and not enemy_head_ahead(ct, target):
+            if (here is not None and here.get_edge(direction).is_passable() and
+                    ahead is not None and not occupied(ahead) and
+                    not enemy_head_ahead(ct, target) and
+                    not recent_collision(target, history, ct.get_length()) and
+                    safe_step(ct, game, ct.get_position(), direction)):
                 best = direction
+                best_score = 0
+                break
+    if best_score == INT_MIN:
+        # If every safe route is blocked, take the least-bad immediately legal
+        # step rather than silently retaining a stale heading.
+        for direction in Direction.get_direction_list():
+            here, target = ct.get_tile(ct.get_position()), ct.get_position().add_dir(direction)
+            ahead = ct.get_tile(target)
+            if (here is not None and here.get_edge(direction).is_passable() and
+                    ahead is not None and not occupied(ahead) and
+                    not enemy_head_ahead(ct, target) and
+                    not recent_collision(target, history, ct.get_length())):
+                best = direction
+                best_score = 0
                 break
     split_target = (special_population_target(game) if special_pressure_active(ct, game)
                     else population_target(game))
-    if (not has_empty_step(ct) and game.get_round_num() < 420 and
+    if (best_score == INT_MIN and game.get_round_num() < 420 and
             ct.get_unit_count() < split_target and ct.can_split(2) and ct.get_length() >= 6):
         ct.do_split(2)
         relay_target(ct, game, True)
