@@ -109,12 +109,16 @@ int flagship_target(Game const& game_state) { return game_state.width * game_sta
 int population_target(Game const& game_state) {
     int area = game_state.width * game_state.height;
     if (area <= 144) return std::min(game_state.unit_limit, 8);
+    // Very large open boards reached 60 units but still repeatedly lost the
+    // longest-dragon tiebreak; keep more length in each collector there.
+    if (area >= 3000) return std::min(game_state.unit_limit, 40);
     return std::min(game_state.unit_limit, std::max(36, std::min(60, area / 10 + 24)));
 }
 
 int special_population_target(Game const& game_state) {
     int area = game_state.width * game_state.height;
     if (area <= 144) return std::min(game_state.unit_limit, 12);
+    if (area >= 3000) return std::min(game_state.unit_limit, 40);
     return std::min(game_state.unit_limit, std::max(36, std::min(60, area / 10 + 24)));
 }
 
@@ -542,14 +546,21 @@ int score_move(Direction direction) {
     if (head_attack) return 1800;
     bool pearl_target = visible_pearl_near(controller, game_state, target, 1);
     bool small_map = game_state.width * game_state.height <= 144;
+    bool flagship = special ? special_is_flagship(controller, game_state) : is_flagship(controller, game_state);
     int future_mobility = mobility(controller, game_state, target);
-    if (!future_mobility && !pearl_target) return INT_MIN_SCORE;
-    int area = open_area(controller, target); bool flagship = special ? special_is_flagship(controller, game_state) : is_flagship(controller, game_state);
+    // Small collectors may take a one-step pearl pocket, but a flagship must
+    // not trade its tiebreak value for a pearl that leaves it trapped.
+    if (!future_mobility && (!pearl_target || (flagship && !small_map))) return INT_MIN_SCORE;
+    int area = open_area(controller, target);
     bool late = game_state.get_round_num() >= 380; Mode mode = special ? special_combat_mode(controller, game_state) : combat_mode(controller, game_state);
-    int required_area = pearl_target ? 1 : (flagship ? std::min(30, std::max(10, controller.get_length() + 4)) : 4);
+    int required_area = flagship ? std::min(30, std::max(10, controller.get_length() + 4)) : (pearl_target ? 1 : 4);
+    // Arena-sized boards are too cramped for the large-map flagship margin;
+    // still demand a few reachable tiles, but let the flagship take nearby food.
+    if (flagship && pearl_target && small_map) required_area = 4;
     if (!pearl_target && controller.get_team() == Team(Team::B) && game_state.width == 16 && game_state.height == 16) required_area = std::max(required_area, 8);
     if (area < required_area) return INT_MIN_SCORE;
-    if (late && !pearl_target && (area < 10 || future_mobility < 2 || here->get_edge(direction).is_portal())) return INT_MIN_SCORE;
+    if (late && (flagship || !pearl_target) && !(small_map && pearl_target) &&
+        (area < 10 || future_mobility < 2 || here->get_edge(direction).is_portal())) return INT_MIN_SCORE;
     auto [pearl_weight, chase_weight] = special ? special_strategy_weights(mode) : strategy_weights(mode);
     int score = area * 12 + future_mobility * 12;
     if (role == Role::COLLECTOR) {
@@ -610,23 +621,29 @@ int split_size() {
     if (round >= 460 || ct->get_unit_count() >= target || !ct->can_split(2)) return 0;
 
     // Split at length four (the first legal two-segment child), rather than
-    // waiting for a long ramp.  This lets a swarm form before the opponent's
-    // early split wave overruns us.  Keep a handful of designated flagships
-    // intact once the minimum population is established so the team still has
-    // large survivors for the 500-round tiebreak.
+    // waiting for a long ramp. This lets collectors form before the opponent's
+    // early split wave overruns us, but designated flagships must keep their
+    // length for the longest-dragon tiebreak.
     int area = game->width * game->height;
     int minimum_open = area <= 144 ? 2 : 4;
     if (open_area(*ct, ct->get_position()) < minimum_open) return 0;
     bool flagship = special_pressure_active(*ct, *game) ? special_is_flagship(*ct, *game) : is_flagship(*ct, *game);
     int reserve = flagship_target(*game);
-    int flagship_floor = area <= 144 ? 8 : 12;
-    if (flagship && ct->get_unit_count() >= reserve && ct->get_length() < flagship_floor + 2) return 0;
+    // On cramped maps, getting the early collector count matters more than
+    // preserving a young flagship. On larger maps, preserve designated
+    // flagships once they have a useful growth base, while still allowing a
+    // few early splits. Other collectors can build toward the population cap.
+    if (flagship && (ct->get_unit_count() >= reserve || (area > 144 && ct->get_length() >= 8))) return 0;
     return 2;
 }
 
 void execute_turn() {
     update_target_memory(*ct, *game);
-    history.push_back(ct->get_position()); if (history.size() > 256) history.erase(history.begin(), history.end() - 256);
+    history.push_back(ct->get_position());
+    // A capped 256-step history stops protecting long dragons from revisiting
+    // older segments of their own body. Keep at least one full body-length.
+    std::size_t history_limit = std::max<std::size_t>(256, static_cast<std::size_t>(ct->get_length()) + 2);
+    if (history.size() > history_limit) history.erase(history.begin(), history.end() - history_limit);
     if (auto portal = visible_portal_direction(); portal.has_value()) {
         ++portal_uses;
         ct->make_move(*portal);
