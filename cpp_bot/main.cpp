@@ -126,22 +126,17 @@ int flagship_target(Game const& game_state) { return game_state.width * game_sta
 
 int population_target(Game const& game_state) {
     int area = game_state.width * game_state.height;
-    if (area <= 144) return std::min(game_state.unit_limit, 32);
-    // On compact maps the opponent's early split wave can otherwise outnumber
-    // us before our collectors gather enough pearls. Use the judge's full unit
-    // allowance there as well.
-    if (area <= 300) return game_state.unit_limit;
-    // The 25x25–25x35 pearl maps benefited from full coverage, while larger
-    // 32x32–60x40 maps lost longest-dragon tiebreaks above forty collectors.
-    if (area <= 1000 || area >= 3000) return game_state.unit_limit;
+    if (area <= 300) return std::min(game_state.unit_limit, 32);
+    if (area <= 1000) return std::min(game_state.unit_limit, 48);
+    // On Big Empty, 64 dragons tied up pearl access without growing the
+    // tiebreak flagship: we reached 64 but only length 32.
     return std::min(game_state.unit_limit, 40);
 }
 
 int special_population_target(Game const& game_state) {
     int area = game_state.width * game_state.height;
-    if (area <= 144) return std::min(game_state.unit_limit, 32);
-    if (area <= 300) return game_state.unit_limit;
-    if (area <= 1000 || area >= 3000) return game_state.unit_limit;
+    if (area <= 300) return std::min(game_state.unit_limit, 32);
+    if (area <= 1000) return std::min(game_state.unit_limit, 48);
     return std::min(game_state.unit_limit, 40);
 }
 
@@ -156,6 +151,12 @@ bool colosseum_like(Controller const& controller, Game const& game_state) {
         role_map_colosseum = max_timer >= 0 && max_timer <= 250;
     }
     return *role_map_colosseum;
+}
+
+int population_target(Controller const& controller, Game const& game_state) {
+    if (game_state.width * game_state.height <= 300 && colosseum_like(controller, game_state))
+        return std::min(game_state.unit_limit, 40);
+    return population_target(game_state);
 }
 
 Role role_for_controller(Controller const& controller, Game const& game_state) {
@@ -218,12 +219,12 @@ bool special_is_flagship(Controller const& controller, Game const& game_state) {
 bool is_flagship(Controller const& controller, Game const& game_state) {
     Role role = role_for_controller(controller, game_state);
     return role == Role::COLLECTOR && (controller.get_id() < 2 || controller.get_length() >= 16 ||
-        role_hash(controller.get_id()) % population_target(game_state) < flagship_target(game_state) - 1);
+        role_hash(controller.get_id()) % population_target(controller, game_state) < flagship_target(game_state) - 1);
 }
 
 Mode strategy_mode(int unit_count, std::optional<int> enemy_count, int population_cap) {
-    if (unit_count >= population_cap) return Mode::HUNT;
     if (!enemy_count.has_value() || *enemy_count <= 0 || unit_count < *enemy_count) return Mode::COLLECT;
+    if (unit_count >= population_cap) return Mode::HUNT;
     if (unit_count > *enemy_count) return Mode::PRESSURE;
     return Mode::BALANCED;
 }
@@ -232,7 +233,7 @@ Mode combat_mode(Controller const& controller, Game const& game_state) {
     int visible = visible_enemy_count(controller), round = game_state.get_round_num();
     if (visible) { enemy_memory_count = std::max(enemy_memory_count, visible); enemy_memory_round = round; }
     else if (round - enemy_memory_round > 24) { enemy_memory_count = std::max(0, enemy_memory_count - 1); enemy_memory_round = round; }
-    return strategy_mode(controller.get_unit_count(), enemy_memory_count ? std::optional<int>(enemy_memory_count) : std::nullopt, population_target(game_state));
+    return strategy_mode(controller.get_unit_count(), enemy_memory_count ? std::optional<int>(enemy_memory_count) : std::nullopt, population_target(controller, game_state));
 }
 
 Mode special_combat_mode(Controller const& controller, Game const& game_state) {
@@ -274,7 +275,7 @@ bool favourable_head_attack(Controller const& controller, Game const& game_state
     // Once our population cap is reached, allow a modestly more aggressive trade.
     int worthwhile_length = std::max(6, our_length * 2);
     if (enemy_visible_segments >= worthwhile_length) return true;
-    return controller.get_unit_count() >= population_target(game_state) &&
+    return controller.get_unit_count() >= population_target(controller, game_state) &&
         enemy_visible_segments >= our_length + 4;
 }
 
@@ -627,9 +628,9 @@ int score_move(Direction direction) {
     if (late && (flagship || !pearl_target) && !(small_map && pearl_target) &&
         (area < 10 || future_mobility < 2 || here->get_edge(direction).is_portal())) return INT_MIN_SCORE;
     auto [pearl_weight, chase_weight] = special ? special_strategy_weights(mode) : strategy_weights(mode);
-    // Reaching the population cap should turn scouts into pressure units, but
-    // the tiebreak dragon must keep growing instead of abandoning pearls.
-    if (flagship && mode == Mode::HUNT) {
+    // Keep the four-to-five tiebreak flagships collecting pearls in every
+    // phase; only smaller dragons switch fully to hunting at the cap.
+    if (flagship) {
         pearl_weight = 8;
         chase_weight = 0;
     }
@@ -690,7 +691,7 @@ bool relay_target(bool safe_action) {
 
 int split_size() {
     int round = game->get_round_num();
-    int target = special_pressure_active(*ct, *game) ? special_population_target(*game) : population_target(*game);
+    int target = special_pressure_active(*ct, *game) ? special_population_target(*game) : population_target(*ct, *game);
     if (round >= 460 || ct->get_unit_count() >= target || !ct->can_split(2)) return 0;
     // Split at length four (the first legal two-segment child), rather than
     // waiting for a long ramp. This lets collectors form before the opponent's
