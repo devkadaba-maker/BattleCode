@@ -244,11 +244,11 @@ Mode special_combat_mode(Controller const& controller, Game const& game_state) {
 }
 
 std::pair<int, int> strategy_weights(Mode mode) {
-    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 1}; case Mode::PRESSURE: return {1, 4}; default: return {1, 8}; }
+    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 1}; case Mode::PRESSURE: return {2, 2}; default: return {2, 3}; }
 }
 
 std::pair<int, int> special_strategy_weights(Mode mode) {
-    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 2}; case Mode::PRESSURE: return {1, 5}; default: return {1, 10}; }
+    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 2}; case Mode::PRESSURE: return {2, 3}; default: return {2, 4}; }
 }
 
 bool favourable_head_attack(Controller const& controller, Game const& game_state, Position target,
@@ -689,9 +689,8 @@ bool relay_target(bool safe_action) {
     return false;
 }
 
-int split_size() {
+int split_size(int target) {
     int round = game->get_round_num();
-    int target = special_pressure_active(*ct, *game) ? special_population_target(*game) : population_target(*ct, *game);
     if (round >= 460 || ct->get_unit_count() >= target || !ct->can_split(2)) return 0;
     // Split at length four (the first legal two-segment child), rather than
     // waiting for a long ramp. This lets collectors form before the opponent's
@@ -729,7 +728,8 @@ void execute_turn() {
         relay_target(true);
         return;
     }
-    int planned = split_size(); if (planned) { ct->do_split(planned); relay_target(true); return; }
+    int target_population = special_pressure_active(*ct, *game) ? special_population_target(*game) : population_target(*ct, *game);
+    int planned = split_size(target_population); if (planned) { ct->do_split(planned); relay_target(true); return; }
     Direction best = ct->get_dir(); int best_score = INT_MIN_SCORE;
     for (Direction direction : Direction::get_direction_list()) { int score = score_move(direction); if (score > best_score) { best = direction; best_score = score; } }
     bool attack_step = favourable_head_attack(*ct, *game, ct->get_position().add_dir(best));
@@ -745,7 +745,8 @@ void execute_turn() {
         // If the head has no immediately safe exit, split off two tail
         // segments so the child can move later this round. Survival may exceed
         // the strategic target, but never the engine limit.
-        if (emergency_score == INT_MIN_SCORE && game->get_round_num() < 500 && ct->can_split(2)) {
+        if (emergency_score == INT_MIN_SCORE && game->get_round_num() < 500 &&
+            ct->get_unit_count() < target_population && ct->can_split(2)) {
             ct->do_split(2);
             relay_target(true);
             return;
