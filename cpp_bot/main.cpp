@@ -6,6 +6,7 @@
 #include <deque>
 #include <limits>
 #include <optional>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -44,10 +45,15 @@ struct TargetMemory {
     bool local = false;
 };
 
+bool favourable_head_attack(Controller const& controller, Game const& game_state, Position target,
+                           std::optional<int> target_id = std::nullopt, bool local_visible = true,
+                           std::optional<Role> role_override = std::nullopt);
+
 std::vector<Position> history;
 std::optional<TargetMemory> target_memory;
 int enemy_memory_count = 0, enemy_memory_round = -10000, last_relay_round = -10000;
-int portal_uses = 0;
+std::unordered_map<int, int> portal_uses;
+int last_portal_round = -10000;
 const Game* role_map_game = nullptr;
 std::optional<bool> role_map_colosseum;
 int special_pressure_sample_round = -1, special_pressure_sample_count = 0, special_pressure_visible_sum = 0;
@@ -78,22 +84,34 @@ bool enemy_head_ahead(Controller const& controller, Position target) {
     return false;
 }
 
-bool enemy_collision_risk(Controller const& controller, Game const& game_state, Position target) {
+bool enemy_collision_risk(Controller const& controller, Game const& game_state, Position target,
+                          std::optional<int> ignore_head_id = std::nullopt) {
     for (auto const& tile : controller.get_tiles()) {
         auto const* dragon = tile.get_dragon();
         if (!dragon || dragon->get_team() == controller.get_team()) continue;
+        if (ignore_head_id.has_value() && dragon->get_id() == *ignore_head_id && dragon->is_head()) continue;
         int d = distance(target, dragon->get_position(), game_state);
         if ((dragon->is_head() && d <= 2) || (!dragon->is_head() && d <= 1)) return true;
     }
     return false;
 }
 
-bool safe_step(Controller const& controller, Game const& game_state, Position start, Direction direction, bool allow_portal = false) {
+bool safe_step(Controller const& controller, Game const& game_state, Position start, Direction direction,
+               bool allow_portal = false, bool allow_head_attack = false) {
     auto const* here = controller.get_tile(start);
     if (!here || !here->get_edge(direction).is_passable() || (!allow_portal && here->get_edge(direction).is_portal())) return false;
     Position target = start.add_dir(direction);
     auto const* ahead = controller.get_tile(target);
-    return ahead && !occupied(ahead) && !enemy_head_ahead(controller, target) && !enemy_collision_risk(controller, game_state, target);
+    bool head_attack = false;
+    std::optional<int> attacked_head_id;
+    if (allow_head_attack && ahead) {
+        auto const* dragon = ahead->get_dragon();
+        head_attack = dragon && dragon->is_head() &&
+            favourable_head_attack(controller, game_state, target, dragon->get_id());
+        if (head_attack) attacked_head_id = dragon->get_id();
+    }
+    return ahead && (!occupied(ahead) || head_attack) && !enemy_head_ahead(controller, target) &&
+        !enemy_collision_risk(controller, game_state, target, attacked_head_id);
 }
 
 std::uint32_t role_hash(int dragon_id) {
@@ -108,18 +126,23 @@ int flagship_target(Game const& game_state) { return game_state.width * game_sta
 
 int population_target(Game const& game_state) {
     int area = game_state.width * game_state.height;
-    if (area <= 144) return std::min(game_state.unit_limit, 8);
-    // Very large open boards reached 60 units but still repeatedly lost the
-    // longest-dragon tiebreak; keep more length in each collector there.
-    if (area >= 3000) return std::min(game_state.unit_limit, 40);
-    return std::min(game_state.unit_limit, std::max(36, std::min(60, area / 10 + 24)));
+    if (area <= 144) return std::min(game_state.unit_limit, 32);
+    // On compact maps the opponent's early split wave can otherwise outnumber
+    // us before our collectors gather enough pearls. Use the judge's full unit
+    // allowance there as well.
+    if (area <= 300) return game_state.unit_limit;
+    // The 25x25–25x35 pearl maps benefited from full coverage, while larger
+    // 32x32–60x40 maps lost longest-dragon tiebreaks above forty collectors.
+    if (area <= 1000 || area >= 3000) return game_state.unit_limit;
+    return std::min(game_state.unit_limit, 40);
 }
 
 int special_population_target(Game const& game_state) {
     int area = game_state.width * game_state.height;
-    if (area <= 144) return std::min(game_state.unit_limit, 12);
-    if (area >= 3000) return std::min(game_state.unit_limit, 40);
-    return std::min(game_state.unit_limit, std::max(36, std::min(60, area / 10 + 24)));
+    if (area <= 144) return std::min(game_state.unit_limit, 32);
+    if (area <= 300) return game_state.unit_limit;
+    if (area <= 1000 || area >= 3000) return game_state.unit_limit;
+    return std::min(game_state.unit_limit, 40);
 }
 
 bool colosseum_like(Controller const& controller, Game const& game_state) {
@@ -220,24 +243,39 @@ Mode special_combat_mode(Controller const& controller, Game const& game_state) {
 }
 
 std::pair<int, int> strategy_weights(Mode mode) {
-    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 1}; case Mode::PRESSURE: return {1, 2}; default: return {1, 4}; }
+    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 1}; case Mode::PRESSURE: return {1, 4}; default: return {1, 8}; }
 }
 
 std::pair<int, int> special_strategy_weights(Mode mode) {
-    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 2}; case Mode::PRESSURE: return {1, 4}; default: return {1, 7}; }
+    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 2}; case Mode::PRESSURE: return {1, 5}; default: return {1, 10}; }
 }
 
 bool favourable_head_attack(Controller const& controller, Game const& game_state, Position target,
-                           std::optional<int> target_id = std::nullopt, bool local_visible = true,
-                           std::optional<Role> role_override = std::nullopt) {
-    (void)controller;
-    (void)game_state;
-    (void)target;
-    (void)target_id;
-    (void)local_visible;
+                           std::optional<int> target_id, bool local_visible,
+                           std::optional<Role> role_override) {
     (void)role_override;
-    // All units are collectors in this iteration; no intentional head trades.
-    return false;
+    if (!local_visible) return false;
+    auto const* tile = controller.get_tile(target);
+    auto const* enemy = tile ? tile->get_dragon() : nullptr;
+    if (!enemy || enemy->get_team() == controller.get_team() || !enemy->is_head() ||
+        (target_id.has_value() && enemy->get_id() != *target_id)) return false;
+
+    int our_length = controller.get_length();
+    int enemy_visible_segments = 0;
+    for (auto const& visible_tile : controller.get_tiles()) {
+        auto const* part = visible_tile.get_dragon();
+        if (part && part->get_id() == enemy->get_id()) ++enemy_visible_segments;
+    }
+    // Protect the long-term tiebreak dragon and avoid trading larger collectors.
+    if (our_length < 2 || our_length >= 10 || is_flagship(controller, game_state)) return false;
+
+    // Visible body segments give a conservative lower bound for enemy size.
+    // A small collector may trade only when the enemy is already visibly large.
+    // Once our population cap is reached, allow a modestly more aggressive trade.
+    int worthwhile_length = std::max(6, our_length * 2);
+    if (enemy_visible_segments >= worthwhile_length) return true;
+    return controller.get_unit_count() >= population_target(game_state) &&
+        enemy_visible_segments >= our_length + 4;
 }
 
 std::uint32_t sonar_checksum(std::uint32_t payload) {
@@ -358,22 +396,37 @@ bool has_enemy_near(Controller const& controller, Game const& game_state, Positi
     return false;
 }
 
-int pearl_drive(Controller const& controller, Game const& game_state, Position start) {
-    int current = 100000, best = 100000;
-    for (auto const& tile : controller.get_tiles()) if (tile.has_pearl()) {
-        current = std::min(current, distance(controller.get_position(), tile.get_position(), game_state));
-        best = std::min(best, distance(start, tile.get_position(), game_state));
+int visible_pearl_route_distance(Controller const& controller, Game const& game_state, Position start) {
+    if (!controller.get_tile(start)) return 100000;
+    std::deque<std::pair<Position, int>> queue{{start, 0}};
+    std::unordered_set<Position, PositionHash> seen{start};
+    while (!queue.empty()) {
+        auto const [current, steps] = queue.front();
+        queue.pop_front();
+        auto const* tile = controller.get_tile(current);
+        if (!tile) continue;
+        if (tile->has_pearl()) return steps;
+        for (Direction direction : Direction::get_direction_list()) {
+            auto const& edge = tile->get_edge(direction);
+            if (!edge.is_passable() || edge.is_portal() ||
+                !safe_step(controller, game_state, current, direction)) continue;
+            Position next = current.add_dir(direction);
+            if (seen.insert(next).second) queue.emplace_back(next, steps + 1);
+        }
     }
-    return best == 100000 ? 0 : (current - best) * 24 + (best == 0 ? 180 : 0);
+    return 100000;
+}
+
+int pearl_drive(Controller const& controller, Game const& game_state, Position start) {
+    int current = visible_pearl_route_distance(controller, game_state, controller.get_position());
+    int best = visible_pearl_route_distance(controller, game_state, start);
+    return current == 100000 || best == 100000 ? 0 : (current - best) * 24 + (best == 0 ? 180 : 0);
 }
 
 int special_pearl_drive(Controller const& controller, Game const& game_state, Position start) {
-    int current = 100000, best = 100000;
-    for (auto const& tile : controller.get_tiles()) if (tile.has_pearl()) {
-        current = std::min(current, distance(controller.get_position(), tile.get_position(), game_state));
-        best = std::min(best, distance(start, tile.get_position(), game_state));
-    }
-    return best == 100000 ? 0 : (current - best) * 8 + (best == 0 ? 80 : 0);
+    int current = visible_pearl_route_distance(controller, game_state, controller.get_position());
+    int best = visible_pearl_route_distance(controller, game_state, start);
+    return current == 100000 || best == 100000 ? 0 : (current - best) * 8 + (best == 0 ? 80 : 0);
 }
 
 int pearl_value(Controller const& controller, Game const& game_state, Position start) {
@@ -503,12 +556,20 @@ void reset_target_state() {
     special_pressure_sample_count = 0;
     special_pressure_visible_sum = 0;
     special_pressure_enabled = false;
-    portal_uses = 0;
+    portal_uses.clear();
+    last_portal_round = -10000;
 }
 
 bool recent_collision(Position target) {
     int begin = std::max(0, static_cast<int>(history.size()) - ct->get_length());
     return std::find(history.begin() + begin, history.end(), target) != history.end();
+}
+
+bool portal_allowed(Edge const& edge) {
+    if (!edge.is_portal()) return true;
+    if (game->get_round_num() == last_portal_round + 1) return false;
+    auto const uses = portal_uses.find(edge.get_portal_id());
+    return uses == portal_uses.end() || uses->second < PORTAL_USE_LIMIT;
 }
 
 bool has_empty_step() {
@@ -524,11 +585,11 @@ bool has_empty_step() {
 }
 
 std::optional<Direction> visible_portal_direction() {
-    if (portal_uses >= PORTAL_USE_LIMIT) return std::nullopt;
     auto const* here = ct->get_tile(ct->get_position());
     if (!here) return std::nullopt;
     for (Direction direction : Direction::get_direction_list()) {
-        if (here->get_edge(direction).is_portal()) return direction;
+        auto const& edge = here->get_edge(direction);
+        if (edge.is_portal() && portal_allowed(edge)) return direction;
     }
     return std::nullopt;
 }
@@ -538,7 +599,8 @@ int score_move(Direction direction) {
     auto const* here = controller.get_tile(start);
     if (!here || !here->get_edge(direction).is_passable()) return INT_MIN_SCORE;
     Position target = start.add_dir(direction); auto const* ahead = controller.get_tile(target);
-    if (here->get_edge(direction).is_portal() && portal_uses >= PORTAL_USE_LIMIT) return INT_MIN_SCORE;
+    auto const& edge = here->get_edge(direction);
+    if (!portal_allowed(edge)) return INT_MIN_SCORE;
     bool special = special_pressure_active(controller, game_state);
     Role role = movement_role(controller, game_state, special);
     bool head_attack = favourable_head_attack(controller, game_state, target, std::nullopt, true, special ? std::optional<Role>(role) : std::nullopt);
@@ -548,9 +610,12 @@ int score_move(Direction direction) {
     bool small_map = game_state.width * game_state.height <= 144;
     bool flagship = special ? special_is_flagship(controller, game_state) : is_flagship(controller, game_state);
     int future_mobility = mobility(controller, game_state, target);
-    // Small collectors may take a one-step pearl pocket, but a flagship must
-    // not trade its tiebreak value for a pearl that leaves it trapped.
-    if (!future_mobility && (!pearl_target || (flagship && !small_map))) return INT_MIN_SCORE;
+    // Colosseum and Arena punish one-step pearl pockets, while Default Small
+    // benefits from allowing non-flagship collectors to take them.
+    bool colosseum = game_state.width == 16 && game_state.height == 16 && colosseum_like(controller, game_state);
+    bool allow_pearl_pocket = game_state.width == 16 && game_state.height == 16 && !colosseum;
+    if (!future_mobility && (!allow_pearl_pocket || !pearl_target || (flagship && !small_map)))
+        return INT_MIN_SCORE;
     int area = open_area(controller, target);
     bool late = game_state.get_round_num() >= 380; Mode mode = special ? special_combat_mode(controller, game_state) : combat_mode(controller, game_state);
     int required_area = flagship ? std::min(30, std::max(10, controller.get_length() + 4)) : (pearl_target ? 1 : 4);
@@ -562,6 +627,12 @@ int score_move(Direction direction) {
     if (late && (flagship || !pearl_target) && !(small_map && pearl_target) &&
         (area < 10 || future_mobility < 2 || here->get_edge(direction).is_portal())) return INT_MIN_SCORE;
     auto [pearl_weight, chase_weight] = special ? special_strategy_weights(mode) : strategy_weights(mode);
+    // Reaching the population cap should turn scouts into pressure units, but
+    // the tiebreak dragon must keep growing instead of abandoning pearls.
+    if (flagship && mode == Mode::HUNT) {
+        pearl_weight = 8;
+        chase_weight = 0;
+    }
     int score = area * 12 + future_mobility * 12;
     if (role == Role::COLLECTOR) {
         // A pearl tile is worth pursuing even when it is beside kelp or in a
@@ -575,6 +646,7 @@ int score_move(Direction direction) {
         if (pearl_target) score += small_map ? 480 : 320;
         score += enemy_pressure(controller, game_state, target);
         if (special) score += special_enemy_chase_value(controller, game_state, target) * chase_weight / 2;
+        else if (chase_weight > 0) score += enemy_chase_value(controller, game_state, target) * chase_weight / 4;
     } else {
         int chase = special ? special_enemy_chase_value(controller, game_state, target) : enemy_chase_value(controller, game_state, target);
         score += chase * (special ? 10 : 8) + enemy_pressure(controller, game_state, target) / (special ? 4 : 3) + chase * chase_weight / 2;
@@ -596,14 +668,15 @@ int score_move(Direction direction) {
 
 bool safe_sprint(Direction direction, int steps) {
     Position current = ct->get_position();
+    bool every_step_has_pearl = true;
     for (int i = 0; i < steps; ++i) {
         if (!safe_step(*ct, *game, current, direction)) return false;
         current = current.add_dir(direction);
         if (recent_collision(current)) return false;
         auto const* tile = ct->get_tile(current);
-        if (tile && tile->has_pearl()) return true;
+        if (!tile || !tile->has_pearl()) every_step_has_pearl = false;
     }
-    return false;
+    return every_step_has_pearl;
 }
 
 bool relay_target(bool safe_action) {
@@ -619,21 +692,22 @@ int split_size() {
     int round = game->get_round_num();
     int target = special_pressure_active(*ct, *game) ? special_population_target(*game) : population_target(*game);
     if (round >= 460 || ct->get_unit_count() >= target || !ct->can_split(2)) return 0;
-
     // Split at length four (the first legal two-segment child), rather than
     // waiting for a long ramp. This lets collectors form before the opponent's
     // early split wave overruns us, but designated flagships must keep their
     // length for the longest-dragon tiebreak.
     int area = game->width * game->height;
-    int minimum_open = area <= 144 ? 2 : 4;
+    int minimum_open = area <= 300 ? 2 : 4;
     if (open_area(*ct, ct->get_position()) < minimum_open) return 0;
     bool flagship = special_pressure_active(*ct, *game) ? special_is_flagship(*ct, *game) : is_flagship(*ct, *game);
     int reserve = flagship_target(*game);
-    // On cramped maps, getting the early collector count matters more than
-    // preserving a young flagship. On larger maps, preserve designated
-    // flagships once they have a useful growth base, while still allowing a
-    // few early splits. Other collectors can build toward the population cap.
-    if (flagship && (ct->get_unit_count() >= reserve || (area > 144 && ct->get_length() >= 8))) return 0;
+    // Keep designated large-map flagships intact from their initial length;
+    // splitting them just to reach the collector reserve repeatedly left our
+    // longest dragon too small in round-limit losses. Small maps still split
+    // young flagships to establish coverage.
+    if (flagship && area >= 600) return 0;
+    if (flagship && ct->get_unit_count() >= reserve) return 0;
+    if (flagship && area > 144 && ct->get_length() >= 8) return 0;
     return 2;
 }
 
@@ -645,7 +719,11 @@ void execute_turn() {
     std::size_t history_limit = std::max<std::size_t>(256, static_cast<std::size_t>(ct->get_length()) + 2);
     if (history.size() > history_limit) history.erase(history.begin(), history.end() - history_limit);
     if (auto portal = visible_portal_direction(); portal.has_value()) {
-        ++portal_uses;
+        auto const* here = ct->get_tile(ct->get_position());
+        if (here) {
+            last_portal_round = game->get_round_num();
+            ++portal_uses[here->get_edge(*portal).get_portal_id()];
+        }
         ct->make_move(*portal);
         relay_target(true);
         return;
@@ -653,7 +731,8 @@ void execute_turn() {
     int planned = split_size(); if (planned) { ct->do_split(planned); relay_target(true); return; }
     Direction best = ct->get_dir(); int best_score = INT_MIN_SCORE;
     for (Direction direction : Direction::get_direction_list()) { int score = score_move(direction); if (score > best_score) { best = direction; best_score = score; } }
-    if (best_score != INT_MIN_SCORE && !safe_step(*ct, *game, ct->get_position(), best)) best_score = INT_MIN_SCORE;
+    bool attack_step = favourable_head_attack(*ct, *game, ct->get_position().add_dir(best));
+    if (best_score != INT_MIN_SCORE && !safe_step(*ct, *game, ct->get_position(), best, false, attack_step)) best_score = INT_MIN_SCORE;
     if (best_score == INT_MIN_SCORE) {
         int emergency_score = INT_MIN_SCORE;
         for (Direction direction : Direction::get_direction_list()) {
@@ -662,16 +741,32 @@ void execute_turn() {
             if (safe_step(*ct, *game, ct->get_position(), direction)) { int score = open_area(*ct, target) * 5 + enemy_pressure(*ct, *game, target); if (score > emergency_score) { best = direction; emergency_score = score; } }
         }
         if (emergency_score != INT_MIN_SCORE) best_score = emergency_score;
-    }
-    if (best_score == INT_MIN_SCORE) {
-        for (Direction direction : Direction::get_direction_list()) {
-            Position target = ct->get_position().add_dir(direction); auto const* here = ct->get_tile(ct->get_position()); auto const* ahead = ct->get_tile(target);
-            if (here && here->get_edge(direction).is_passable() && ahead && !occupied(ahead) && !enemy_head_ahead(*ct, target) && !recent_collision(target)) { best = direction; best_score = 0; break; }
+        // If the head has no immediately safe exit, split off two tail
+        // segments so the child can move later this round. Survival may exceed
+        // the strategic target, but never the engine limit.
+        if (emergency_score == INT_MIN_SCORE && game->get_round_num() < 500 && ct->can_split(2)) {
+            ct->do_split(2);
+            relay_target(true);
+            return;
         }
     }
-    int target_count = special_pressure_active(*ct, *game) ? special_population_target(*game) : population_target(*game);
-    if (best_score == INT_MIN_SCORE && game->get_round_num() < 460 && ct->get_unit_count() < target_count && split_size()) { ct->do_split(2); relay_target(true); return; }
-    bool sprint = game->get_round_num() < 120 && ct->get_unit_count() < 4 && ct->get_length() >= 12 && safe_sprint(best, 2);
+    if (best_score == INT_MIN_SCORE) {
+        int fallback_score = INT_MIN_SCORE;
+        bool rank_fallback = game->width * game->height <= 144;
+        for (Direction direction : Direction::get_direction_list()) {
+            Position target = ct->get_position().add_dir(direction); auto const* here = ct->get_tile(ct->get_position()); auto const* ahead = ct->get_tile(target);
+            if (here && here->get_edge(direction).is_passable() && portal_allowed(here->get_edge(direction)) && ahead && !occupied(ahead) && !enemy_head_ahead(*ct, target) && !recent_collision(target)) {
+                int score = rank_fallback ? open_area(*ct, target) * 5 + enemy_pressure(*ct, *game, target) : 0;
+                if (score > fallback_score) { best = direction; fallback_score = score; }
+                if (!rank_fallback) break;
+            }
+        }
+        if (fallback_score != INT_MIN_SCORE) best_score = fallback_score;
+    }
+    // On the cramped Arena board, sprint only when each extra step immediately
+    // replaces its length cost with a pearl. Larger maps keep the tested
+    // one-step behavior; the same sprint rule hurt there in matchup tests.
+    bool sprint = game->width * game->height <= 144 && ct->get_length() >= 4 && safe_sprint(best, 2);
     if (sprint) ct->make_moves({best, best}); else ct->make_move(best);
     relay_target(best_score != INT_MIN_SCORE && safe_step(*ct, *game, ct->get_position(), best));
 }
