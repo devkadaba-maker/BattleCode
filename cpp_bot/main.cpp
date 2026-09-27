@@ -272,11 +272,12 @@ bool favourable_head_attack(Controller const& controller, Game const& game_state
 
     // Visible body segments give a conservative lower bound for enemy size.
     // A small collector may trade only when the enemy is already visibly large.
-    // Once our population cap is reached, allow a modestly more aggressive trade.
+    // Trophy is decided at the round-500 length tiebreak, so preserve collectors there until the team reaches its target.
+    if (game_state.width == 25 && game_state.height == 25 &&
+        controller.get_unit_count() < population_target(controller, game_state)) return false;
     int worthwhile_length = std::max(6, our_length * 2);
     if (enemy_visible_segments >= worthwhile_length) return true;
-    return controller.get_unit_count() >= population_target(controller, game_state) &&
-        enemy_visible_segments >= our_length + 4;
+    return enemy_visible_segments >= our_length + 4;
 }
 
 std::uint32_t sonar_checksum(std::uint32_t payload) {
@@ -619,7 +620,8 @@ int score_move(Direction direction) {
         return INT_MIN_SCORE;
     int area = open_area(controller, target);
     bool late = game_state.get_round_num() >= 380; Mode mode = special ? special_combat_mode(controller, game_state) : combat_mode(controller, game_state);
-    int required_area = flagship ? std::min(30, std::max(10, controller.get_length() + 4)) : (pearl_target ? 1 : 4);
+    int required_area = flagship ? std::min(30, std::max(10, controller.get_length() + 4)) :
+        (pearl_target ? std::min(12, std::max(4, controller.get_length() + 2)) : 4);
     // Arena-sized boards are too cramped for the large-map flagship margin;
     // still demand a few reachable tiles, but let the flagship take nearby food.
     if (flagship && pearl_target && small_map) required_area = 4;
