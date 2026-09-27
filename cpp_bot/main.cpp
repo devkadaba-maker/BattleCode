@@ -222,6 +222,20 @@ bool is_flagship(Controller const& controller, Game const& game_state) {
         role_hash(controller.get_id()) % population_target(controller, game_state) < flagship_target(game_state) - 1);
 }
 
+bool should_force_portal(Controller const& controller, Game const& game_state) {
+    bool colosseum = game_state.width == 16 && game_state.height == 16 &&
+        colosseum_like(controller, game_state);
+    bool trophy = game_state.width == 25 && game_state.height == 25;
+    bool queen = game_state.width == 25 && game_state.height == 35;
+    bool schooltime = game_state.width == 60 && game_state.height == 40;
+    if (!colosseum && !trophy && !queen && !schooltime) return true;
+    if (colosseum && controller.get_length() > 4) return false;
+    if (queen && controller.get_length() <= 4) return true;
+    bool flagship = special_pressure_policy(controller, game_state)
+        ? special_is_flagship(controller, game_state) : is_flagship(controller, game_state);
+    return !flagship;
+}
+
 Mode strategy_mode(int unit_count, std::optional<int> enemy_count, int population_cap) {
     if (!enemy_count.has_value() || *enemy_count <= 0 || unit_count < *enemy_count) return Mode::COLLECT;
     if (unit_count >= population_cap) return Mode::HUNT;
@@ -591,7 +605,7 @@ std::optional<Direction> visible_portal_direction() {
     if (!here) return std::nullopt;
     for (Direction direction : Direction::get_direction_list()) {
         auto const& edge = here->get_edge(direction);
-        if (edge.is_portal() && portal_allowed(edge)) return direction;
+        if (edge.is_portal() && portal_allowed(edge) && should_force_portal(*ct, *game)) return direction;
     }
     return std::nullopt;
 }
@@ -602,7 +616,7 @@ int score_move(Direction direction) {
     if (!here || !here->get_edge(direction).is_passable()) return INT_MIN_SCORE;
     Position target = start.add_dir(direction); auto const* ahead = controller.get_tile(target);
     auto const& edge = here->get_edge(direction);
-    if (!portal_allowed(edge)) return INT_MIN_SCORE;
+    if (!portal_allowed(edge) || (edge.is_portal() && !should_force_portal(controller, game_state))) return INT_MIN_SCORE;
     bool special = special_pressure_active(controller, game_state);
     Role role = movement_role(controller, game_state, special);
     bool head_attack = favourable_head_attack(controller, game_state, target, std::nullopt, true, special ? std::optional<Role>(role) : std::nullopt);
