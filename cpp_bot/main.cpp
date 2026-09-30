@@ -96,22 +96,32 @@ bool enemy_collision_risk(Controller const& controller, Game const& game_state, 
     return false;
 }
 
+bool portal_arrival_square(Controller const& controller, Position target) {
+    for (Tile const& tile : controller.get_tiles()) {
+        for (Direction direction : Direction::get_direction_list()) {
+            if (tile.get_edge(direction).is_portal() && tile.get_position().add_dir(direction) == target)
+                return true;
+        }
+    }
+    return false;
+}
+
+bool flagship_dragon(Controller const& controller, Game const& game_state);
+
 bool safe_step(Controller const& controller, Game const& game_state, Position start, Direction direction,
                bool allow_portal = false, bool allow_head_attack = false) {
     auto const* here = controller.get_tile(start);
     if (!here || !here->get_edge(direction).is_passable() || (!allow_portal && here->get_edge(direction).is_portal())) return false;
     Position target = start.add_dir(direction);
+    if (flagship_dragon(controller, game_state) && portal_arrival_square(controller, target)) return false;
     auto const* ahead = controller.get_tile(target);
     bool head_attack = false;
-    std::optional<int> attacked_head_id;
     if (allow_head_attack && ahead) {
         auto const* dragon = ahead->get_dragon();
         head_attack = dragon && dragon->is_head() &&
             favourable_head_attack(controller, game_state, target, dragon->get_id());
-        if (head_attack) attacked_head_id = dragon->get_id();
     }
-    return ahead && (!occupied(ahead) || head_attack) && !enemy_head_ahead(controller, target) &&
-        !enemy_collision_risk(controller, game_state, target, attacked_head_id);
+    return ahead && (!occupied(ahead) || head_attack) && !enemy_head_ahead(controller, target);
 }
 
 std::uint32_t role_hash(int dragon_id) {
@@ -220,6 +230,11 @@ bool is_flagship(Controller const& controller, Game const& game_state) {
     Role role = role_for_controller(controller, game_state);
     return role == Role::COLLECTOR && (controller.get_id() < 2 || controller.get_length() >= 16 ||
         role_hash(controller.get_id()) % population_target(controller, game_state) < flagship_target(game_state) - 1);
+}
+
+bool flagship_dragon(Controller const& controller, Game const& game_state) {
+    return special_pressure_active(controller, game_state)
+        ? special_is_flagship(controller, game_state) : is_flagship(controller, game_state);
 }
 
 bool should_force_portal(Controller const& controller, Game const& game_state) {
@@ -605,7 +620,14 @@ std::optional<Direction> visible_portal_direction() {
     if (!here) return std::nullopt;
     for (Direction direction : Direction::get_direction_list()) {
         auto const& edge = here->get_edge(direction);
-        if (edge.is_portal() && portal_allowed(edge) && should_force_portal(*ct, *game)) return direction;
+        if (!edge.is_portal() || !portal_allowed(edge) || !should_force_portal(*ct, *game)) continue;
+        if (flagship_dragon(*ct, *game)) {
+            for (Direction alternative : Direction::get_direction_list()) {
+                if (!here->get_edge(alternative).is_portal() &&
+                    safe_step(*ct, *game, ct->get_position(), alternative)) return std::nullopt;
+            }
+        }
+        return direction;
     }
     return std::nullopt;
 }
@@ -625,6 +647,8 @@ int score_move(Direction direction) {
     bool pearl_target = visible_pearl_near(controller, game_state, target, 1);
     bool small_map = game_state.width * game_state.height <= 144;
     bool flagship = special ? special_is_flagship(controller, game_state) : is_flagship(controller, game_state);
+    if (flagship && portal_arrival_square(controller, target)) return INT_MIN_SCORE;
+    if (flagship && edge.is_portal()) return INT_MIN_SCORE;
     int future_mobility = mobility(controller, game_state, target);
     // Colosseum and Arena punish one-step pearl pockets, while Default Small
     // benefits from allowing non-flagship collectors to take them.
@@ -672,7 +696,6 @@ int score_move(Direction direction) {
     if (future_mobility == 1) score -= 80;
     score += special ? special_friendly_pressure(controller, game_state, target) : friendly_pressure(controller, game_state, target);
     if (enemy_collision_risk(controller, game_state, target)) {
-        if (role == Role::COLLECTOR && late) return INT_MIN_SCORE;
         score -= special ? (role == Role::HUNTER ? 260 : 550) : (role == Role::HUNTER ? 300 : 500);
     }
     if (target.x == 0 || target.y == 0 || target.x == game_state.width - 1 || target.y == game_state.height - 1) score -= special ? (role == Role::COLLECTOR ? 220 : 120) : 150;
@@ -755,14 +778,24 @@ void execute_turn() {
         for (Direction direction : Direction::get_direction_list()) {
             Position target = ct->get_position().add_dir(direction); auto const* here = ct->get_tile(ct->get_position()); auto const* ahead = ct->get_tile(target);
             if (!here || !here->get_edge(direction).is_passable() || !ahead || occupied(ahead) || enemy_head_ahead(*ct, target) || recent_collision(target)) continue;
-            if (safe_step(*ct, *game, ct->get_position(), direction)) { int score = open_area(*ct, target) * 5 + enemy_pressure(*ct, *game, target); if (score > emergency_score) { best = direction; emergency_score = score; } }
+            if (safe_step(*ct, *game, ct->get_position(), direction)) {
+                int area = open_area(*ct, target);
+                int future_mobility = mobility(*ct, *game, target);
+                int two_step_area = 0;
+                for (Direction next_direction : Direction::get_direction_list()) {
+                    if (safe_step(*ct, *game, target, next_direction))
+                        two_step_area = std::max(two_step_area, open_area(*ct, target.add_dir(next_direction)));
+                }
+                int score = two_step_area * 16 + future_mobility * 24 + area * 5 + enemy_pressure(*ct, *game, target);
+                if (score > emergency_score) { best = direction; emergency_score = score; }
+            }
         }
         if (emergency_score != INT_MIN_SCORE) best_score = emergency_score;
         // If the head has no immediately safe exit, split off two tail
         // segments so the child can move later this round. Survival may exceed
         // the strategic target, but never the engine limit.
         if (emergency_score == INT_MIN_SCORE && game->get_round_num() < 500 &&
-            ct->get_unit_count() < target_population && ct->can_split(2)) {
+            ct->get_unit_count() < game->unit_limit && ct->can_split(2)) {
             ct->do_split(2);
             relay_target(true);
             return;
