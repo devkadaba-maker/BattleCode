@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 1,105 recorded games form complete matrices with no invalid actions
+All 1,347 recorded games form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -150,3 +150,69 @@ The legacy root Python tests already fail on their population-target assertion
 in the untouched root bot. The C++ corner-split and new vision/counter tests
 pass. No competition account was available, so no current online replay audit,
 submission, activation or measured Elo improvement is claimed.
+
+## Queen escape experiment against champion 43ebea6
+
+A new six-move simple-path search scores queen exits while excluding the
+new body trail and the visible straight-ahead destinations of other heads.
+It applies to queens only and contributes to emergency movement as well as
+normal movement. The archived patch uses weight 4000. An opening-only version
+stops after turn 15; the longer version remains active through turn 499.
+The forecasts are conservative fixed obstacles, not a complete simulation of
+body motion or opponent decisions; unseen continuations are optimistic.
+
+The opening-only UNSW screen (seeds 3434 and 3535, both sides) returned
+**1–3** despite saving every queen from the original turn-5 trap. Their later
+deaths were on turns 95, 106, 280 and 483. Keeping the check active throughout
+the game returned **3–1** on the same tuning games. The global longer policy
+returned **7–7** on seven screening maps at seed 3434, then **26–16–2** on all
+22 maps at seed 3939. None of these games enters the final gate.
+
+The frozen global candidate's separate fresh gate (3636 and 3737; all 22 maps,
+both sides) returned **50 wins, 34 losses and 4 draws**, a **59.09% score**.
+Its decisive-game Wilson 95% interval is **48.83–69.38%**. It misses both the
+60% score target and the lower-bound-above-50% target. **Do not promote it.**
+The active bot remains exactly the 43ebea6 champion. A result against the
+original baseline or a historical Python opponent does not override this gate.
+
+Default, Maze, Slithery Fight and Stripes each returned 1–3 in the fresh gate;
+Tower Defense returned 3–1 after a 2–0 screen. Devil and Default Small, each
+0–2 in the all-map screen, returned 2–2 in the fresh gate. The saved Devil
+trace shows the candidate queen traversing a border pocket on turns 78–86
+and dying against a wall at (0,15). Short lookahead cannot guarantee a future
+exit, particularly with changing bodies and a limited view. Future work should
+model when occupied segments vacate and examine congestion before entering
+corridors; this evidence does not justify selectively disabling losing maps.
+
+Judge sandbox checks completed on UNSW (scope limited to UNSW, seed 3838;
+24.5M maximum points/turn) and Devil (global candidate, seed 4141; 22.0M), both
+below the 100M limit. These execution checks do not establish strategy strength.
+`queen-escape-decision.json` records the rejected candidate and exact binary
+hashes. Its SHA256 is
+`351f8e5098b3d831ed0be1e6d4a8738391b3babeb3658c353518483be45a16d0`;
+the retained champion is
+`5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18`.
+
+To reproduce, check out 43ebea6 and apply `research/queen-escape.patch` with `git apply --unidiff-zero`, then
+materialize with `--queen-escape-weight 4000 --queen-escape-rounds 500
+--queen-escape-scope 0`. Scope 1 restricts it to UNSW's 64×64 dimensions;
+rounds 16 reproduces the opening-only screen. Compile the archived
+`research/queen-escape-smoke.cpp` after applying the patch; it checks a dead-end
+versus a longer exit and friendly/enemy head forecasts. This smoke check passed.
+The active source has no enabled escape-policy changes.
+
+Two incorrectly specified map arguments failed before matches could start and
+are excluded from evidence. Their failed request logs remain local. Valid games
+from the second request were retained, the intended seven-map manifest corrected,
+and its three missing matches resumed. The runner now rejects unknown map names
+before writing a manifest or starting any engine. Every counted matrix must pass
+`check_records.py`; incomplete batches are never accepted as evidence.
+
+The separate diverse-opponent batch at seed 4040 covered all 22 maps and both
+sides: **27–15–2** against the original C++ baseline and **36–6–2** against
+historical hard Python v2. All 242 matches in this iteration's six matrices
+are complete, unique and free of bot runtime faults or invalid actions.
+Together with prior evidence, 1,347 matrix records pass `check_records.py`.
+The original source is retained, and the rejected patch can reproduce its
+exact tested native SHA256. No website submission or measured Elo change is
+claimed.

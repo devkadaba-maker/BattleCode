@@ -1,0 +1,42 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/escape-global"
+  ],
+  "opponents": [
+    ".experiments/bin/baseline",
+    "hard_bot_v2"
+  ],
+  "maps": [
+    "arena",
+    "australia",
+    "autarky",
+    "big_empty",
+    "Colosseum",
+    "default",
+    "default_small",
+    "devil",
+    "dilemma",
+    "islands",
+    "maze",
+    "portals",
+    "queen_of_spades",
+    "schooltime",
+    "slithery_fight",
+    "stripes",
+    "stronghold",
+    "tower_defense",
+    "trauma",
+    "trophy",
+    "unsw",
+    "weakhold"
+  ],
+  "seeds": [
+    4040
+  ],
+  "games": 88,
+  "sha256": {
+    ".experiments/bin/escape-global": "351f8e5098b3d831ed0be1e6d4a8738391b3babeb3658c353518483be45a16d0",
+    ".experiments/bin/baseline": "0a2d515e2c83918b1e4f458ec00843346cdb23111bfe089b5b5605892ebab263"
+  }
+}

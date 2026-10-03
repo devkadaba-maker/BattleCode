@@ -120,6 +120,9 @@ def main():
     parser.add_argument('--loss-replays')
     parser.add_argument('--resume', action='store_true', help='Continue an interrupted batch with the identical manifest')
     args = parser.parse_args()
+    missing_maps = [name for name in args.maps if not (ROOT/'maps'/f'{name}.map').is_file()]
+    if missing_maps:
+        parser.error('unknown map names (use filename stems, case-sensitive): ' + ', '.join(missing_maps))
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     jobs = [(str(Path(c).resolve()), str(Path(o).resolve()), ROOT/'maps'/f'{m}.map', seed, side)

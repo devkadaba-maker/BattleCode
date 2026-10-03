@@ -120,3 +120,9 @@ configuration or the signed-in website; never commit API keys. Check the server
 build and unranked scrims before activating. No online submission or Elo change
 was made during this iteration. The original Python test suite has a pre-existing
 population-target assertion failure; the new C++ strategy tests pass.
+
+The subsequent queen-escape experiment was **not promoted**. Its fresh
+88-game comparison against the current Weakhold champion returned 50–34–4
+(59.09%; decisive Wilson lower bound 48.83%), missing the verification target.
+The champion remains unchanged. Reproducible experiment patches, loss traces,
+raw records and sandbox checks are in `benchmarks/`.

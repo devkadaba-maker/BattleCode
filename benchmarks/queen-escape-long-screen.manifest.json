@@ -1,0 +1,21 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/escape-long"
+  ],
+  "opponents": [
+    ".experiments/bin/champion43"
+  ],
+  "maps": [
+    "unsw"
+  ],
+  "seeds": [
+    3434,
+    3535
+  ],
+  "games": 4,
+  "sha256": {
+    ".experiments/bin/escape-long": "cc8f3b713dbee3a9a87dc7d273ee867405c3c6137c2d8a944310a1ecc156b3b9",
+    ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}

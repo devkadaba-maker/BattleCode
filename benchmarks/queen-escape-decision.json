@@ -1,0 +1,46 @@
+{
+  "champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "candidate_sha256": "351f8e5098b3d831ed0be1e6d4a8738391b3babeb3658c353518483be45a16d0",
+  "champion_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "seeds": [
+    3636,
+    3737
+  ],
+  "games": 88,
+  "wins": 50,
+  "losses": 34,
+  "draws": 4,
+  "score": 0.5909090909090909,
+  "decisive_wilson95": [
+    0.4883,
+    0.6938
+  ],
+  "decision": "retain champion; candidate not promoted",
+  "reason": "score below 60% and Wilson lower bound below 50%; screened games excluded",
+  "regressions_to_investigate": [
+    {
+      "map": "default",
+      "wins": 1,
+      "losses": 3,
+      "draws": 0
+    },
+    {
+      "map": "maze",
+      "wins": 1,
+      "losses": 3,
+      "draws": 0
+    },
+    {
+      "map": "slithery_fight",
+      "wins": 1,
+      "losses": 3,
+      "draws": 0
+    },
+    {
+      "map": "stripes",
+      "wins": 1,
+      "losses": 3,
+      "draws": 0
+    }
+  ]
+}
