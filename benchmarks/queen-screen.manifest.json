@@ -1,0 +1,31 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/sprint3",
+    ".experiments/bin/queen0",
+    ".experiments/bin/queen0sprint"
+  ],
+  "opponents": [
+    ".experiments/bin/baseline"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    101
+  ],
+  "games": 48,
+  "sha256": {
+    ".experiments/bin/sprint3": "cd1a67c6409d4330d4724660fc8ed64e7511442e1d91236fc7f8df4fda11fdc9",
+    ".experiments/bin/queen0": "e06cc566fbfc52cddc95678e4de34e1ff6a8c7660bd925cf08907cb862cfabc3",
+    ".experiments/bin/queen0sprint": "a964dab295f94f680ef15b539278c3ecb8781ae75a1ba224645de107b89edce0",
+    ".experiments/bin/baseline": "0a2d515e2c83918b1e4f458ec00843346cdb23111bfe089b5b5605892ebab263"
+  }
+}

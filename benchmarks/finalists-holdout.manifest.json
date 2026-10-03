@@ -1,0 +1,30 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/vision6",
+    ".experiments/bin/queen-hunt"
+  ],
+  "opponents": [
+    ".experiments/bin/baseline"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    202,
+    303
+  ],
+  "games": 64,
+  "sha256": {
+    ".experiments/bin/vision6": "da80afda2a14b3492c2e877f6ca64e0644f310133dab9753f7042e7264ff7dfe",
+    ".experiments/bin/queen-hunt": "d1655133a3982194f41c1e96aa5e2566d5fc400d00939a59f2dde8c833eb1578",
+    ".experiments/bin/baseline": "0a2d515e2c83918b1e4f458ec00843346cdb23111bfe089b5b5605892ebab263"
+  }
+}

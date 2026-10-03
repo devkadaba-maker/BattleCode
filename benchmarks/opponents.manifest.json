@@ -1,0 +1,27 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/vision6"
+  ],
+  "opponents": [
+    "hard_bot_v2",
+    "."
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    404
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/bin/vision6": "da80afda2a14b3492c2e877f6ca64e0644f310133dab9753f7042e7264ff7dfe"
+  }
+}
