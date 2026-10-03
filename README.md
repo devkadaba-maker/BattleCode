@@ -12,8 +12,10 @@ current pearls, spawn countdowns at estimated arrival time, nearby friendly and
 enemy dragons (excluding self), and actual kelp edges. Existing collision,
 reachable-area and queen protections still decide whether a step is allowed.
 
-The vision weight is **6**. Free pearl sprinting, disabling queen splits, and
-queen hunting were tested but remain disabled by default.
+The vision weight is **6**, with a **0-weight fallback for Weakhold's 40×15
+geometry**. That fallback repairs a repeated queen death in a narrow border
+corridor. Free pearl sprinting, disabling queen splits, and queen hunting were
+tested but remain disabled by default.
 
 ## Setup
 
@@ -47,10 +49,32 @@ matches. The selected candidate played 108 of the recorded games:
 | Hard Python v2 / eight maps, both sides | 16 | 0 | 0 |
 | Root Python bot / eight maps, both sides | 16 | 0 | 0 |
 
-Overall against the C++ baseline: **48–27–1**. The additional-map regression is
-real and should be the next tuning priority; local win rate does not establish
-an increase in competition Elo. Current online losses and active-submission
-status were inaccessible because the competition account was not signed in.
+The subsequent fresh gate played **220 games across all 22 official maps**, both
+sides, using seeds 505, 606, 707, 808 and 909. The same selected policy scored
+**131 wins, 84 losses and 5 draws: 60.68%** counting draws as half a win. All
+games were valid. The 95% Wilson interval for wins among decisive games is
+54.27–67.21%; map/seed outcomes can be correlated, so this is descriptive local
+evidence rather than a guarantee about competition Elo.
+
+This supports retaining the vision6/split3 champion over the original repository
+baseline. Weakhold returned **0–5–5**, with the candidate's B-side queen trapped
+and dead on turn 188 in every seed. Stronghold, Trauma and UNSW returned 4–6
+each. Current online losses and active-submission status remain unavailable;
+the repository baseline is not verified as the active competition submission.
+
+The next version is a targeted Weakhold repair. Against the previous champion,
+it returned **5 wins, 5 draws and no losses** on ten fresh Weakhold games. Its
+all-map regression batch returned **22–21–1**: the **42 games on the other 21
+maps exactly matched champion self-play controls** for scores, death counts,
+queen diagnostics, population peaks and faults. A separate all-map comparison
+against the original C++ bot returned **24–18–2**. The promoted native binary
+is byte-identical to the tested Weakhold variant. Its Weakhold sandbox match
+won with queen length 4 against 0 and a 14.5M maximum CPU-point cost per turn.
+
+This is a map-specific repair, not a statistically established broad strength
+increase over the previous champion. The fallback identifies the current
+official Weakhold map by dimensions. The wider sprint variant was rejected
+after a fresh **44–44** comparison against the champion despite a 31–13 screen.
 
 The selected vision policy completed a Big Empty judge-sandbox match with a
 maximum of **23.8 million CPU points per turn**, below the 100 million limit.
@@ -66,21 +90,29 @@ Materialize and compile the unchanged baseline with the current helper:
 .venv/bin/python scripts/build_variant.py candidate --split-limit 3 --vision-weight 6 --compile
 .venv/bin/python scripts/benchmark.py --candidates .experiments/candidate --opponents .experiments/baseline --seeds 505 606 --output benchmarks/next-validation.jsonl --workers 2 --loss-replays .experiments/losses
 .venv/bin/python scripts/report.py benchmarks/next-validation.jsonl
+.venv/bin/python scripts/check_records.py benchmarks/next-validation.jsonl
 ```
 
 Each map/seed is played from both starting sides. `--resume` requires identical
-inputs and binaries. Workers run in separate processes. Native games screen
+inputs and binaries. Each match runs in a separate process; threads only supervise
+those processes. Native games screen
 strategy; judge-sandbox runs are required before an online submission. Keep
 fresh seeds and comparisons against the previous champion, rather than selecting
 changes solely on the tuning sample.
+
+Use `scripts/report.py --by-map` to inspect regressions as well as the aggregate
+score. New policies must beat the previous champion on fresh validation games
+before replacing it. Website sign-in attempts are paused; verified improvements
+and their evidence are published to the continuation GitHub branch and PR #1.
 
 ## Checks and submission
 
 ```sh
 g++ -std=c++20 -O2 tests/vision_target_smoke.cpp -o /tmp/vision-test && /tmp/vision-test
 g++ -std=c++20 -O2 tests/corner_split_smoke.cpp -o /tmp/corner-test && /tmp/corner-test
+g++ -std=c++20 -O2 tests/free_sprint_smoke.cpp -o /tmp/sprint-test && /tmp/sprint-test
 git diff --check
-.venv/bin/unswbc submit cpp_bot -n vision6-split3 -d "Three planned splits per parent; visible-graph pearl/countdown scoring"
+.venv/bin/unswbc submit cpp_bot -n vision6-split3-weakhold -d "Three planned splits; visible-graph scoring with Weakhold corridor fallback"
 ```
 
 Submitting requires competition authentication. Use the CLI's secure local key

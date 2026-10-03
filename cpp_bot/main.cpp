@@ -20,6 +20,9 @@ namespace {
 #ifndef VISION_TARGET_WEIGHT
 #define VISION_TARGET_WEIGHT 6
 #endif
+#ifndef WEAKHOLD_VISION_WEIGHT
+#define WEAKHOLD_VISION_WEIGHT 0
+#endif
 #ifndef FREE_PEARL_SPRINT
 #define FREE_PEARL_SPRINT 0
 #endif
@@ -32,6 +35,15 @@ namespace {
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
+
+int vision_weight(Game const& state) {
+    if constexpr (WEAKHOLD_VISION_WEIGHT != VISION_TARGET_WEIGHT) {
+        // The official Weakhold geometry has narrow border corridors. The
+        // short visible target horizon can lure its queen into a closed end.
+        if (state.width == 40 && state.height == 15) return WEAKHOLD_VISION_WEIGHT;
+    }
+    return VISION_TARGET_WEIGHT;
+}
 
 constexpr int INT_MIN_SCORE = std::numeric_limits<int>::min() / 4;
 constexpr int HUNTER_MAX_LENGTH = 6;
@@ -788,7 +800,7 @@ int score_move(Direction direction) {
     if (direction == controller.get_dir()) score += 5; else if (direction == controller.get_dir().get_opposite()) score -= 10;
     auto directions = Direction::get_direction_list();
     if (direction == directions[static_cast<std::size_t>(role_hash(controller.get_id()) % 4)]) score += flagship ? 3 : 9;
-    score += vision_target_bonuses[direction_index(direction)] * VISION_TARGET_WEIGHT;
+    score += vision_target_bonuses[direction_index(direction)] * vision_weight(game_state);
     return score;
 }
 
@@ -894,7 +906,8 @@ void execute_turn() {
     }
     int target_population = special_pressure_active(*ct, *game) ? special_population_target(*game) : population_target(*ct, *game);
     int planned = split_size(target_population); if (planned) { ct->do_split(planned); ++parent_split_count; relay_target(true); return; }
-    if constexpr (VISION_TARGET_WEIGHT > 0) vision_target_bonuses = visible_target_scores(*ct, *game);
+    if (vision_weight(*game) > 0) vision_target_bonuses = visible_target_scores(*ct, *game);
+    else vision_target_bonuses.fill(0);
     Direction best = ct->get_dir(); int best_score = INT_MIN_SCORE;
     for (Direction direction : Direction::get_direction_list()) { int score = score_move(direction); if (score > best_score) { best = direction; best_score = score; } }
     bool attack_step = favourable_head_attack(*ct, *game, ct->get_position().add_dir(best));
@@ -946,7 +959,9 @@ void execute_turn() {
     // one-step behavior; the same sprint rule hurt there in matchup tests.
     bool sprint = game->width * game->height <= 144 && ct->get_length() >= 4 && safe_sprint(best, 2);
     std::vector<Direction> route;
-    if constexpr (FREE_PEARL_SPRINT > 0) route = free_pearl_route(best);
+    if constexpr (FREE_PEARL_SPRINT > 0) {
+        if (FREE_PEARL_SPRINT == 1 || ct->get_id() < 2) route = free_pearl_route(best);
+    }
     if (!route.empty()) {
         Position position = ct->get_position();
         for (std::size_t i = 0; i + 1 < route.size(); ++i) {

@@ -17,7 +17,8 @@ parser.add_argument('name')
 parser.add_argument('--ref')
 parser.add_argument('--split-limit', type=int)
 parser.add_argument('--vision-weight', type=int)
-parser.add_argument('--free-sprint', type=int, choices=[0,1])
+parser.add_argument('--weakhold-vision-weight', type=int)
+parser.add_argument('--free-sprint', type=int, choices=[0,1,2], help='0 off, 1 all dragons, 2 queens only')
 parser.add_argument('--queen-split-limit', type=int)
 parser.add_argument('--queen-hunt', type=int, choices=[0,1])
 parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
@@ -32,7 +33,7 @@ else:
     source = (ROOT/'cpp_bot/main.cpp').read_text()
 defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vision_weight,
            'FREE_PEARL_SPRINT':args.free_sprint,'QUEEN_SPLIT_LIMIT':args.queen_split_limit,
-           'QUEEN_HUNT':args.queen_hunt}
+           'QUEEN_HUNT':args.queen_hunt, 'WEAKHOLD_VISION_WEIGHT':args.weakhold_vision_weight}
 prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
 (destination/'main.cpp').write_text(prefix+source)
 for name in ('helper.hpp','bot.toml'):

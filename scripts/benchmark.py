@@ -9,13 +9,15 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict
 import hashlib
 import json
-import multiprocessing
+import os
 from pathlib import Path
 import sys
+import signal
+import subprocess
 import time
 
 from unswbc.bot import Bot, Pool
@@ -87,12 +89,32 @@ def match(candidate, opponent, map_path, seed, side, replay_dir=None):
             pool.close()
 
 
+def isolated_match(*job):
+    """Threads supervise subprocesses; each engine lives in a fresh process."""
+    process = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), '--single-match'],
+                               stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                               text=True, start_new_session=True)
+    try:
+        output, errors = process.communicate(json.dumps([str(x) if isinstance(x, Path) else x for x in job]), timeout=300)
+    except subprocess.TimeoutExpired:
+        if os.name == 'posix':
+            os.killpg(process.pid, signal.SIGKILL)
+        else:
+            process.kill()
+        process.communicate()
+        raise RuntimeError('isolated match exceeded 300 seconds')
+    if process.returncode:
+        raise RuntimeError(f'isolated worker exited {process.returncode}: {errors[-2000:]}')
+    return json.loads(output)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--candidates', nargs='+', required=True)
     parser.add_argument('--opponents', nargs='+', required=True)
     parser.add_argument('--maps', nargs='+', default=['arena','default_small','default','big_empty','schooltime','trophy','Colosseum','queen_of_spades'])
     parser.add_argument('--seeds', nargs='+', type=int, default=[101])
+    parser.add_argument('--sides', nargs='+', choices=['A','B'], default=['A','B'], help='Both sides by default; a single side can run identical-bot controls')
     parser.add_argument('--workers', type=int, default=2)
     parser.add_argument('--output', required=True)
     parser.add_argument('--loss-replays')
@@ -102,11 +124,13 @@ def main():
     output.parent.mkdir(parents=True, exist_ok=True)
     jobs = [(str(Path(c).resolve()), str(Path(o).resolve()), ROOT/'maps'/f'{m}.map', seed, side)
             for c in args.candidates for o in args.opponents for m in args.maps
-            for seed in args.seeds for side in ('A','B')]
+            for seed in args.seeds for side in args.sides]
     metadata = {'toolkit': '1.2.9', 'candidates': args.candidates, 'opponents': args.opponents,
                 'maps': args.maps, 'seeds': args.seeds, 'games': len(jobs),
                 'sha256': {str(p): hashlib.sha256(Path(p).read_bytes()).hexdigest()
                            for p in args.candidates + args.opponents if Path(p).is_file()}}
+    if args.sides != ['A', 'B']:
+        metadata['sides'] = args.sides
     records = []
     manifest = output.with_suffix('.manifest.json')
     if args.resume and output.exists():
@@ -118,11 +142,10 @@ def main():
     else:
         manifest.write_text(json.dumps(metadata, indent=2)+'\n')
     total = metadata['games']
-    # Each worker owns an engine and its bot processes. Do not run multiple
-    # Wasmtime engines from threads in one Python process.
-    with output.open('a' if args.resume else 'w') as log, ProcessPoolExecutor(
-            max_workers=args.workers, mp_context=multiprocessing.get_context('spawn')) as executor:
-        futures = {executor.submit(match, *job, args.loss_replays): job for job in jobs}
+    # The parent never runs Wasmtime concurrently in threads. One subprocess
+    # owns each engine, avoiding reuse and process-pool worker lifecycle stalls.
+    with output.open('a' if args.resume else 'w') as log, ThreadPoolExecutor(max_workers=args.workers) as executor:
+        futures = {executor.submit(isolated_match, *job, args.loss_replays): job for job in jobs}
         for future in as_completed(futures):
             job = futures[future]
             try:
@@ -142,4 +165,7 @@ def main():
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    if sys.argv[1:] == ['--single-match']:
+        print(json.dumps(match(*json.load(sys.stdin))))
+    else:
+        sys.exit(main())

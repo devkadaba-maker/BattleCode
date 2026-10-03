@@ -1,0 +1,43 @@
+{
+  "toolkit": "unswbc 1.2.9",
+  "map": "weakhold",
+  "seed": 2929,
+  "sandbox": true,
+  "candidate": {
+    "project": ".experiments/weakhold-routing",
+    "vision_weight": 6,
+    "weakhold_vision_weight": 0,
+    "split_limit": 3,
+    "free_pearl_sprint": 0
+  },
+  "opponent": {
+    "project": ".experiments/vision6-project",
+    "vision_weight": 6,
+    "weakhold_vision_weight": 6,
+    "split_limit": 3,
+    "free_pearl_sprint": 0
+  },
+  "result": "candidate A won after500 rounds; queen4 vs0",
+  "candidate_points_per_turn": {
+    "p50": 3900000,
+    "p99": 14000000,
+    "mean": 6100000,
+    "max": 14500000,
+    "turns": 1502
+  },
+  "opponent_points_per_turn": {
+    "p50": 5400000,
+    "p99": 19700000,
+    "mean": 7300000,
+    "max": 21100000,
+    "turns": 1818
+  },
+  "cpu_limit": 100000000,
+  "log_tail": [
+    "replay viewer: code or code-insiders is not installed -- run `unswbc vscode` to retry",
+    "team A wins after 500 rounds (longer queen, 4 to 0) (6.5s)",
+    "team A points per turn: p50 3.9M  p99 14.0M  mean 6.1M  max 14.5M  (1502 turns)",
+    "team B points per turn: p50 5.4M  p99 19.7M  mean 7.3M  max 21.1M  (1818 turns)",
+    "wrote replay: replays/weakhold-routing-vs-vision6-project-on-weakhold-2026-10-04-010159.replay"
+  ]
+}
