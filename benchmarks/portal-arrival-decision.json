@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_before_broad_validation",
+  "active_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "After observing a poor portal arrival, refuse that portal ID on its remaining allowed use.",
+  "standard_screen": {
+    "seed": 8686,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "both_sides": true,
+    "strict_guard": {
+      "wins": 7, "losses": 9, "draws": 0,
+      "native_sha256": "e53f118562cebbd85c4557e174c65a93d4d0eb66930b286ccd13b557db57cd5e"
+    },
+    "broad_guard": {
+      "wins": 8, "losses": 8, "draws": 0,
+      "native_sha256": "906b287bc132f3d2bed211d04d9664cb110cf2d839a873d2406500bf0320686b"
+    },
+    "valid_games": 32
+  },
+  "portal_heavy_confirmation": {
+    "candidate": "broad_guard",
+    "seed": 8787,
+    "maps": ["portals", "maze", "schooltime", "islands", "default", "stripes", "autarky", "trauma"],
+    "both_sides": true,
+    "wins": 7, "losses": 9, "draws": 0,
+    "valid_games": 16,
+    "notable_maps": {"maze": "0-2", "stripes": "0-2", "autarky": "2-0"}
+  },
+  "runtime_or_invalid_action_faults": 0,
+  "fresh_all_map_validation": "not_run_after_failed_confirmation",
+  "diverse_opponents": "not_run",
+  "judge_sandbox": "not_run",
+  "reason": "The strict guard lost its tuning screen and the frozen broad guard fell from 8-8 to 7-9 on portal-heavy maps, with two serious map regressions. Refusing a previously poor exit did not improve match strength.",
+  "reproduction": {
+    "base_commit": "94c81568a530bea45e3f8f5820cc4e7a06d5f274",
+    "patch": "benchmarks/research/portal-arrival-guard.patch",
+    "build_flags": ["--portal-arrival-guard 1", "--portal-arrival-guard 2"]
+  },
+  "accepted_matrix_games_after": 2307,
+  "failed_diagnostic_rows_after": 192,
+  "failed_diagnostic_invalid_games_after": 9,
+  "local_results_are_measured_elo": false
+}

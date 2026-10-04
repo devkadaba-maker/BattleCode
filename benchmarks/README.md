@@ -652,3 +652,19 @@ tested binary hashes, reproduction patch and exact decision are recorded in
 `pearl-cluster-decision.json`; seed 8585 is now seen evidence. The active
 Schooltime champion remains byte-identical and the accepted corpus stays at
 2,259 games.
+
+## Learned portal-arrival guard
+
+This experiment remembered whether a dragon's first use of a portal ID arrived
+with poor mobility. A strict guard refused IDs whose arrival had fewer than two
+exits; a broader guard also rejected arrivals with open area below six or
+immediate enemy pressure. On the standard eight maps, both sides of seed 8686,
+the strict guard scored **7–9** and the broad guard **8–8**.
+
+The frozen broad candidate then played the eight maps with the most portal
+edges on seed 8787 and scored **7–9** in 16 valid games. Maze and Stripes each
+regressed to 0–2, while only Autarky improved to 2–0. All 48 games were complete
+and fault-free, but the policy failed screening and no all-map, diverse-opponent
+or sandbox gate was run. Exact hashes and reproduction instructions are in
+`portal-arrival-decision.json`. Seeds 8686 and 8787 are now seen evidence; the
+active champion remains unchanged and accepted evidence rises to 2,307 games.

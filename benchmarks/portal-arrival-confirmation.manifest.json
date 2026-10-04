@@ -1,0 +1,27 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/portal-arrival2/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/champion-ref8/.unswbc-build/bot"
+  ],
+  "maps": [
+    "portals",
+    "maze",
+    "schooltime",
+    "islands",
+    "default",
+    "stripes",
+    "autarky",
+    "trauma"
+  ],
+  "seeds": [
+    8787
+  ],
+  "games": 16,
+  "sha256": {
+    ".experiments/portal-arrival2/.unswbc-build/bot": "906b287bc132f3d2bed211d04d9664cb110cf2d839a873d2406500bf0320686b",
+    ".experiments/champion-ref8/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

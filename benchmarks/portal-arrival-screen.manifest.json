@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/portal-arrival1/.unswbc-build/bot",
+    ".experiments/portal-arrival2/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/champion-ref8/.unswbc-build/bot"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    8686
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/portal-arrival1/.unswbc-build/bot": "e53f118562cebbd85c4557e174c65a93d4d0eb66930b286ccd13b557db57cd5e",
+    ".experiments/portal-arrival2/.unswbc-build/bot": "906b287bc132f3d2bed211d04d9664cb110cf2d839a873d2406500bf0320686b",
+    ".experiments/champion-ref8/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}
