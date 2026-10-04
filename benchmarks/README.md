@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 1,525 accepted records form complete matrices with no invalid actions
+All 1,599 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -343,3 +343,47 @@ This screen adds 88 accepted records, bringing the complete valid matrices to
 1,525 games. The 20 previously failed diagnostic records remain separate and
 unchanged. Future work should test a materially different corridor-entry or
 teammate-motion hypothesis rather than retune the rejected depth-reward family.
+
+## Pre-emptive queen split — fresh validation failed
+
+The original UNSW trace showed a precise timing failure. On turn 3 the queen
+had one legal exit and that exit had no onward move. It entered the exit, then
+split on turn 4 only after becoming completely boxed in, and died against a
+wall on turn 5. This experiment split two tail segments one turn earlier when
+that condition was visible. It applied only to queens, required length at least
+four, and retained both the parent and queen split caps.
+
+Two modes were selected on UNSW seeds 4848, 4949, 5050, 5151 and 5252, both
+sides. The strict zero-onward trigger scored **6–4**; a broader trigger that
+also treated one onward move as dangerous scored **5–5**. These are tuning
+results. The strict trigger's all-map tuning batch on seed 5353 returned
+**21–19–4**, a 52.27% score. It did not justify a broad promotion gate.
+
+The strict policy was then frozen behind the official UNSW queen spawn
+signature so other maps could not activate it. On five fresh seeds 5454,
+5555, 5656, 5757 and 5858, both sides, it returned **4 wins and 6 losses**.
+It therefore failed scoped validation and was not promoted. No sandbox,
+diverse-opponent or unaffected-map equivalence gate was run after that failure.
+
+The intervention did repair the immediate deterministic symptom: in the fresh
+batch the candidate queen survived beyond turn 5 in every game and died in nine
+of ten games only on turns 78–415, while the champion opponent's queen usually
+died on turn 5. That survival did not translate into stronger final outcomes.
+This is why queen lifespan alone is not used as the selection metric.
+
+All 74 records across the three matrices are complete, unique and valid. An
+interrupted all-map file contained only 25 of 44 records despite completed
+progress output; it was resumed with the exact manifest and binaries before
+being counted. The active champion remains unchanged. Apply
+`research/queen-preemptive-split.patch` to 43ebea6 using
+`git apply --unidiff-zero` for global modes 1/2, or the separate
+`research/queen-preemptive-split-unsw.patch` for scoped mode 3. All three native
+binaries were reproduced byte-for-byte. The archived smoke test verifies the
+strict trigger, a route with an onward move, the split cap and queen-only scope.
+Exact hashes, manifests, per-map results and limitations are in
+`queen-preemptive-split-decision.json`.
+
+This iteration brings the accepted complete matrices to 1,599 games. Seeds
+4848 through 5858 listed in the decision file are now seen evidence. Future
+work should address why long-lived queens still lose growth races rather than
+retuning this rejected split timing rule.

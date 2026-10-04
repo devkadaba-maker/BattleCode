@@ -1,0 +1,309 @@
+{
+  "decision": "retain champion; pre-emptive queen split passed tuning but failed fresh scoped validation",
+  "champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "champion_native_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypothesis": "when a queen has one legal exit and it has no onward move, split one turn before complete entrapment while respecting existing parent and queen caps",
+  "batches": {
+    "queen-preempt-unsw-screen": {
+      "manifest": {
+        "toolkit": "1.2.9",
+        "candidates": [
+          ".experiments/bin/preempt-zero",
+          ".experiments/bin/preempt-one"
+        ],
+        "opponents": [
+          ".experiments/bin/champion43"
+        ],
+        "maps": [
+          "unsw"
+        ],
+        "seeds": [
+          4848,
+          4949,
+          5050,
+          5151,
+          5252
+        ],
+        "games": 20,
+        "sha256": {
+          ".experiments/bin/preempt-zero": "1d06c15f45db639c7f342998efe23395325c9667d701424c5dc58ffe8297979b",
+          ".experiments/bin/preempt-one": "59c79b9bcb1fe34cc95d2bed010089b2149bacfddceb6b7dd703c475ff046222",
+          ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+        }
+      },
+      "results": {
+        "preempt-one": {
+          "games": 10,
+          "outcomes": {
+            "win": 5,
+            "loss": 5
+          },
+          "score_percent": 50.0,
+          "decisive_wilson95_percent": [
+            23.65895936154873,
+            76.34104063845126
+          ],
+          "invalid": 0,
+          "candidate_queen_deaths": 9
+        },
+        "preempt-zero": {
+          "games": 10,
+          "outcomes": {
+            "win": 6,
+            "loss": 4
+          },
+          "score_percent": 60.0,
+          "decisive_wilson95_percent": [
+            31.266954745018637,
+            83.18224187964903
+          ],
+          "invalid": 0,
+          "candidate_queen_deaths": 9
+        }
+      }
+    },
+    "queen-preempt-all-map-screen": {
+      "manifest": {
+        "toolkit": "1.2.9",
+        "candidates": [
+          ".experiments/bin/preempt-zero"
+        ],
+        "opponents": [
+          ".experiments/bin/champion43"
+        ],
+        "maps": [
+          "arena",
+          "australia",
+          "autarky",
+          "big_empty",
+          "Colosseum",
+          "default",
+          "default_small",
+          "devil",
+          "dilemma",
+          "islands",
+          "maze",
+          "portals",
+          "queen_of_spades",
+          "schooltime",
+          "slithery_fight",
+          "stripes",
+          "stronghold",
+          "tower_defense",
+          "trauma",
+          "trophy",
+          "unsw",
+          "weakhold"
+        ],
+        "seeds": [
+          5353
+        ],
+        "games": 44,
+        "sha256": {
+          ".experiments/bin/preempt-zero": "1d06c15f45db639c7f342998efe23395325c9667d701424c5dc58ffe8297979b",
+          ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+        }
+      },
+      "results": {
+        "preempt-zero": {
+          "games": 44,
+          "outcomes": {
+            "win": 21,
+            "loss": 19,
+            "draw": 4
+          },
+          "score_percent": 52.27272727272727,
+          "decisive_wilson95_percent": [
+            37.497106853929736,
+            67.06477044981831
+          ],
+          "invalid": 0,
+          "candidate_queen_deaths": 27,
+          "by_map": {
+            "Colosseum": {
+              "win": 2
+            },
+            "arena": {
+              "win": 1,
+              "loss": 1
+            },
+            "australia": {
+              "loss": 1,
+              "win": 1
+            },
+            "autarky": {
+              "win": 1,
+              "loss": 1
+            },
+            "big_empty": {
+              "loss": 1,
+              "win": 1
+            },
+            "default": {
+              "win": 1,
+              "loss": 1
+            },
+            "default_small": {
+              "loss": 1,
+              "win": 1
+            },
+            "devil": {
+              "win": 2
+            },
+            "dilemma": {
+              "loss": 1,
+              "win": 1
+            },
+            "islands": {
+              "loss": 2
+            },
+            "maze": {
+              "loss": 2
+            },
+            "portals": {
+              "draw": 2
+            },
+            "queen_of_spades": {
+              "win": 2
+            },
+            "schooltime": {
+              "loss": 1,
+              "win": 1
+            },
+            "slithery_fight": {
+              "win": 1,
+              "loss": 1
+            },
+            "stripes": {
+              "loss": 1,
+              "win": 1
+            },
+            "stronghold": {
+              "loss": 1,
+              "win": 1
+            },
+            "tower_defense": {
+              "win": 1,
+              "loss": 1
+            },
+            "trauma": {
+              "loss": 1,
+              "win": 1
+            },
+            "trophy": {
+              "loss": 1,
+              "win": 1
+            },
+            "unsw": {
+              "loss": 1,
+              "win": 1
+            },
+            "weakhold": {
+              "draw": 2
+            }
+          }
+        }
+      }
+    },
+    "queen-preempt-unsw-validation": {
+      "manifest": {
+        "toolkit": "1.2.9",
+        "candidates": [
+          ".experiments/bin/preempt-unsw"
+        ],
+        "opponents": [
+          ".experiments/bin/champion43"
+        ],
+        "maps": [
+          "unsw"
+        ],
+        "seeds": [
+          5454,
+          5555,
+          5656,
+          5757,
+          5858
+        ],
+        "games": 10,
+        "sha256": {
+          ".experiments/bin/preempt-unsw": "945cea12afc90a2ee0e5b12f37cf7f7d742bbbec40b0272be27c4791dc92b8cd",
+          ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+        }
+      },
+      "results": {
+        "preempt-unsw": {
+          "games": 10,
+          "outcomes": {
+            "win": 4,
+            "loss": 6
+          },
+          "score_percent": 40.0,
+          "decisive_wilson95_percent": [
+            16.817758120350966,
+            68.73304525498135
+          ],
+          "invalid": 0,
+          "candidate_queen_deaths": 9
+        }
+      }
+    }
+  },
+  "selection_note": "modes 1 and 2 were selected on seeds 4848..5252; strict mode 1 advanced; seed 5353 is all-map tuning; scoped mode 3 was frozen before fresh seeds 5454..5858",
+  "fresh_validation_passed": false,
+  "promotion": false,
+  "sandbox_run": false,
+  "diverse_opponent_gate_run": false,
+  "accepted_new_games": 74,
+  "accepted_total_games": 1599,
+  "prior_failed_diagnostic_games": 20,
+  "seen_new_seeds": [
+    4848,
+    4949,
+    5050,
+    5151,
+    5252,
+    5353,
+    5454,
+    5555,
+    5656,
+    5757,
+    5858
+  ],
+  "native_sha256": {
+    "preempt-zero": "1d06c15f45db639c7f342998efe23395325c9667d701424c5dc58ffe8297979b",
+    "preempt-one": "59c79b9bcb1fe34cc95d2bed010089b2149bacfddceb6b7dd703c475ff046222",
+    "preempt-unsw": "945cea12afc90a2ee0e5b12f37cf7f7d742bbbec40b0272be27c4791dc92b8cd"
+  },
+  "reproduction": {
+    "base": "43ebea6",
+    "global_patch": "research/queen-preemptive-split.patch",
+    "global_patch_sha256": "4dbda494cca4d5b04a68d4fe46c2d1cb33a1a2cf84188cb8bb5a64da0beae7ac",
+    "scoped_patch": "research/queen-preemptive-split-unsw.patch",
+    "scoped_patch_sha256": "e9d34996d435f598c392ac0d6981d8878915da937382cd9ad48fadf8e396a60f",
+    "global_flags": {
+      "preempt-zero": [
+        "--preemptive-queen-split",
+        "1"
+      ],
+      "preempt-one": [
+        "--preemptive-queen-split",
+        "2"
+      ]
+    },
+    "scoped_flags": {
+      "preempt-unsw": [
+        "--preemptive-queen-split",
+        "3"
+      ]
+    },
+    "compiler": "g++ -std=c++20 -O2",
+    "all_binaries_reproduced_byte_identical": true,
+    "smoke_test_passed": true
+  },
+  "limitations": [
+    "UNSW tuning games are correlated deterministic map/side cases",
+    "saving the opening queen did not produce better fresh final outcomes",
+    "no sandbox or diverse-opponent gate was justified after fresh validation failed",
+    "local outcomes are not Elo"
+  ]
+}

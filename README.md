@@ -134,3 +134,9 @@ screening results, not validation or Elo. The active bot remains unchanged.
 `scripts/trace_loss.py` can reproduce a matrix case with verified native hashes
 and retain the turns before queen deaths; its Colosseum reproduction matched
 the original game exactly. See the benchmark notes for usage and evidence.
+
+A later pre-emptive queen split saved UNSW queens from the repeated turn-5 wall
+death, but it did not improve final results reliably. The strict trigger scored
+6–4 in tuning and then **4–6 on five fresh seeds from both sides** after being
+frozen to UNSW. It is archived but disabled. The active champion is unchanged;
+all 1,599 accepted local matches remain fault-free and are not Elo measurements.

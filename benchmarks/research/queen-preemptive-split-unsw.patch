@@ -1,0 +1,54 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -34,0 +35,3 @@
++#ifndef PREEMPTIVE_QUEEN_SPLIT
++#define PREEMPTIVE_QUEEN_SPLIT 0
++#endif
+@@ -37,0 +41 @@
++std::optional<bool> preemptive_split_scope_enabled;
+@@ -865,0 +870,28 @@
++bool should_preemptively_split_queen() {
++    if constexpr (PREEMPTIVE_QUEEN_SPLIT == 0) return false;
++    if constexpr (PREEMPTIVE_QUEEN_SPLIT == 3) {
++        if (!preemptive_split_scope_enabled.has_value()) {
++            Position position = ct->get_position();
++            preemptive_split_scope_enabled = game->get_round_num() == 0 && game->width == 64 && game->height == 64 &&
++                ((ct->get_id() == 0 && position == Position(20,42)) ||
++                 (ct->get_id() == 1 && position == Position(43,21)));
++        }
++        if (!*preemptive_split_scope_enabled) return false;
++    }
++    if (ct->get_id() >= 2 || ct->get_length() < 4 ||
++        parent_split_count >= QUEEN_SPLIT_LIMIT || parent_split_count >= PARENT_SPLIT_LIMIT ||
++        game->get_round_num() >= 460 || ct->get_unit_count() >= game->unit_limit || !ct->can_split(2)) return false;
++    int exits = 0;
++    int onward = 0;
++    for (Direction direction : Direction::get_direction_list()) {
++        Position target = ct->get_position().add_dir(direction);
++        if (!safe_step(*ct, *game, ct->get_position(), direction) || recent_collision(target)) continue;
++        ++exits;
++        onward = mobility(*ct, *game, target);
++    }
++    // A split one turn before complete entrapment releases two tail segments.
++    // Mode 1 handles only a provable zero-onward exit; mode 2 also handles a
++    // one-onward corridor. Both preserve the existing per-parent split cap.
++    return exits == 1 && (onward == 0 || PREEMPTIVE_QUEEN_SPLIT >= 2 && onward == 1);
++}
++
+@@ -903,0 +936,6 @@
++        relay_target(true);
++        return;
++    }
++    if (should_preemptively_split_queen()) {
++        ct->do_split(2);
++        ++parent_split_count;
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -23,0 +24 @@
++parser.add_argument('--preemptive-queen-split', type=int, choices=[0,1,2,3], help='1 zero-onward globally, 2 one-onward globally, 3 zero-onward on official UNSW spawn signature')
+@@ -36 +37,2 @@
+-           'QUEEN_HUNT':args.queen_hunt, 'WEAKHOLD_VISION_WEIGHT':args.weakhold_vision_weight}
++           'QUEEN_HUNT':args.queen_hunt, 'WEAKHOLD_VISION_WEIGHT':args.weakhold_vision_weight,
++           'PREEMPTIVE_QUEEN_SPLIT':args.preemptive_queen_split}
