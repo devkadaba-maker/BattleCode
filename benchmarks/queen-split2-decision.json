@@ -1,0 +1,72 @@
+{
+  "decision": "retain champion; queen split cap two failed screening and its matrix contained a candidate invalid action",
+  "champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "champion_native_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypothesis": "stopping the queen after two planned splits may preserve more length for growth than the champion's cap of three",
+  "candidate": {
+    "build_flag": [
+      "--queen-split-limit",
+      "2"
+    ],
+    "native_sha256": "440f931317c8c53b20c3f07e2e25e902b53477d3cb9b38d0a3cf7531d81599ba",
+    "reproduced_binary_identical": true
+  },
+  "failed_matrix": {
+    "records": "research/failed/queen-split2-screen.jsonl",
+    "manifest": "research/failed/queen-split2-screen.manifest.json",
+    "seed": 5959,
+    "maps": 22,
+    "both_sides": true,
+    "rows": 44,
+    "valid_rows": 43,
+    "invalid_rows": 1,
+    "valid_subset_outcomes": {
+      "win": 21,
+      "loss": 20,
+      "draw": 2
+    },
+    "valid_subset_score_percent": 51.16279069767442,
+    "invalid_case": {
+      "map": "slithery_fight",
+      "side": "A",
+      "candidate_side": "A",
+      "recorded_outcome": "win",
+      "invalid_death_code": "A",
+      "faults": []
+    },
+    "accepted_as_strength_evidence": false
+  },
+  "diagnostic_reproduction": {
+    "path": "research/queen-split2-invalid-reproduction.json",
+    "valid": true,
+    "outcome": "loss",
+    "matches_original": false,
+    "different_fields": [
+      "outcome",
+      "valid",
+      "result",
+      "deaths"
+    ],
+    "interpretation": "the invalid action did not reproduce and the game result changed; the rerun is diagnostic only and does not replace the failed matrix row"
+  },
+  "promotion_gate": {
+    "fresh_validation_run": false,
+    "diverse_opponents_run": false,
+    "judge_sandbox_run": false,
+    "reason": "the candidate failed the initial screen; a matrix with an invalid action cannot qualify"
+  },
+  "corpus": {
+    "accepted_complete_valid_records": 1599,
+    "failed_diagnostic_matrix_records_before": 20,
+    "failed_diagnostic_matrix_records_added": 44,
+    "accepted_total_changed": false
+  },
+  "seen_seeds_added": [
+    5959
+  ],
+  "limitations": [
+    "the 43 valid rows are a biased subset after excluding an invalid result and are reported only for transparency",
+    "one tuning seed is not a broad strength estimate",
+    "local matches do not measure competition Elo"
+  ]
+}

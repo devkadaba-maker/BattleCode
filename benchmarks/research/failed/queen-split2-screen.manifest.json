@@ -1,0 +1,41 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/queen-split2"
+  ],
+  "opponents": [
+    ".experiments/bin/champion43"
+  ],
+  "maps": [
+    "arena",
+    "australia",
+    "autarky",
+    "big_empty",
+    "Colosseum",
+    "default",
+    "default_small",
+    "devil",
+    "dilemma",
+    "islands",
+    "maze",
+    "portals",
+    "queen_of_spades",
+    "schooltime",
+    "slithery_fight",
+    "stripes",
+    "stronghold",
+    "tower_defense",
+    "trauma",
+    "trophy",
+    "unsw",
+    "weakhold"
+  ],
+  "seeds": [
+    5959
+  ],
+  "games": 44,
+  "sha256": {
+    ".experiments/bin/queen-split2": "440f931317c8c53b20c3f07e2e25e902b53477d3cb9b38d0a3cf7531d81599ba",
+    ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}

@@ -140,3 +140,11 @@ death, but it did not improve final results reliably. The strict trigger scored
 6–4 in tuning and then **4–6 on five fresh seeds from both sides** after being
 frozen to UNSW. It is archived but disabled. The active champion is unchanged;
 all 1,599 accepted local matches remain fault-free and are not Elo measurements.
+
+A direct queen split-cap-two screen was also rejected. Across all 22 maps and
+both sides of tuning seed 5959, one of 44 games recorded a candidate-side
+invalid action. The remaining 43 rows were only 21–20–2 (51.16%). An exact
+rerun did not reproduce the invalid action and changed that game from a win to
+a loss, so the whole matrix is retained under `benchmarks/research/failed/`
+and excluded from accepted evidence. The split-cap-three champion remains
+unchanged.

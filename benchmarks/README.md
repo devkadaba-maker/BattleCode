@@ -387,3 +387,33 @@ This iteration brings the accepted complete matrices to 1,599 games. Seeds
 4848 through 5858 listed in the decision file are now seen evidence. Future
 work should address why long-lived queens still lose growth races rather than
 retuning this rejected split timing rule.
+
+## Queen split cap two — failed diagnostic matrix
+
+The next growth hypothesis tested whether a queen should stop after two planned
+splits rather than the champion's three. The candidate changed only
+`QUEEN_SPLIT_LIMIT` from 3 to 2 and was screened against the unchanged champion
+on all 22 official maps, both starting sides, with tuning seed 5959.
+
+The 44-row matrix is not accepted strength evidence. Its Slithery Fight A-side
+game recorded an invalid action on the candidate side (death code `A`) despite
+no process fault. Among the 43 valid rows, the candidate returned **21 wins,
+20 losses and 2 draws**, a 51.16% score. That valid subset is reported for
+transparency only; removing a failed row does not repair the matrix or establish
+an improvement.
+
+`scripts/trace_loss.py` reran the exact failed case after checking both native
+hashes and the pinned toolkit. The rerun was valid but changed from the recorded
+candidate win to a candidate loss, with different result and death diagnostics.
+It therefore did not reproduce the fault and is not a substitute observation.
+The failed matrix and manifest are preserved in `research/failed/`, while the
+rerun is `research/queen-split2-invalid-reproduction.json`.
+
+The tested binary SHA256 is
+`440f931317c8c53b20c3f07e2e25e902b53477d3cb9b38d0a3cf7531d81599ba`.
+Rebuilding from the champion source with `--queen-split-limit 2` reproduced it
+byte-for-byte. No fresh validation, diverse-opponent batch or judge sandbox was
+run after the screen failed. Seed 5959 is now seen tuning evidence. The accepted
+corpus remains 1,599 complete fault-free records; the failed diagnostic corpus
+now contains 64 matrix rows. Exact details are in
+`queen-split2-decision.json`. The cap-three champion remains active.
