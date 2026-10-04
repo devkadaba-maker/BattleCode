@@ -635,3 +635,20 @@ The promoted native SHA256 is
 Exact records and the control comparison are in `enemy-order-*.json*`. This is
 a narrow map repair, not a statistically established broad gain or measured
 Elo. The 198 valid games in this iteration raise the accepted corpus to 2,259.
+
+## Pearl-cluster weighting — failed matrix
+
+Reducing the bonus for dense visible pearl clusters was screened at 50% and
+0% of the champion value on the standard eight maps, both sides, seed 8585.
+The 50% candidate recorded **8 wins and 7 losses** among 15 valid games, plus
+one invalid Trophy game. The 0% candidate scored **7–9** in 16 valid games.
+The entire 32-row combined matrix is isolated under `research/failed/` and is
+excluded from accepted strength evidence.
+
+An exact-hash rerun of the invalid Trophy case was valid and remained a loss,
+but changed the result/death diagnostics and did not reproduce the fault. No
+fresh, diverse-opponent or sandbox gate was run after the failed screen. The
+tested binary hashes, reproduction patch and exact decision are recorded in
+`pearl-cluster-decision.json`; seed 8585 is now seen evidence. The active
+Schooltime champion remains byte-identical and the accepted corpus stays at
+2,259 games.

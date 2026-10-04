@@ -1,0 +1,53 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 62db418..fae9255 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -44,6 +44,9 @@ namespace {
+ #ifndef ENEMY_HEADING_ORDER_AWARE
+ #define ENEMY_HEADING_ORDER_AWARE 2
+ #endif
++#ifndef PEARL_CLUSTER_PERCENT
++#define PEARL_CLUSTER_PERCENT 100
++#endif
+ 
+ int parent_split_count = 0;
+ std::array<int, 4> vision_target_bonuses{};
+@@ -829,7 +832,8 @@ int score_move(Direction direction) {
+             score += (special ? special_pearl_drive(controller, game_state, target) : pearl_drive(controller, game_state, target)) * (pearl_weight + (small_map ? 5 : 3));
+             score += pearl_value(controller, game_state, target) * (small_map ? 12 : 8);
+         }
+-        score += pearl_cluster_value(controller, game_state, target) * (small_map ? 3 : 2);
++        score += pearl_cluster_value(controller, game_state, target) *
++            (small_map ? 3 : 2) * PEARL_CLUSTER_PERCENT / 100;
+         if (pearl_target) score += small_map ? 480 : 320;
+         score += enemy_pressure(controller, game_state, target);
+         if (special) score += special_enemy_chase_value(controller, game_state, target) * chase_weight / 2;
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index d59fd12..7e29bf4 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -26,6 +26,7 @@ parser.add_argument('--friendly-head-destination-penalty', type=int)
+ parser.add_argument('--friendly-priority-claim-penalty', type=int)
+ parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2],
+                     help='0 off, 1 all maps, 2 Schooltime 60x40 only')
++parser.add_argument('--pearl-cluster-percent', type=int)
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -36,6 +37,8 @@ if args.friendly_head_destination_penalty is not None and args.friendly_head_des
+     parser.error('--friendly-head-destination-penalty must be non-negative')
+ if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
+     parser.error('--friendly-priority-claim-penalty must be non-negative')
++if args.pearl_cluster_percent is not None and args.pearl_cluster_percent < 0:
++    parser.error('--pearl-cluster-percent must be non-negative')
+ destination = ROOT / '.experiments' / args.name
+ destination.mkdir(parents=True, exist_ok=True)
+ if args.ref:
+@@ -49,6 +52,7 @@ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
+ defines['ENEMY_HEADING_ORDER_AWARE'] = args.enemy_heading_order_aware
++defines['PEARL_CLUSTER_PERCENT'] = args.pearl_cluster_percent
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):

@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_before_fresh_validation_and_exclude_failed_matrix",
+  "active_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Reducing the dense visible-pearl cluster bonus might prevent over-convergence while retaining direct pearl attraction.",
+  "screen": {
+    "seed": 8585,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "both_sides": true,
+    "rows": 32,
+    "accepted_as_strength_evidence": false,
+    "cluster_50_percent": {
+      "wins": 8, "losses": 7, "draws": 0, "invalid_games": 1,
+      "native_sha256": "487512bf3858d1e39a084eb56b9828c6dedcb8e147e2dc8caf0af845b8ab7de6"
+    },
+    "cluster_0_percent": {
+      "wins": 7, "losses": 9, "draws": 0, "invalid_games": 0,
+      "native_sha256": "fb27c5a15af40eb129ab6715da6dfdb15c1a4156191f3173abc6fde23ad02936"
+    }
+  },
+  "invalid_game": {
+    "candidate": "cluster50/bot", "map": "trophy", "seed": 8585, "side": "B",
+    "recorded_result": "loss", "fault": "candidate invalid-action death code A",
+    "exact_hash_rerun": {
+      "valid": true, "result": "loss", "reproduced": false,
+      "different_fields": ["valid", "result", "deaths"]
+    }
+  },
+  "fresh_validation": "not_run_after_failed_screen",
+  "reason": "Neither candidate advanced on match strength, and the combined matrix is invalid because one recorded game contained an invalid action. The valid subset is not promotion evidence.",
+  "reproduction": {
+    "base_commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "patch": "benchmarks/research/pearl-cluster.patch",
+    "build_flags": ["--pearl-cluster-percent 50", "--pearl-cluster-percent 0"]
+  },
+  "accepted_matrix_games_after": 2259,
+  "failed_diagnostic_rows_after": 192,
+  "failed_diagnostic_invalid_games_after": 9,
+  "local_results_are_measured_elo": false
+}
