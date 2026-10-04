@@ -32,6 +32,9 @@ namespace {
 #ifndef QUEEN_HUNT
 #define QUEEN_HUNT 0
 #endif
+#ifndef LARGE_POPULATION_TARGET
+#define LARGE_POPULATION_TARGET 40
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -171,14 +174,14 @@ int population_target(Game const& game_state) {
     if (area <= 1000) return std::min(game_state.unit_limit, 48);
     // On Big Empty, 64 dragons tied up pearl access without growing the
     // tiebreak flagship: we reached 64 but only length 32.
-    return std::min(game_state.unit_limit, 40);
+    return std::min(game_state.unit_limit, LARGE_POPULATION_TARGET);
 }
 
 int special_population_target(Game const& game_state) {
     int area = game_state.width * game_state.height;
     if (area <= 300) return std::min(game_state.unit_limit, 32);
     if (area <= 1000) return std::min(game_state.unit_limit, 48);
-    return std::min(game_state.unit_limit, 40);
+    return std::min(game_state.unit_limit, LARGE_POPULATION_TARGET);
 }
 
 bool colosseum_like(Controller const& controller, Game const& game_state) {

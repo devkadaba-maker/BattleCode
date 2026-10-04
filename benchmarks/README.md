@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 1,599 accepted records form complete matrices with no invalid actions
+All 1,653 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -417,3 +417,37 @@ run after the screen failed. Seed 5959 is now seen tuning evidence. The accepted
 corpus remains 1,599 complete fault-free records; the failed diagnostic corpus
 now contains 64 matrix rows. Exact details are in
 `queen-split2-decision.json`. The cap-three champion remains active.
+
+## Large-map population target — tuning rejected
+
+The next experiment varied the planned population ceiling on maps larger than
+1,000 tiles. The champion uses 40. Targets 32, 44 and 48 were compared against
+that unchanged champion on Maze, Stronghold, Trauma, Slithery Fight, Islands,
+Schooltime, Australia, Big Empty and UNSW, from both sides of tuning seed 6060.
+Maps of 1,000 tiles or fewer were unaffected by the parameter and were not
+replayed in this screen.
+
+| Large-map target | Wins | Losses | Score | Mean total-length delta | Mean longest delta |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 32 | 8 | 10 | 44.44% | -6.44 | -4.33 |
+| 44 | 7 | 11 | 38.89% | +20.89 | -1.22 |
+| 48 | 9 | 9 | 50.00% | +3.44 | +1.00 |
+
+All 54 games are complete, unique and valid. The lower ceiling lost both sides
+on Maze and Big Empty. Target 44 lost both sides on Islands, Australia and Big
+Empty. Target 48 won both sides on Islands, Big Empty and UNSW, but lost both
+sides on Stronghold, Schooltime and Australia. These two-game map results are
+diagnostic only and are too small to justify map-specific selection.
+
+Higher population sometimes increased final total length without improving the
+engine result. That rejects the simple assumption that more board coverage, or
+more aggregate length by itself, is a sufficient strength objective. None of
+the candidates advanced to fresh validation, diverse opponents or judge
+sandbox. Seed 6060 is now tuning evidence.
+
+`LARGE_POPULATION_TARGET` defaults to 40, preserving the active policy. The
+default build remains byte-identical to the champion native SHA256. The build
+helper accepts `--large-population-target` so all three rejected binaries are
+reproducible; exact hashes and growth deltas are in
+`population-target-decision.json`. The 54 valid records raise the accepted
+corpus to 1,653 games. The cap-three, target-40 champion remains active.

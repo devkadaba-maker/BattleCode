@@ -1,0 +1,30 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/population32",
+    ".experiments/bin/population48"
+  ],
+  "opponents": [
+    ".experiments/bin/champion43"
+  ],
+  "maps": [
+    "maze",
+    "stronghold",
+    "trauma",
+    "slithery_fight",
+    "islands",
+    "schooltime",
+    "australia",
+    "big_empty",
+    "unsw"
+  ],
+  "seeds": [
+    6060
+  ],
+  "games": 36,
+  "sha256": {
+    ".experiments/bin/population32": "df476e7af9c7fb12501f26b1ef761c5ebb0941ddf356ccdc07ad93405031b6b7",
+    ".experiments/bin/population48": "f9ed5329d889daa03deb4f2986e1b40b0ab940bd324b08b4b3aad585a0b9ad37",
+    ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}

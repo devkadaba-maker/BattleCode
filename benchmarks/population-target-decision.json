@@ -1,0 +1,106 @@
+{
+  "decision": "retain champion; large-map population targets 32, 44 and 48 failed tuning",
+  "champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "champion_native_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypothesis": "changing the planned population ceiling on maps larger than 1000 tiles may trade board coverage for pearl growth and longest-dragon strength",
+  "scope": {
+    "maps": [
+      "maze",
+      "stronghold",
+      "trauma",
+      "slithery_fight",
+      "islands",
+      "schooltime",
+      "australia",
+      "big_empty",
+      "unsw"
+    ],
+    "both_sides": true,
+    "tuning_seed": 6060,
+    "unchanged_maps": "all official maps with area at most 1000 tiles"
+  },
+  "variants": {
+    "population32": {
+      "target": 32,
+      "native_sha256": "df476e7af9c7fb12501f26b1ef761c5ebb0941ddf356ccdc07ad93405031b6b7",
+      "games": 18,
+      "outcomes": {
+        "win": 8,
+        "loss": 10,
+        "draw": 0
+      },
+      "score_percent": 44.44444444444444,
+      "decisive_wilson95_percent": [
+        24.56,
+        66.28
+      ],
+      "mean_final_total_length_delta": -6.444444444444445,
+      "mean_final_longest_delta": -4.333333333333333,
+      "mean_peak_population_delta": -0.6666666666666666
+    },
+    "population44": {
+      "target": 44,
+      "native_sha256": "7264b79f17f3ba73cd07a20c91531a9e5ce5aa5f6483a8644528b2b431644974",
+      "games": 18,
+      "outcomes": {
+        "win": 7,
+        "loss": 11,
+        "draw": 0
+      },
+      "score_percent": 38.888888888888886,
+      "decisive_wilson95_percent": [
+        20.30,
+        61.38
+      ],
+      "mean_final_total_length_delta": 20.88888888888889,
+      "mean_final_longest_delta": -1.2222222222222223,
+      "mean_peak_population_delta": 4.055555555555555
+    },
+    "population48": {
+      "target": 48,
+      "native_sha256": "f9ed5329d889daa03deb4f2986e1b40b0ab940bd324b08b4b3aad585a0b9ad37",
+      "games": 18,
+      "outcomes": {
+        "win": 9,
+        "loss": 9,
+        "draw": 0
+      },
+      "score_percent": 50.0,
+      "decisive_wilson95_percent": [
+        29.03,
+        70.97
+      ],
+      "mean_final_total_length_delta": 3.4444444444444446,
+      "mean_final_longest_delta": 1.0,
+      "mean_peak_population_delta": 2.888888888888889
+    }
+  },
+  "evidence": {
+    "records": [
+      "population-target-screen.jsonl",
+      "population-target44-screen.jsonl"
+    ],
+    "complete_unique_valid_games": 54,
+    "runtime_or_invalid_action_failures": 0,
+    "reproduced_default_binary_identical_to_champion": true,
+    "fresh_validation_run": false,
+    "diverse_opponents_run": false,
+    "judge_sandbox_run": false,
+    "reason_no_gate": "all candidates scored at or below 50 percent in the affected-map tuning screen"
+  },
+  "corpus": {
+    "accepted_complete_valid_records_before": 1599,
+    "accepted_complete_valid_records_added": 54,
+    "accepted_complete_valid_records_after": 1653,
+    "failed_diagnostic_matrix_records": 64
+  },
+  "seen_seeds_added": [
+    6060
+  ],
+  "limitations": [
+    "all three variants were selected and compared on one tuning seed",
+    "positive length deltas did not translate into a winning match score",
+    "two-game map outcomes are not sufficient for map-specific promotion",
+    "local games do not measure competition Elo"
+  ]
+}

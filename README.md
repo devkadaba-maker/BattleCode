@@ -139,7 +139,7 @@ A later pre-emptive queen split saved UNSW queens from the repeated turn-5 wall
 death, but it did not improve final results reliably. The strict trigger scored
 6–4 in tuning and then **4–6 on five fresh seeds from both sides** after being
 frozen to UNSW. It is archived but disabled. The active champion is unchanged;
-all 1,599 accepted local matches remain fault-free and are not Elo measurements.
+all 1,653 accepted local matches remain fault-free and are not Elo measurements.
 
 A direct queen split-cap-two screen was also rejected. Across all 22 maps and
 both sides of tuning seed 5959, one of 44 games recorded a candidate-side
@@ -148,3 +148,10 @@ rerun did not reproduce the invalid action and changed that game from a win to
 a loss, so the whole matrix is retained under `benchmarks/research/failed/`
 and excluded from accepted evidence. The split-cap-three champion remains
 unchanged.
+
+Large-map population ceilings of 32, 44 and 48 were then screened against the
+champion on every official map larger than 1,000 tiles. They scored 8–10, 7–11
+and 9–9 respectively. Although target 48 slightly improved average final total
+and longest-dragon length, it did not improve match results, so the champion's
+target of 40 remains active. These 54 complete valid games bring the accepted
+local evidence corpus to 1,653 records.
