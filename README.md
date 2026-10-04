@@ -170,3 +170,12 @@ had just 5–9 across its valid rows and two additional Schooltime games with
 opponent-side invalid actions. Neither fault reproduced, and one exact rerun
 changed a recorded win to a loss. The entire matrix is isolated under failed
 diagnostics; the accepted 1,773-game corpus and active champion are unchanged.
+
+A pearl-allocation experiment assigned each visible pearl to the nearest
+friendly head, breaking equal-distance ties by lower snake ID. Discounting
+claimed pearls to 25% screened at 10–6, but the frozen candidate returned
+**49–34–5 over 88 fresh all-map, both-side games: 58.52%, with a 48.29% Wilson
+lower bound among decisive games**. It missed both promotion thresholds, with
+1–3 regressions on Colosseum, Islands and Maze. The policy is archived but
+disabled; the champion binary remains byte-identical and the accepted corpus
+now contains 1,893 complete valid games.

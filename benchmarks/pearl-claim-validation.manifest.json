@@ -1,0 +1,42 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/pearl-claim25/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/champion-ref/.unswbc-build/bot"
+  ],
+  "maps": [
+    "arena",
+    "australia",
+    "autarky",
+    "big_empty",
+    "Colosseum",
+    "default",
+    "default_small",
+    "devil",
+    "dilemma",
+    "islands",
+    "maze",
+    "portals",
+    "queen_of_spades",
+    "schooltime",
+    "slithery_fight",
+    "stripes",
+    "stronghold",
+    "tower_defense",
+    "trauma",
+    "trophy",
+    "unsw",
+    "weakhold"
+  ],
+  "seeds": [
+    6666,
+    6767
+  ],
+  "games": 88,
+  "sha256": {
+    ".experiments/pearl-claim25/.unswbc-build/bot": "b75c9cf1ae4fc20f404248a60ba4a1f70f9e83d6f446e37ac30a891cad53e58e",
+    ".experiments/champion-ref/.unswbc-build/bot": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-04",
+  "decision": "reject",
+  "active_champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "active_champion_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypothesis": "Discount a visible pearl when another friendly head is closer, using lower snake ID to break equal-distance ties.",
+  "tuning": {
+    "seed": 6565,
+    "maps": 8,
+    "sides": ["A", "B"],
+    "claim_percent_25": {"wins": 10, "losses": 6, "draws": 0, "sha256": "b75c9cf1ae4fc20f404248a60ba4a1f70f9e83d6f446e37ac30a891cad53e58e"},
+    "claim_percent_50": {"wins": 8, "losses": 8, "draws": 0, "sha256": "894f5256bbedfd83250457d79f3b38e2d05e9708d1558079cc2fb9942c5c79a4"}
+  },
+  "fresh_validation": {
+    "candidate": "claim_percent_25",
+    "seeds": [6666, 6767],
+    "maps": 22,
+    "sides": ["A", "B"],
+    "games": 88,
+    "wins": 49,
+    "losses": 34,
+    "draws": 5,
+    "score_percent": 58.52,
+    "decisive_wilson_95_percent": [48.29, 68.99],
+    "valid_games": 88,
+    "runtime_faults": 0,
+    "invalid_actions": 0,
+    "serious_regressions": {"Colosseum": "1-3", "islands": "1-3", "maze": "1-3"}
+  },
+  "gate": {
+    "required_score_percent": 60.0,
+    "required_wilson_lower_percent": 50.0,
+    "passed": false,
+    "diverse_opponent_gate_run": false,
+    "judge_sandbox_run": false,
+    "reason": "The frozen candidate missed both statistical promotion thresholds; further gates would not rescue the failed champion comparison."
+  },
+  "records": ["pearl-claim-screen.jsonl", "pearl-claim-validation.jsonl"],
+  "reproduction": "Apply research/pearl-claim.patch to f54cccaa8d4d27179499bfa60389a1bfd15549f8, then run scripts/build_variant.py NAME --pearl-claim-percent 25 --compile.",
+  "accepted_matrix_records_after_iteration": 1893,
+  "note": "These are local match outcomes, not Elo measurements. The active bot remains unchanged."
+}

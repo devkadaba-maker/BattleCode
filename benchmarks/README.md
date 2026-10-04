@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 1,773 accepted records form complete matrices with no invalid actions
+All 1,893 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -60,6 +60,24 @@ each seed, while the A side drew. Stronghold, Trauma and UNSW each returned
 4–6. Maze (9–1), Portals (8–2), Stripes (9–1) and Tower Defense (7–3) improved
 on their earlier two-game samples, illustrating why small map samples are
 insufficient for selection. Run `scripts/report.py --by-map` for the full table.
+
+## Pearl ownership experiment
+
+The candidate discounted a visible pearl when another friendly head was closer;
+lower snake ID broke equal-distance ties. On the eight tuning maps at seed 6565,
+25% residual value scored 10–6 and 50% scored 8–8. The 25% binary was frozen at
+SHA256 `b75c9cf1ae4fc20f404248a60ba4a1f70f9e83d6f446e37ac30a891cad53e58e`.
+
+Fresh seeds 6666 and 6767 then covered all 22 maps from both sides. The frozen
+candidate scored **49 wins, 34 losses and 5 draws in 88 valid games (58.52%)**;
+the decisive-game Wilson 95% interval was **48.29–68.99%**. Colosseum, Islands
+and Maze each returned 1–3. The result misses both the 60% score target and the
+lower-bound-above-50% target, so no diverse-opponent or judge-sandbox gate was
+run and the champion remains active. Apply `research/pearl-claim.patch` to
+`f54ccc` and build with `--pearl-claim-percent 25` to reproduce the candidate.
+The raw tuning and fresh matrices pass `scripts/check_records.py`; the checker
+now preserves variant identity when multiple compiled inputs share the filename
+`.unswbc-build/bot`. These results are local evidence, not measured Elo.
 
 Tracing the deterministic Weakhold seed505 B-side loss found the queen moving
 from (29,1) north to (29,0), then west along the corridor to (24,0), splitting

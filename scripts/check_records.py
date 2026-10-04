@@ -9,16 +9,24 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('files', nargs='+')
 args = parser.parse_args()
 failed = False
+
+def portable_bot_name(value):
+    """Keep variant identity when compiled binaries all end in build/bot."""
+    path = Path(value)
+    if path.name == 'bot' and path.parent.name == '.unswbc-build':
+        return f'{path.parent.parent.name}/bot'
+    return path.name or Path(__file__).resolve().parents[1].name
+
 for filename in args.files:
     path = Path(filename)
     rows = [json.loads(line) for line in path.read_text().splitlines()]
     manifest = json.loads(path.with_suffix('.manifest.json').read_text())
     # Record paths refer to the original machine; match their terminal names.
     expected = set(itertools.product(
-        [Path(p).name or Path(__file__).resolve().parents[1].name for p in manifest['candidates']],
-        [Path(p).name or Path(__file__).resolve().parents[1].name for p in manifest['opponents']],
+        [portable_bot_name(p) for p in manifest['candidates']],
+        [portable_bot_name(p) for p in manifest['opponents']],
         manifest['maps'], manifest['seeds'], manifest.get('sides', ['A', 'B'])))
-    actual = [(Path(r['candidate']).name, Path(r['opponent']).name,
+    actual = [(portable_bot_name(r['candidate']), portable_bot_name(r['opponent']),
                r['map'], r['seed'], r['side']) for r in rows]
     errors = []
     if len(rows) != manifest['games'] or set(actual) != expected:
