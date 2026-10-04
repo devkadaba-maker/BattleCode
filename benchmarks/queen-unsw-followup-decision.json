@@ -1,0 +1,194 @@
+{
+  "champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "decision": "retain champion; none of these tuning candidates qualify for validation or promotion",
+  "map": "unsw",
+  "screen_seeds": [
+    4242,
+    4343,
+    4444,
+    4545,
+    4646
+  ],
+  "accepted_matrices": {
+    "queen-escape-unsw-scope-screen": {
+      "games": 10,
+      "outcomes": {
+        "escape-unsw-only": {
+          "win": 4,
+          "loss": 6,
+          "draw": 0
+        }
+      },
+      "manifest": {
+        "toolkit": "1.2.9",
+        "candidates": [
+          ".experiments/bin/escape-unsw-only"
+        ],
+        "opponents": [
+          ".experiments/bin/champion43"
+        ],
+        "maps": [
+          "unsw"
+        ],
+        "seeds": [
+          4242,
+          4343,
+          4444,
+          4545,
+          4646
+        ],
+        "games": 10,
+        "sha256": {
+          ".experiments/bin/escape-unsw-only": "cc8f3b713dbee3a9a87dc7d273ee867405c3c6137c2d8a944310a1ecc156b3b9",
+          ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+        }
+      }
+    },
+    "queen-escape-unsw-weight-screen": {
+      "games": 30,
+      "outcomes": {
+        "escape-unsw-250": {
+          "win": 2,
+          "loss": 8,
+          "draw": 0
+        },
+        "escape-unsw-750": {
+          "win": 4,
+          "loss": 6,
+          "draw": 0
+        },
+        "escape-unsw-1500": {
+          "win": 4,
+          "loss": 6,
+          "draw": 0
+        }
+      },
+      "manifest": {
+        "toolkit": "1.2.9",
+        "candidates": [
+          ".experiments/bin/escape-unsw-250",
+          ".experiments/bin/escape-unsw-750",
+          ".experiments/bin/escape-unsw-1500"
+        ],
+        "opponents": [
+          ".experiments/bin/champion43"
+        ],
+        "maps": [
+          "unsw"
+        ],
+        "seeds": [
+          4242,
+          4343,
+          4444,
+          4545,
+          4646
+        ],
+        "games": 30,
+        "sha256": {
+          ".experiments/bin/escape-unsw-250": "508e32739b2c86e259d7d96179e10987d7eae410dc569c65c6210764b55ec6ce",
+          ".experiments/bin/escape-unsw-750": "1e876cf67d6e2deed4deee04032fc9fa8926c6d43c1f0e6635dc17d482eaa73b",
+          ".experiments/bin/escape-unsw-1500": "af9de797517a956dee047b5a99d34a5fb989badb1912cee5bdac5b09377edef3",
+          ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+        }
+      }
+    },
+    "queen-escape-unsw-round-screen": {
+      "games": 30,
+      "outcomes": {
+        "escape-unsw-r1": {
+          "win": 5,
+          "loss": 5,
+          "draw": 0
+        },
+        "escape-unsw-r2": {
+          "win": 3,
+          "loss": 7,
+          "draw": 0
+        },
+        "escape-unsw-r4": {
+          "win": 3,
+          "loss": 7,
+          "draw": 0
+        }
+      },
+      "manifest": {
+        "toolkit": "1.2.9",
+        "candidates": [
+          ".experiments/bin/escape-unsw-r1",
+          ".experiments/bin/escape-unsw-r2",
+          ".experiments/bin/escape-unsw-r4"
+        ],
+        "opponents": [
+          ".experiments/bin/champion43"
+        ],
+        "maps": [
+          "unsw"
+        ],
+        "seeds": [
+          4242,
+          4343,
+          4444,
+          4545,
+          4646
+        ],
+        "games": 30,
+        "sha256": {
+          ".experiments/bin/escape-unsw-r1": "ed35b52100f8d20284a949b7b1cf8116ce78fcae346c13e1fa8d48f66992d3d2",
+          ".experiments/bin/escape-unsw-r2": "34114aeb5e5c7ddb4991b0199abeae782365d7ee2b2da8444bc0240a19e66dd1",
+          ".experiments/bin/escape-unsw-r4": "2fe54f1cc7212314a852f77994110c0f3e3cecd5712dcad7c751ba7588d2dc8b",
+          ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+        }
+      }
+    },
+    "queen-bend-release-unsw-screen": {
+      "games": 20,
+      "outcomes": {
+        "bend-release-unsw-750": {
+          "win": 4,
+          "loss": 6,
+          "draw": 0
+        },
+        "bend-release-unsw-4000": {
+          "win": 4,
+          "loss": 6,
+          "draw": 0
+        }
+      },
+      "manifest": {
+        "toolkit": "1.2.9",
+        "candidates": [
+          ".experiments/bin/bend-release-unsw-750",
+          ".experiments/bin/bend-release-unsw-4000"
+        ],
+        "opponents": [
+          ".experiments/bin/champion43"
+        ],
+        "maps": [
+          "unsw"
+        ],
+        "seeds": [
+          4242,
+          4343,
+          4444,
+          4545,
+          4646
+        ],
+        "games": 20,
+        "sha256": {
+          ".experiments/bin/bend-release-unsw-750": "c39fe43db1becc129f28cec146decf0bc9295691e0610e8266c3379233aaa4e0",
+          ".experiments/bin/bend-release-unsw-4000": "3aa48a785c9eee89caa2687bd974a61b7da821da554094efc3a2c9e64f1abd79",
+          ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+        }
+      }
+    }
+  },
+  "failed_matrix": {
+    "path": "research/failed/queen-release-unsw-screen.jsonl",
+    "matches": 20,
+    "invalid_action_games": 3,
+    "runtime_faults": 0,
+    "prototype": "straight body-chain reconstruction; superseded by bent-body reconstruction"
+  },
+  "fresh_validation_games": 0,
+  "new_sandbox_checks": 0
+}

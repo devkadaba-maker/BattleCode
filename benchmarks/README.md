@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 1,347 recorded games form complete matrices with no invalid actions
+All 1,437 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -216,3 +216,70 @@ Together with prior evidence, 1,347 matrix records pass `check_records.py`.
 The original source is retained, and the rejected patch can reproduce its
 exact tested native SHA256. No website submission or measured Elo change is
 claimed.
+
+## UNSW follow-up: scope, duration and moving-body estimates
+
+The next screen restricted queen escape to UNSW's 64×64 geometry, using
+both sides of seeds 4242, 4343, 4444, 4545 and 4646. These seeds are now tuning
+evidence, including all later parameter trials; they are not fresh validation.
+The comparison remained the unchanged champion from 43ebea6.
+
+| Queen escape policy | Wins | Losses | Draws | Games |
+| --- | ---: | ---: | ---: | ---: |
+| UNSW only, weight 4000, through turn 499 | 4 | 6 | 0 | 10 |
+| UNSW only, weight 250, through turn 499 | 2 | 8 | 0 | 10 |
+| UNSW only, weight 750, through turn 499 | 4 | 6 | 0 | 10 |
+| UNSW only, weight 1500, through turn 499 | 4 | 6 | 0 | 10 |
+| UNSW only, weight 4000, turn 0 only | 5 | 5 | 0 | 10 |
+| UNSW only, weight 4000, turns 0–1 | 3 | 7 | 0 | 10 |
+| UNSW only, weight 4000, turns 0–3 | 3 | 7 | 0 | 10 |
+| Moving-body estimate, weight 750, through turn 499 | 4 | 6 | 0 | 10 |
+| Moving-body estimate, weight 4000, through turn 499 | 4 | 6 | 0 | 10 |
+
+None qualifies for a fresh validation gate or promotion. Restricting the failed
+global policy to UNSW did not establish a repair, and lowering its weight or
+duration did not solve the tradeoff. The persistent static policy saved all
+ten queens from the original turn-5 death, yet still lost more final games.
+Queen survival alone is an insufficient selection criterion.
+
+`research/queen-escape-unsw-20-trace.json` retains preceding turns from the
+seed 4444 B-side loss. After surviving the opening, its queen zigzagged from
+(47,21) on turn 12 to (49,18) on turn 17, moved west twice to (47,18), split
+on turn 19, and died against a wall on turn 20. Saving the original opening
+does not prevent a later corridor trap.
+
+The moving-body experiment reconstructs visible body order by following each
+segment's arrow towards its predecessor, including bends. Its depth search
+permits old body and earlier path squares only after a conservative release
+estimate plus one extra move; pearls and predicted spawns delay that release.
+Unknown segments stay blocked. Other dragons' visible bodies and predicted
+straight head destinations remain fixed obstacles. Immediate moves still use
+the champion's safety checks; the prediction changes route ranking only.
+
+An initial straight-chain reconstruction was superseded before selection. Its
+20 complete diagnostic games contained three invalid-action games, including
+an invalid action by the opponent in two of them, with no process faults.
+Those records and their exact manifests are preserved in `research/failed/`
+and are excluded from accepted evidence. A traced repetition of seed 4242 A
+did not reproduce the invalid action; that repetition is diagnostic, not a
+replacement for the failed record. The cause remains unresolved. The corrected
+bend reconstruction's separate 20-game screen was complete and fault-free,
+but both weights still returned 4–6. Neither prototype is enabled.
+
+Apply `research/queen-body-release.patch` to 43ebea6 with
+`git apply --unidiff-zero`, then use `--queen-escape-weight 750` (or 4000),
+`--queen-escape-rounds 500 --queen-escape-scope 1 --queen-escape-release 1`.
+The archived smoke test checks body order through bends, a route opened by
+body release, and pearl growth closing that route; it passed. The earlier
+prototype is reproducible with `research/queen-body-release-straight.patch`.
+Static scope/weight/duration trials use the existing `queen-escape.patch`.
+Binary hashes and exact outcomes are in `queen-unsw-followup-decision.json`
+and each matrix manifest.
+
+This follow-up adds 90 complete, valid screening games and 20 failed-matrix
+diagnostic games. There was no new sandbox run or final validation because
+all candidates failed screening. All 1,437 accepted matrix records pass
+`check_records.py`; the failed diagnostic matrix intentionally fails that check.
+The active source and native champion hash remain unchanged. Future work
+should examine the limited-view assumption at corridor entry and collisions
+with moving teammates, rather than promoting the static forecast family.

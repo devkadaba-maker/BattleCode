@@ -1,0 +1,26 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/bend-release-unsw-750",
+    ".experiments/bin/bend-release-unsw-4000"
+  ],
+  "opponents": [
+    ".experiments/bin/champion43"
+  ],
+  "maps": [
+    "unsw"
+  ],
+  "seeds": [
+    4242,
+    4343,
+    4444,
+    4545,
+    4646
+  ],
+  "games": 20,
+  "sha256": {
+    ".experiments/bin/bend-release-unsw-750": "c39fe43db1becc129f28cec146decf0bc9295691e0610e8266c3379233aaa4e0",
+    ".experiments/bin/bend-release-unsw-4000": "3aa48a785c9eee89caa2687bd974a61b7da821da554094efc3a2c9e64f1abd79",
+    ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}
