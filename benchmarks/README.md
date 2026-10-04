@@ -668,3 +668,18 @@ and fault-free, but the policy failed screening and no all-map, diverse-opponent
 or sandbox gate was run. Exact hashes and reproduction instructions are in
 `portal-arrival-decision.json`. Seeds 8686 and 8787 are now seen evidence; the
 active champion remains unchanged and accepted evidence rises to 2,307 games.
+
+## Head-attack population reserve
+
+The existing bot allows a small non-flagship collector to trade into a visibly
+larger enemy head. This experiment delayed those attacks until the team had at
+least four or six surviving dragons. On the standard eight maps, both sides of
+seed 8888, the four-unit reserve scored **8–8** and the six-unit reserve **7–9**;
+the latter also lost both Schooltime games.
+
+The frozen four-unit candidate then scored another **8–8** on eight maps chosen
+for frequent head contact at seed 8989. All 48 games were complete and valid,
+but neither setting produced a positive match-strength signal, so no all-map,
+diverse-opponent or sandbox gate was run. Exact hashes and reproduction details
+are in `head-attack-reserve-decision.json`. Seeds 8888 and 8989 are now seen;
+the active champion remains unchanged and accepted evidence rises to 2,355.

@@ -1,0 +1,27 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/attack-reserve4/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/champion-ref9/.unswbc-build/bot"
+  ],
+  "maps": [
+    "Colosseum",
+    "stronghold",
+    "slithery_fight",
+    "trophy",
+    "schooltime",
+    "devil",
+    "default",
+    "unsw"
+  ],
+  "seeds": [
+    8989
+  ],
+  "games": 16,
+  "sha256": {
+    ".experiments/attack-reserve4/.unswbc-build/bot": "f6f81b82b883bde1b5e6408a69f0ad2447bc1df5b92db3ca4dc8f774928f2615",
+    ".experiments/champion-ref9/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}
