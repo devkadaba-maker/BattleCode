@@ -23,6 +23,7 @@ parser.add_argument('--queen-split-limit', type=int)
 parser.add_argument('--queen-hunt', type=int, choices=[0,1])
 parser.add_argument('--large-population-target', type=int)
 parser.add_argument('--friendly-head-destination-penalty', type=int)
+parser.add_argument('--friendly-priority-claim-penalty', type=int)
 parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
 args = parser.parse_args()
 if not args.name.replace('-','').replace('_','').isalnum():
@@ -31,6 +32,8 @@ if args.large_population_target is not None and args.large_population_target < 2
     parser.error('--large-population-target must be at least 2')
 if args.friendly_head_destination_penalty is not None and args.friendly_head_destination_penalty < 0:
     parser.error('--friendly-head-destination-penalty must be non-negative')
+if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
+    parser.error('--friendly-priority-claim-penalty must be non-negative')
 destination = ROOT / '.experiments' / args.name
 destination.mkdir(parents=True, exist_ok=True)
 if args.ref:
@@ -42,6 +45,7 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
            'QUEEN_HUNT':args.queen_hunt, 'WEAKHOLD_VISION_WEIGHT':args.weakhold_vision_weight}
 defines['LARGE_POPULATION_TARGET'] = args.large_population_target
 defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
 prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
 (destination/'main.cpp').write_text(prefix+source)
 for name in ('helper.hpp','bot.toml'):

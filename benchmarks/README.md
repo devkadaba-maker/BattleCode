@@ -488,3 +488,34 @@ These 120 complete valid records bring the accepted corpus to 1,773 games. The
 policy is disabled and the champion remains unchanged. Future congestion work
 must predict the teammate's actual scored move or coordinate reservations,
 rather than assuming every head continues straight.
+
+## Deterministic teammate priority — failed matrix
+
+The follow-up attempted asymmetric right-of-way. When a lower-ID friendly head
+could legally enter a candidate destination without reversing or using a portal,
+the higher-ID snake received a movement penalty. This gives queens and older
+snakes priority and avoids the symmetry of the rejected straight-head forecast.
+
+On both sides of standard tuning seed 6464, penalty 120 returned **9–7** across
+its 16 valid games. Penalty 360 returned **5–9** across 14 valid games. Its two
+Schooltime rows recorded candidate wins but also opponent-side invalid actions,
+one from each starting side. The complete 32-row combined matrix is therefore
+invalid and is preserved in `research/failed/`; it is not accepted evidence.
+
+Exact reruns verified the same binary hashes and toolkit. Both reruns were
+valid, so neither opponent invalid action reproduced. The A-side rerun remained
+a candidate win but differed in result and death diagnostics; the B-side rerun
+flipped from a recorded candidate win to a loss. These diagnostic reruns do not
+replace the failed rows or rescue the matrix.
+
+The policy did not advance to fresh all-map validation, diverse opponents or
+judge sandbox. The build helper retains
+`--friendly-priority-claim-penalty` for reproducibility, with default zero. The
+default native build remains byte-identical to the champion, and the smoke test
+checks lower-ID, higher-ID and enemy classification. Exact hashes and replay
+details are in `teammate-priority-decision.json`.
+
+Seed 6464 is now seen tuning evidence. The accepted corpus remains 1,773 games.
+Failed diagnostic matrices now contain 96 rows and six invalid games in total;
+all stay excluded. Do not retest this unchanged priority rule or infer strength
+from the valid subset.

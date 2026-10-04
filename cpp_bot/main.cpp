@@ -38,6 +38,9 @@ namespace {
 #ifndef FRIENDLY_HEAD_DESTINATION_PENALTY
 #define FRIENDLY_HEAD_DESTINATION_PENALTY 0
 #endif
+#ifndef FRIENDLY_PRIORITY_CLAIM_PENALTY
+#define FRIENDLY_PRIORITY_CLAIM_PENALTY 0
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -594,6 +597,25 @@ int friendly_head_destinations(Controller const& controller, Position target) {
     return count;
 }
 
+int lower_id_friendly_claims(Controller const& controller, Position target) {
+    int count = 0;
+    for (auto const& tile : controller.get_tiles()) {
+        auto const* dragon = tile.get_dragon();
+        if (!dragon || !dragon->is_head() || dragon->get_team() != controller.get_team() ||
+            dragon->get_id() >= controller.get_id()) continue;
+        for (Direction direction : Direction::get_direction_list()) {
+            if (direction == dragon->get_dir().get_opposite()) continue;
+            auto const& edge = tile.get_edge(direction);
+            if (edge.is_passable() && !edge.is_portal() &&
+                dragon->get_position().add_dir(direction) == target) {
+                ++count;
+                break;
+            }
+        }
+    }
+    return count;
+}
+
 int special_friendly_pressure(Controller const& controller, Game const& game_state, Position start) {
     int score = 0;
     for (auto const& tile : controller.get_tiles()) {
@@ -811,6 +833,8 @@ int score_move(Direction direction) {
     score += special ? special_friendly_pressure(controller, game_state, target) : friendly_pressure(controller, game_state, target);
     if constexpr (FRIENDLY_HEAD_DESTINATION_PENALTY > 0)
         score -= friendly_head_destinations(controller, target) * FRIENDLY_HEAD_DESTINATION_PENALTY;
+    if constexpr (FRIENDLY_PRIORITY_CLAIM_PENALTY > 0)
+        score -= lower_id_friendly_claims(controller, target) * FRIENDLY_PRIORITY_CLAIM_PENALTY;
     if (enemy_collision_risk(controller, game_state, target)) {
         score -= special ? (role == Role::HUNTER ? 260 : 550) : (role == Role::HUNTER ? 300 : 500);
     }

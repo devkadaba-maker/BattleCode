@@ -58,6 +58,10 @@ int main() {
     assert(friendly_head_destinations(controller, Position(2,3)) == 0);
     neighbour->dragon_part = DragonPart(Position(2,4),7,Team(Team::B),Direction::EAST,true);
     assert(friendly_head_destinations(controller, Position(3,4)) == 0);
+    neighbour->dragon_part = DragonPart(Position(2,4),2,Team(Team::A),Direction::NORTH,true);
+    assert(lower_id_friendly_claims(controller, Position(3,4)) == 1);
+    neighbour->dragon_part = DragonPart(Position(2,4),6,Team(Team::A),Direction::NORTH,true);
+    assert(lower_id_friendly_claims(controller, Position(3,4)) == 0);
     neighbour->dragon_part.reset();
 
     // Repeated turns increment the individual parent's counter, then move.

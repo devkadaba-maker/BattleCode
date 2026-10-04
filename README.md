@@ -163,3 +163,10 @@ fresh all-map gate at **40–44–4** (47.73%; decisive Wilson 95% 37.28–58.17
 It reduced aggregate head deaths without improving final match strength, so it
 is reproducible but disabled. The accepted local corpus now contains 1,773
 complete valid games; the champion remains unchanged.
+
+A deterministic lower-ID right-of-way experiment was also rejected before
+fresh validation. Penalty 120 scored only 9–7 on the tuning maps; penalty 360
+had just 5–9 across its valid rows and two additional Schooltime games with
+opponent-side invalid actions. Neither fault reproduced, and one exact rerun
+changed a recorded win to a loss. The entire matrix is isolated under failed
+diagnostics; the accepted 1,773-game corpus and active champion are unchanged.
