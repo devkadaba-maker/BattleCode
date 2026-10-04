@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-05",
+  "map": "schooltime",
+  "seed": 8484,
+  "candidate": "enemy-order-schooltime",
+  "opponent": "champion-ref6",
+  "sandbox": true,
+  "result": "team A candidate won after 500 rounds by longer queen, 3 to 0",
+  "candidate_points_per_turn": {"p50_millions": 4.5, "p99_millions": 15.5, "mean_millions": 5.0, "max_millions": 23.2, "turns": 22041},
+  "opponent_points_per_turn": {"p50_millions": 4.7, "p99_millions": 17.5, "mean_millions": 5.5, "max_millions": 24.4, "turns": 23154},
+  "limit_millions": 100,
+  "runtime_faults": 0
+}

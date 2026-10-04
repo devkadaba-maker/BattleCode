@@ -1,0 +1,42 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/enemy-order-aware/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/champion-ref6/.unswbc-build/bot"
+  ],
+  "maps": [
+    "Colosseum",
+    "arena",
+    "australia",
+    "autarky",
+    "big_empty",
+    "default",
+    "default_small",
+    "devil",
+    "dilemma",
+    "islands",
+    "maze",
+    "portals",
+    "queen_of_spades",
+    "schooltime",
+    "slithery_fight",
+    "stripes",
+    "stronghold",
+    "tower_defense",
+    "trauma",
+    "trophy",
+    "unsw",
+    "weakhold"
+  ],
+  "seeds": [
+    7676,
+    7777
+  ],
+  "games": 88,
+  "sha256": {
+    ".experiments/enemy-order-aware/.unswbc-build/bot": "6d451b89debfcf0f5a81bf712ee3d8f6bc1e0e3aafe9219c5ff161c6cc4dbf91",
+    ".experiments/champion-ref6/.unswbc-build/bot": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}

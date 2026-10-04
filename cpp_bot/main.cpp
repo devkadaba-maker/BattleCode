@@ -41,6 +41,9 @@ namespace {
 #ifndef FRIENDLY_PRIORITY_CLAIM_PENALTY
 #define FRIENDLY_PRIORITY_CLAIM_PENALTY 0
 #endif
+#ifndef ENEMY_HEADING_ORDER_AWARE
+#define ENEMY_HEADING_ORDER_AWARE 2
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -119,6 +122,13 @@ bool enemy_head_ahead(Controller const& controller, Position target) {
     for (auto const& tile : controller.get_tiles()) {
         auto const* dragon = tile.get_dragon();
         if (!dragon || dragon->get_team() == controller.get_team() || !dragon->is_head()) continue;
+#if ENEMY_HEADING_ORDER_AWARE > 0
+        // A later enemy has not moved yet. If we take its projected square
+        // first, it must choose another move or collide with occupied space.
+        bool enabled = ENEMY_HEADING_ORDER_AWARE == 1 ||
+            (ENEMY_HEADING_ORDER_AWARE == 2 && game && game->width == 60 && game->height == 40);
+        if (enabled && dragon->get_id() > controller.get_id()) continue;
+#endif
         if (dragon->get_position().add_dir(dragon->get_dir()) == target) return true;
     }
     return false;

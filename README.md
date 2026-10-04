@@ -14,7 +14,9 @@ reachable-area and queen protections still decide whether a step is allowed.
 
 The vision weight is **6**, with a **0-weight fallback for Weakhold's 40×15
 geometry**. That fallback repairs a repeated queen death in a narrow border
-corridor. Free pearl sprinting, disabling queen splits, and queen hunting were
+corridor. On Schooltime's unique 60×40 geometry, move-order-aware enemy-heading
+handling allows an earlier dragon to consider a square projected by a later-ID
+enemy. Free pearl sprinting, disabling queen splits, and queen hunting were
 tested but remain disabled by default.
 
 ## Setup
@@ -200,3 +202,13 @@ opponent-side invalid game; limiting portals to one use scored 9–7. A separate
 clean frozen confirmation of the trapped-only policy scored 9–7, below the
 fresh-gate threshold. The failed 32-row matrix is isolated, the 16 clean games
 raise accepted evidence to 1,941, and the champion remains unchanged.
+
+The next promoted change is narrowly scoped to Schooltime. A broad move-order-
+aware enemy-heading policy screened 12–4 but missed the broad fresh gate at
+48–36–4 (56.82%; decisive Wilson lower bound 46.48%) and regressed Australia
+and Stripes to 0–4. The frozen Schooltime-only policy then scored **9–1** on
+five new seeds from both sides. All **42** games on the other 21 maps exactly
+matched champion self-play controls across results and diagnostics. A judge-
+sandbox Schooltime match won with a 23.2M candidate maximum points per turn,
+below the 100M limit. This is a scoped repair, not a broad statistical strength
+claim or a measured Elo change.

@@ -24,6 +24,8 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
 parser.add_argument('--large-population-target', type=int)
 parser.add_argument('--friendly-head-destination-penalty', type=int)
 parser.add_argument('--friendly-priority-claim-penalty', type=int)
+parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2],
+                    help='0 off, 1 all maps, 2 Schooltime 60x40 only')
 parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
 args = parser.parse_args()
 if not args.name.replace('-','').replace('_','').isalnum():
@@ -46,6 +48,7 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
 defines['LARGE_POPULATION_TARGET'] = args.large_population_target
 defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
 defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
+defines['ENEMY_HEADING_ORDER_AWARE'] = args.enemy_heading_order_aware
 prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
 (destination/'main.cpp').write_text(prefix+source)
 for name in ('helper.hpp','bot.toml'):

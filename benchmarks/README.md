@@ -3,10 +3,13 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 1,941 accepted records form complete matrices with no invalid actions
+All 2,259 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
+
+The active policy now also enables move-order-aware enemy-heading handling only
+on Schooltime's unique 60×40 geometry. The broad form remains rejected.
 
 `vision6` was the first selected candidate: `PARENT_SPLIT_LIMIT=3`,
 `VISION_TARGET_WEIGHT=6`, `FREE_PEARL_SPRINT=0`, `QUEEN_HUNT=0`,
@@ -609,3 +612,26 @@ The tested 1000 binary SHA256 is
 Seeds 7272, 7373 and 7474 are now seen evidence. These 120 valid games raise
 the accepted corpus to 2,061. The experiment is disabled and the byte-identical
 champion remains active.
+
+## Schooltime move-order repair
+
+A broad experiment stopped treating a later-ID enemy's projected straight-ahead
+square as unavailable: our lower-ID dragon acts first, so the later dragon must
+avoid the newly occupied square. It screened **12–4** on seed 7575, then scored
+**48–36–4** across all 22 maps, both sides, fresh seeds 7676 and 7777. Its
+56.82% score and decisive Wilson 95% interval of 46.48–67.18% failed broad
+promotion; Australia and Stripes each regressed to 0–4.
+
+Schooltime had returned 2–0 in tuning and 4–0 in that fresh matrix. A scoped
+60×40 candidate was frozen before further testing. On five new seeds, both
+sides, it scored **9–1** in ten valid games. On seed 8383, all **42** games over
+the other 21 maps exactly matched champion self-play controls for result,
+deaths, queen diagnostics, population peaks, faults and notices. The Schooltime
+judge sandbox also passed: the candidate won after 500 rounds, with 23.2M
+maximum points per turn (24.4M overall), below the 100M limit.
+
+The promoted native SHA256 is
+`74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533`.
+Exact records and the control comparison are in `enemy-order-*.json*`. This is
+a narrow map repair, not a statistically established broad gain or measured
+Elo. The 198 valid games in this iteration raise the accepted corpus to 2,259.

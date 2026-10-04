@@ -1,0 +1,46 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index f5470dd..954381b 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -41,6 +41,9 @@ namespace {
+ #ifndef FRIENDLY_PRIORITY_CLAIM_PENALTY
+ #define FRIENDLY_PRIORITY_CLAIM_PENALTY 0
+ #endif
++#ifndef ENEMY_HEADING_ORDER_AWARE
++#define ENEMY_HEADING_ORDER_AWARE 0
++#endif
+ 
+ int parent_split_count = 0;
+ std::array<int, 4> vision_target_bonuses{};
+@@ -119,6 +122,11 @@ bool enemy_head_ahead(Controller const& controller, Position target) {
+     for (auto const& tile : controller.get_tiles()) {
+         auto const* dragon = tile.get_dragon();
+         if (!dragon || dragon->get_team() == controller.get_team() || !dragon->is_head()) continue;
++#if ENEMY_HEADING_ORDER_AWARE > 0
++        // A later enemy has not moved yet. If we take its projected square
++        // first, it must choose another move or collide with occupied space.
++        if (dragon->get_id() > controller.get_id()) continue;
++#endif
+         if (dragon->get_position().add_dir(dragon->get_dir()) == target) return true;
+     }
+     return false;
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 08a2816..77842c5 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -24,6 +24,7 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
+ parser.add_argument('--large-population-target', type=int)
+ parser.add_argument('--friendly-head-destination-penalty', type=int)
+ parser.add_argument('--friendly-priority-claim-penalty', type=int)
++parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1])
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -46,6 +47,7 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
+ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
++defines['ENEMY_HEADING_ORDER_AWARE'] = args.enemy_heading_order_aware
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):

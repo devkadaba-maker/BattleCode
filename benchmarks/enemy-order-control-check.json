@@ -1,0 +1,11 @@
+{
+  "seed": 8383,
+  "maps_checked": 21,
+  "candidate_games_checked": 42,
+  "fields": ["result", "deaths", "queen_deaths", "peak_population", "faults", "notices"],
+  "mismatches": [],
+  "sha256": {
+    "benchmarks/enemy-order-schooltime-regression.jsonl": "c778cf690b56e6eb0ccd72d806f434cdea54615edcf36f3e9ec71d3fdf3c9ce3",
+    "benchmarks/enemy-order-champion-control.jsonl": "bfd12dcaf4a59bd58a6d5f824aed688ef133b4d7315614ad433da9a7a7f43ad1"
+  }
+}
