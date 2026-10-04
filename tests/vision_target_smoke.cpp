@@ -50,6 +50,16 @@ int main() {
     assert(visible_target_value(controller, scenario, target, 2) < plain);
     neighbour->dragon_part.reset();
 
+    // A teammate's current heading forecasts its next destination. Enemy heads
+    // and our own head are handled by separate collision logic.
+    neighbour = controller.get_tile(Position(2,4));
+    neighbour->dragon_part = DragonPart(Position(2,4),6,Team(Team::A),Direction::EAST,true);
+    assert(friendly_head_destinations(controller, Position(3,4)) == 1);
+    assert(friendly_head_destinations(controller, Position(2,3)) == 0);
+    neighbour->dragon_part = DragonPart(Position(2,4),7,Team(Team::B),Direction::EAST,true);
+    assert(friendly_head_destinations(controller, Position(3,4)) == 0);
+    neighbour->dragon_part.reset();
+
     // Repeated turns increment the individual parent's counter, then move.
     reset_target_state(); history.clear();
     std::ostringstream output;

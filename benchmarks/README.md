@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 1,653 accepted records form complete matrices with no invalid actions
+All 1,773 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -451,3 +451,40 @@ helper accepts `--large-population-target` so all three rejected binaries are
 reproducible; exact hashes and growth deltas are in
 `population-target-decision.json`. The 54 valid records raise the accepted
 corpus to 1,653 games. The cap-three, target-40 champion remains active.
+
+## Friendly straight-head forecast — fresh validation failed
+
+The next congestion hypothesis penalized a move into the square a visible
+friendly head is currently pointing toward. It excludes self and enemy heads,
+and unlike the earlier broad head-risk experiment it forecasts only the single
+straight destination rather than every possible turn. The default penalty is
+zero, preserving champion behavior.
+
+On the standard eight-map tuning set, both sides of seed 6161, penalty 240
+returned **10–6** and penalty 720 returned **11–5**. The stronger 720 binary was
+frozen before fresh validation. Across all 22 official maps, both sides, fresh
+seeds 6262 and 6363, it returned **40 wins, 44 losses and 4 draws**: a 47.73%
+score with a decisive-game Wilson 95% interval of 37.28–58.17%. It therefore
+failed both promotion thresholds.
+
+The fresh matrix was complete, unique and fault-free. The candidate accumulated
+4,292 head deaths versus 4,762 for the champion side, and 15,522 total deaths
+versus 16,685. Its mean final total-length delta was +3.77, but its mean
+longest-dragon delta was -0.88. Avoiding the predicted congestion improved
+survival proxies while worsening the result that actually selects the bot.
+Those aggregate counts are descriptive because each policy also changes the
+opponent's interaction opportunities.
+
+No diverse-opponent or judge-sandbox gate was run after fresh validation
+failed. The default build remains byte-identical to the champion. The frozen
+720 binary was independently reproduced with SHA256
+`9ecaffb11867cfd16bdbe33af4d130d81bfbdf0ae9a0b7bb5f6464bba9ee6296`;
+the 240 binary is also recorded in `teammate-destination-decision.json`. The
+smoke test checks friendly, enemy and self classification. Seeds 6161, 6262 and
+6363 are now seen evidence; do not retune this unchanged straight-destination
+family on them.
+
+These 120 complete valid records bring the accepted corpus to 1,773 games. The
+policy is disabled and the champion remains unchanged. Future congestion work
+must predict the teammate's actual scored move or coordinate reservations,
+rather than assuming every head continues straight.

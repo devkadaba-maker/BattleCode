@@ -139,7 +139,7 @@ A later pre-emptive queen split saved UNSW queens from the repeated turn-5 wall
 death, but it did not improve final results reliably. The strict trigger scored
 6–4 in tuning and then **4–6 on five fresh seeds from both sides** after being
 frozen to UNSW. It is archived but disabled. The active champion is unchanged;
-all 1,653 accepted local matches remain fault-free and are not Elo measurements.
+all 1,773 accepted local matches remain fault-free and are not Elo measurements.
 
 A direct queen split-cap-two screen was also rejected. Across all 22 maps and
 both sides of tuning seed 5959, one of 44 games recorded a candidate-side
@@ -155,3 +155,11 @@ and 9–9 respectively. Although target 48 slightly improved average final total
 and longest-dragon length, it did not improve match results, so the champion's
 target of 40 remains active. These 54 complete valid games bring the accepted
 local evidence corpus to 1,653 records.
+
+A focused teammate-congestion forecast then penalized moving into a visible
+friendly head's straight-ahead destination. Penalties 240 and 720 scored 10–6
+and 11–5 on the eight-map tuning set, but the frozen 720 candidate failed its
+fresh all-map gate at **40–44–4** (47.73%; decisive Wilson 95% 37.28–58.17%).
+It reduced aggregate head deaths without improving final match strength, so it
+is reproducible but disabled. The accepted local corpus now contains 1,773
+complete valid games; the champion remains unchanged.

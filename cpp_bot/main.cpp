@@ -35,6 +35,9 @@ namespace {
 #ifndef LARGE_POPULATION_TARGET
 #define LARGE_POPULATION_TARGET 40
 #endif
+#ifndef FRIENDLY_HEAD_DESTINATION_PENALTY
+#define FRIENDLY_HEAD_DESTINATION_PENALTY 0
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -580,6 +583,17 @@ int friendly_pressure(Controller const& controller, Game const& game_state, Posi
     return score;
 }
 
+int friendly_head_destinations(Controller const& controller, Position target) {
+    int count = 0;
+    for (auto const& tile : controller.get_tiles()) {
+        auto const* dragon = tile.get_dragon();
+        if (!dragon || !dragon->is_head() || dragon->get_team() != controller.get_team() ||
+            dragon->get_id() == controller.get_id()) continue;
+        if (dragon->get_position().add_dir(dragon->get_dir()) == target) ++count;
+    }
+    return count;
+}
+
 int special_friendly_pressure(Controller const& controller, Game const& game_state, Position start) {
     int score = 0;
     for (auto const& tile : controller.get_tiles()) {
@@ -795,6 +809,8 @@ int score_move(Direction direction) {
     }
     if (future_mobility == 1) score -= 80;
     score += special ? special_friendly_pressure(controller, game_state, target) : friendly_pressure(controller, game_state, target);
+    if constexpr (FRIENDLY_HEAD_DESTINATION_PENALTY > 0)
+        score -= friendly_head_destinations(controller, target) * FRIENDLY_HEAD_DESTINATION_PENALTY;
     if (enemy_collision_risk(controller, game_state, target)) {
         score -= special ? (role == Role::HUNTER ? 260 : 550) : (role == Role::HUNTER ? 300 : 500);
     }

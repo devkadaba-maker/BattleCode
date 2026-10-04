@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/teammate240b",
+    ".experiments/bin/teammate720b"
+  ],
+  "opponents": [
+    ".experiments/bin/champion43"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    6161
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/bin/teammate240b": "234f45e341c53a5715178a672b7855e1ef368569c580683ab1fe431f6c7a05ba",
+    ".experiments/bin/teammate720b": "9ecaffb11867cfd16bdbe33af4d130d81bfbdf0ae9a0b7bb5f6464bba9ee6296",
+    ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}
