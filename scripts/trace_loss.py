@@ -20,6 +20,17 @@ import benchmark
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def portable_bot_name(value):
+    path = Path(value)
+    if path.name == 'bot' and path.parent.name == '.unswbc-build':
+        return f'{path.parent.parent.name}/bot'
+    return path.name
+
+
+def requested_bot(value, requested):
+    return not requested or requested in {Path(value).name, portable_bot_name(value)}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('matrix', type=Path)
@@ -40,8 +51,8 @@ def main():
         parser.error('diagnostic output already exists; choose a new filename')
     rows = [json.loads(line) for line in args.matrix.read_text().splitlines()]
     selected = [r for r in rows if r['map'] == args.map and r['seed'] == args.seed and r['side'] == args.side
-                and (not args.candidate or Path(r['candidate']).name == args.candidate)
-                and (not args.opponent or Path(r['opponent']).name == args.opponent)]
+                and requested_bot(r['candidate'], args.candidate)
+                and requested_bot(r['opponent'], args.opponent)]
     if len(selected) != 1:
         parser.error(f'selection must identify exactly one row; found {len(selected)}')
     original = selected[0]
@@ -51,8 +62,8 @@ def main():
         parser.error(f'toolkit mismatch: installed {toolkit}, recorded {manifest["toolkit"]}')
     binaries, hashes = {}, {}
     for role in ['candidate', 'opponent']:
-        name = Path(original[role]).name
-        listed = [p for p in manifest[role+'s'] if Path(p).name == name]
+        name = portable_bot_name(original[role])
+        listed = [p for p in manifest[role+'s'] if portable_bot_name(p) == name]
         if len(listed) != 1 or listed[0] not in manifest['sha256']:
             parser.error(f'{role} needs an unambiguous frozen native binary hash')
         path = Path(original[role])

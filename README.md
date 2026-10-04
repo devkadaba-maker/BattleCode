@@ -186,3 +186,10 @@ selective eighth scored 4–12 across the standard eight maps. All 32 games were
 valid, but neither policy justified fresh validation. The exact patch and raw
 matrix are archived; the accepted corpus is now 1,925 games and the active
 champion remains unchanged.
+
+Arrival-time-aware route guidance was also rejected. Exact spawn timing scored
+8–8; allowing two turns of slack produced 6–9 across valid rows plus one
+Schooltime game with invalid actions. A supervised rerun was valid but changed
+the result and death diagnostics, so it does not replace the failed row. The
+entire 32-row combined matrix is isolated under failed diagnostics and the
+accepted corpus remains 1,925 games. The champion is unchanged.

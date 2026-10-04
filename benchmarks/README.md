@@ -94,6 +94,22 @@ code from `df5f1e0`. The result indicates that replacing pearl collection with
 full tactical pursuit is harmful even when restricted to visible contact and
 population-cap play. It is screening evidence, not measured Elo.
 
+## Future-spawn route guidance
+
+The route-distance term was extended to recognize pearl countdowns that would
+expire by estimated arrival. Exact arrival timing scored **8–8** on the standard
+eight-map screen at seed 6969. Allowing two extra turns scored **6–9 across its
+valid rows**, with one additional Schooltime B-side game recording invalid
+actions on both teams. The whole 32-row combined matrix is preserved under
+`research/failed/` and excluded from the accepted corpus.
+
+An exact supervised rerun of the invalid case completed validly but remained a
+candidate loss and differed in result and death diagnostics. It is diagnostic
+only and cannot replace the original observation. `scripts/trace_loss.py` now
+accepts variant-qualified names such as `future-route2/bot`, preventing ambiguity
+when several frozen binaries share the filename `.unswbc-build/bot`. Neither
+timing setting advanced to fresh validation; the champion remains unchanged.
+
 Tracing the deterministic Weakhold seed505 B-side loss found the queen moving
 from (29,1) north to (29,0), then west along the corridor to (24,0), splitting
 on turns186 and187, and dying on turn188. On UNSW, it moved from (43,21) west

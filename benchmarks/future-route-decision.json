@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_failed_screen",
+  "active_champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "active_champion_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypothesis": "Let route-distance guidance target pearl spawns whose countdown expires by estimated arrival.",
+  "screen": {
+    "seed": 6969,
+    "maps": 8,
+    "sides": ["A", "B"],
+    "exact_arrival": {"wins": 8, "losses": 8, "draws": 0, "sha256": "e0d5714f2fefc1047a01e5023b64a24d1226014f7df456216e3251ef1657948f"},
+    "two_turn_slack": {"valid_wins": 6, "valid_losses": 9, "draws": 0, "invalid_games": 1, "sha256": "1ab169a97a8bb25650beccb1d591feff55bcdba2a86706cd8a39ca0d805efc3a"},
+    "failed_matrix_rows": 32,
+    "failed_case": "Schooltime seed6969 sideB recorded invalid actions on both teams"
+  },
+  "diagnostic_rerun": {
+    "valid": true,
+    "outcome": "loss",
+    "reproduced_fault": false,
+    "different_fields": ["valid", "result", "deaths"],
+    "strength_evidence": false,
+    "file": "research/future-route-schooltime-invalid-rerun.json"
+  },
+  "fresh_validation_run": false,
+  "reason": "Exact timing was neutral and the slack policy lost its valid subset; the combined matrix also contained an invalid game and is excluded from accepted evidence.",
+  "records": ["research/failed/future-route-screen.jsonl"],
+  "reproduction": "Apply research/future-route.patch to ffb0de0 and build with --future-route-slack 0 or 2.",
+  "accepted_matrix_records_after_iteration": 1925,
+  "failed_diagnostic_rows_after_iteration": 128,
+  "note": "These are local match outcomes, not Elo measurements. The active bot remains unchanged."
+}
