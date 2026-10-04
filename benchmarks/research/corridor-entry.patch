@@ -1,0 +1,56 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index f5470dd..48c76ab 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -41,6 +41,9 @@ namespace {
+ #ifndef FRIENDLY_PRIORITY_CLAIM_PENALTY
+ #define FRIENDLY_PRIORITY_CLAIM_PENALTY 0
+ #endif
++#ifndef FLAGSHIP_CORRIDOR_ENTRY_PENALTY
++#define FLAGSHIP_CORRIDOR_ENTRY_PENALTY 0
++#endif
+ 
+ int parent_split_count = 0;
+ std::array<int, 4> vision_target_bonuses{};
+@@ -811,6 +814,12 @@ int score_move(Direction direction) {
+         chase_weight = 0;
+     }
+     int score = area * 12 + future_mobility * 12;
++#if FLAGSHIP_CORRIDOR_ENTRY_PENALTY > 0
++    // Penalize the irreversible transition from an open square into a
++    // one-onward corridor. Do not hinder a flagship already inside one.
++    if (flagship && future_mobility == 1 && mobility(controller, game_state, start) >= 2)
++        score -= FLAGSHIP_CORRIDOR_ENTRY_PENALTY;
++#endif
+     if (role == Role::COLLECTOR) {
+         // A pearl tile is worth pursuing even when it is beside kelp or in a
+         // narrow pocket.  The old mobility gate made the bot walk past those
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 08a2816..a98687e 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -24,6 +24,7 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
+ parser.add_argument('--large-population-target', type=int)
+ parser.add_argument('--friendly-head-destination-penalty', type=int)
+ parser.add_argument('--friendly-priority-claim-penalty', type=int)
++parser.add_argument('--flagship-corridor-entry-penalty', type=int)
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -34,6 +35,8 @@ if args.friendly_head_destination_penalty is not None and args.friendly_head_des
+     parser.error('--friendly-head-destination-penalty must be non-negative')
+ if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
+     parser.error('--friendly-priority-claim-penalty must be non-negative')
++if args.flagship_corridor_entry_penalty is not None and args.flagship_corridor_entry_penalty < 0:
++    parser.error('--flagship-corridor-entry-penalty must be non-negative')
+ destination = ROOT / '.experiments' / args.name
+ destination.mkdir(parents=True, exist_ok=True)
+ if args.ref:
+@@ -46,6 +49,7 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
+ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
++defines['FLAGSHIP_CORRIDOR_ENTRY_PENALTY'] = args.flagship_corridor_entry_penalty
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):

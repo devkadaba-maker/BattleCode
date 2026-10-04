@@ -585,3 +585,27 @@ Seed 6464 is now seen tuning evidence. The accepted corpus remains 1,773 games.
 Failed diagnostic matrices now contain 96 rows and six invalid games in total;
 all stay excluded. Do not retest this unchanged priority rule or infer strength
 from the valid subset.
+
+## Flagship corridor-entry guard — fresh validation failed
+
+This experiment penalized only the transition from a currently open square
+(at least two legal moves) into a square with exactly one onward move, and only
+for flagships. Unlike the rejected static path scoring, it did not hinder a
+flagship already inside a corridor. Penalty 400 scored **8–8** and penalty 1000
+scored **10–6** on the standard eight-map, both-side tuning seed 7272.
+
+The frozen 1000 candidate then failed its independent all-map gate. Across all
+22 official maps, both sides, fresh seeds 7373 and 7474, it returned **33 wins,
+51 losses and 4 draws** in 88 complete valid games: a 39.77% score and a
+decisive-game Wilson 95% interval of 29.53–49.98%. Portals regressed to 0–4;
+nine additional maps returned 1–3. There were no runtime or invalid-action
+faults, but the strength result failed both promotion thresholds, so diverse
+opponents and judge sandbox were not run.
+
+The tested 1000 binary SHA256 is
+`b650024d34045b464421b71e8ab51523307af3983a589b100c49700889a472ee`.
+`research/corridor-entry.patch` reproduces both candidates from commit
+`896122c`; exact hashes and results are in `corridor-entry-decision.json`.
+Seeds 7272, 7373 and 7474 are now seen evidence. These 120 valid games raise
+the accepted corpus to 2,061. The experiment is disabled and the byte-identical
+champion remains active.
