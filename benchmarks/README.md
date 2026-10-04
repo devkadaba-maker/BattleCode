@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 1,925 accepted records form complete matrices with no invalid actions
+All 1,941 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -109,6 +109,23 @@ only and cannot replace the original observation. `scripts/trace_loss.py` now
 accepts variant-qualified names such as `future-route2/bot`, preventing ambiguity
 when several frozen binaries share the filename `.unswbc-build/bot`. Neither
 timing setting advanced to fresh validation; the champion remains unchanged.
+
+## Conservative portal policy
+
+Two portal controls were screened on seed 7070: non-flagships forced portal
+entry only when no safe ordinary move existed, and a separate candidate limited
+each portal ID to one use. The trapped-only candidate had 10 wins and 5 losses
+across valid rows but one Schooltime A-side game recorded an opponent-side
+invalid action. The one-use candidate scored 9–7. The complete combined matrix
+is retained under `research/failed/` and excluded from accepted evidence.
+
+The frozen trapped-only binary then played a clean confirmation on seed 7171
+and scored **9–7**. That is positive but below the advancement threshold, so no
+fresh all-map, diverse-opponent or sandbox gate was run. A supervised rerun of
+the invalid case was valid and flipped the candidate loss to a win, but it did
+not reproduce or replace the original observation. The 16 clean confirmation
+games bring accepted evidence to 1,941. Exact hashes and reproduction details
+are in `portal-policy-decision.json` and `research/portal-policy.patch`.
 
 Tracing the deterministic Weakhold seed505 B-side loss found the queen moving
 from (29,1) north to (29,0), then west along the corridor to (24,0), splitting

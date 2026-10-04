@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_before_fresh_validation",
+  "active_champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "active_champion_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypotheses": ["Force portal entry only when no safe non-portal move exists", "Limit each portal ID to one use"],
+  "initial_failed_screen": {
+    "seed": 7070,
+    "maps": 8,
+    "force_only_trapped": {"valid_wins": 10, "valid_losses": 5, "invalid_games": 1, "sha256": "9065ea1f972588828dfbb7f6e9ca661cd46dc1e202b84ef4f143e20e3c321b80"},
+    "one_use_limit": {"wins": 9, "losses": 7, "invalid_games": 0, "sha256": "d82bca1d493ce66667801dc02b74fe8da782b5562f4d27e6f609169e5bd151bb"},
+    "failed_case": "Schooltime seed7070 sideA had an opponent-side invalid action",
+    "rows": 32,
+    "accepted_evidence": false
+  },
+  "clean_confirmation": {
+    "candidate": "force_only_trapped",
+    "seed": 7171,
+    "games": 16,
+    "wins": 9,
+    "losses": 7,
+    "draws": 0,
+    "valid_games": 16
+  },
+  "diagnostic_rerun": {
+    "valid": true,
+    "outcome": "win",
+    "reproduced_fault": false,
+    "different_fields": ["outcome", "valid", "result", "deaths"],
+    "strength_evidence": false
+  },
+  "fresh_validation_run": false,
+  "reason": "The clean frozen confirmation was only 9-7, below the advancement threshold; the stronger-looking first screen was invalid.",
+  "reproduction": "Apply research/portal-policy.patch to 63abadf and build with --portal-force-only-trapped 1 or --portal-use-limit 1.",
+  "accepted_matrix_records_after_iteration": 1941,
+  "failed_diagnostic_rows_after_iteration": 160,
+  "note": "These are local match outcomes, not Elo measurements. The active bot remains unchanged."
+}

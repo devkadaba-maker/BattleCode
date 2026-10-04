@@ -1,0 +1,67 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index f5470dd..090fe53 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -41,6 +41,12 @@ namespace {
+ #ifndef FRIENDLY_PRIORITY_CLAIM_PENALTY
+ #define FRIENDLY_PRIORITY_CLAIM_PENALTY 0
+ #endif
++#ifndef PORTAL_FORCE_ONLY_TRAPPED
++#define PORTAL_FORCE_ONLY_TRAPPED 0
++#endif
++#ifndef PORTAL_USE_LIMIT_OVERRIDE
++#define PORTAL_USE_LIMIT_OVERRIDE -1
++#endif
+ 
+ int parent_split_count = 0;
+ std::array<int, 4> vision_target_bonuses{};
+@@ -733,7 +739,8 @@ bool portal_allowed(Edge const& edge) {
+     if (!edge.is_portal()) return true;
+     if (game->get_round_num() == last_portal_round + 1) return false;
+     auto const uses = portal_uses.find(edge.get_portal_id());
+-    return uses == portal_uses.end() || uses->second < PORTAL_USE_LIMIT;
++    int limit = PORTAL_USE_LIMIT_OVERRIDE >= 0 ? PORTAL_USE_LIMIT_OVERRIDE : PORTAL_USE_LIMIT;
++    return uses == portal_uses.end() || uses->second < limit;
+ }
+ 
+ bool has_empty_step() {
+@@ -754,7 +761,7 @@ std::optional<Direction> visible_portal_direction() {
+     for (Direction direction : Direction::get_direction_list()) {
+         auto const& edge = here->get_edge(direction);
+         if (!edge.is_portal() || !portal_allowed(edge) || !should_force_portal(*ct, *game)) continue;
+-        if (flagship_dragon(*ct, *game)) {
++        if (PORTAL_FORCE_ONLY_TRAPPED || flagship_dragon(*ct, *game)) {
+             for (Direction alternative : Direction::get_direction_list()) {
+                 if (!here->get_edge(alternative).is_portal() &&
+                     safe_step(*ct, *game, ct->get_position(), alternative)) return std::nullopt;
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 08a2816..8da6f08 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -24,6 +24,8 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
+ parser.add_argument('--large-population-target', type=int)
+ parser.add_argument('--friendly-head-destination-penalty', type=int)
+ parser.add_argument('--friendly-priority-claim-penalty', type=int)
++parser.add_argument('--portal-force-only-trapped', type=int, choices=[0,1])
++parser.add_argument('--portal-use-limit', type=int)
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -34,6 +36,8 @@ if args.friendly_head_destination_penalty is not None and args.friendly_head_des
+     parser.error('--friendly-head-destination-penalty must be non-negative')
+ if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
+     parser.error('--friendly-priority-claim-penalty must be non-negative')
++if args.portal_use_limit is not None and args.portal_use_limit < 0:
++    parser.error('--portal-use-limit must be non-negative')
+ destination = ROOT / '.experiments' / args.name
+ destination.mkdir(parents=True, exist_ok=True)
+ if args.ref:
+@@ -46,6 +50,8 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
+ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
++defines['PORTAL_FORCE_ONLY_TRAPPED'] = args.portal_force_only_trapped
++defines['PORTAL_USE_LIMIT_OVERRIDE'] = args.portal_use_limit
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):

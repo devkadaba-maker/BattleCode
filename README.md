@@ -193,3 +193,10 @@ Schooltime game with invalid actions. A supervised rerun was valid but changed
 the result and death diagnostics, so it does not replace the failed row. The
 entire 32-row combined matrix is isolated under failed diagnostics and the
 accepted corpus remains 1,925 games. The champion is unchanged.
+
+A conservative portal policy initially looked promising but was not promoted.
+Forcing portals only when trapped returned 10–5 across valid rows plus one
+opponent-side invalid game; limiting portals to one use scored 9–7. A separate
+clean frozen confirmation of the trapped-only policy scored 9–7, below the
+fresh-gate threshold. The failed 32-row matrix is isolated, the 16 clean games
+raise accepted evidence to 1,941, and the champion remains unchanged.
