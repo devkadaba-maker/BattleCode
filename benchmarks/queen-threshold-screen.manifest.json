@@ -1,0 +1,43 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/escape-threshold3",
+    ".experiments/bin/escape-threshold-body"
+  ],
+  "opponents": [
+    ".experiments/bin/champion43"
+  ],
+  "maps": [
+    "arena",
+    "australia",
+    "autarky",
+    "big_empty",
+    "Colosseum",
+    "default",
+    "default_small",
+    "devil",
+    "dilemma",
+    "islands",
+    "maze",
+    "portals",
+    "queen_of_spades",
+    "schooltime",
+    "slithery_fight",
+    "stripes",
+    "stronghold",
+    "tower_defense",
+    "trauma",
+    "trophy",
+    "unsw",
+    "weakhold"
+  ],
+  "seeds": [
+    4747
+  ],
+  "games": 88,
+  "sha256": {
+    ".experiments/bin/escape-threshold3": "b44e3687c336fc4516105b9e588cbab0cb3d6f9422cb49c287b13aadd0690e66",
+    ".experiments/bin/escape-threshold-body": "aed0e1cfb499a2794f2ed4b42000338a610ac2be9706e12a230d3dcafa8ee3e0",
+    ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}

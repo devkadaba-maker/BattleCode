@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 1,437 accepted records form complete matrices with no invalid actions
+All 1,525 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -283,3 +283,63 @@ all candidates failed screening. All 1,437 accepted matrix records pass
 The active source and native champion hash remain unchanged. Future work
 should examine the limited-view assumption at corridor entry and collisions
 with moving teammates, rather than promoting the static forecast family.
+
+## Saturated escape-budget screen — champion retained
+
+The next hypothesis capped the queen's escape-depth reward once a route had
+enough steps, preserving the champion's food/congestion ordering among equally
+adequate routes. Both candidates kept the earlier six-step search, own-trail
+exclusion and fixed straight-head forecasts. One saturated at three moves;
+the other at `min(6, length + 1)`. These were global policies with weight 4000
+through turn 499, without moving-body release.
+
+`queen-threshold-screen.jsonl` contains all 22 official maps, both sides,
+seed 4747, against the current champion from 43ebea6: 88 complete, unique,
+valid games. This seed is now tuning evidence, not unseen validation.
+
+| Policy | Wins | Losses | Draws | Score | Decisive Wilson 95% |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Three-step saturation | 16 | 26 | 2 | 38.64% | 25.00–53.19% |
+| Body-length saturation | 22 | 20 | 2 | 52.27% | 37.72–66.64% |
+
+Neither warrants a fresh promotion gate. Both lost both sides on Big Empty,
+Default, Dilemma, Islands and Stripes. Body-length saturation also lost both
+sides on Arena and Slithery Fight. Its two Colosseum wins did not preserve the
+queens: they died on turns 81 and 56. Do not select a map-specific repair from
+that two-game result without a diagnosed repair and separate fresh controls.
+There was no new sandbox or diverse-opponent gate because screening failed.
+The active bot's source and native hash remain unchanged.
+
+The three-step Colosseum A-side loss was reproduced exactly, including scores,
+deaths, queen inputs/outputs, population peaks and notices. Its queen was at
+(14,13), length 8, on turn 83; it moved to the right edge, down, left, down,
+and right into (15,15) on turn 88. It split on turns 88–90 and died against the
+wall on turn 91. At turn 83 only the east step was immediately safe; by turn
+86 both west and south had only two moves in the static forecast. The fatal
+corner must be prevented earlier than the final wall move. This trace does
+not establish that a longer static horizon would succeed.
+
+`scripts/trace_loss.py` now reproduces a selected matrix row using its exact
+native binary hashes and the pinned toolkit. It retains queen spawn data and
+the preceding eight rounds, compares the full game diagnostics with the
+original row, and labels the output as a diagnostic rerun excluded from matrix
+evidence. It rejects ambiguous selections, missing/mismatched binaries and
+existing output files. The Colosseum reproduction matched exactly; ambiguity
+and binary-mismatch rejection checks passed. Example:
+
+```sh
+.venv/bin/python scripts/trace_loss.py benchmarks/queen-threshold-screen.jsonl --candidate escape-threshold3 --map Colosseum --seed 4747 --side A --output .experiments/colosseum-diagnostic.json
+```
+
+The retained reproduction is `research/queen-threshold-colosseum-reproduction.json`.
+Apply `research/queen-threshold.patch` to 43ebea6 with `git apply --unidiff-zero`, then build
+with `--queen-escape-weight 4000 --queen-escape-rounds 500 --queen-escape-scope 0`
+and `--queen-escape-threshold 1` or `2`. Both native binaries were reproduced
+byte-for-byte from the archived patch. The smoke test passed for both modes,
+checking saturation, the queen-only scope and friendly/enemy head forecasts.
+Exact hashes, build flags, outcomes and decision are in `queen-threshold-decision.json`.
+
+This screen adds 88 accepted records, bringing the complete valid matrices to
+1,525 games. The 20 previously failed diagnostic records remain separate and
+unchanged. Future work should test a materially different corridor-entry or
+teammate-motion hypothesis rather than retune the rejected depth-reward family.

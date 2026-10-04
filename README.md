@@ -126,3 +126,11 @@ The subsequent queen-escape experiment was **not promoted**. Its fresh
 (59.09%; decisive Wilson lower bound 48.83%), missing the verification target.
 The champion remains unchanged. Reproducible experiment patches, loss traces,
 raw records and sandbox checks are in `benchmarks/`.
+
+Two subsequent escape-budget variants were also rejected: saturating at three
+moves scored 16–26–2, and saturating at body length plus one (maximum six) scored
+22–20–2 against the champion across all 22 maps and both sides. These are
+screening results, not validation or Elo. The active bot remains unchanged.
+`scripts/trace_loss.py` can reproduce a matrix case with verified native hashes
+and retain the turns before queen deaths; its Colosseum reproduction matched
+the original game exactly. See the benchmark notes for usage and evidence.
