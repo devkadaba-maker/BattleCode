@@ -179,3 +179,10 @@ lower bound among decisive games**. It missed both promotion thresholds, with
 1–3 regressions on Colosseum, Islands and Maze. The policy is archived but
 disabled; the champion binary remains byte-identical and the accepted corpus
 now contains 1,893 complete valid games.
+
+A population-cap tactical-hunter experiment was rejected at screening. A
+hashed quarter of eligible non-flagship snakes scored 7–9, while a more
+selective eighth scored 4–12 across the standard eight maps. All 32 games were
+valid, but neither policy justified fresh validation. The exact patch and raw
+matrix are archived; the accepted corpus is now 1,925 games and the active
+champion remains unchanged.

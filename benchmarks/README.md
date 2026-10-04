@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 1,893 accepted records form complete matrices with no invalid actions
+All 1,925 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -78,6 +78,21 @@ run and the champion remains active. Apply `research/pearl-claim.patch` to
 The raw tuning and fresh matrices pass `scripts/check_records.py`; the checker
 now preserves variant identity when multiple compiled inputs share the filename
 `.unswbc-build/bot`. These results are local evidence, not measured Elo.
+
+## Tactical hunter role screen
+
+This experiment assigned a deterministic subset of non-queen, non-flagship
+snakes to the existing hunter movement policy only after the team reached its
+population target and an enemy head was visible. On the standard eight maps,
+both sides of tuning seed 6868, modulo 4 scored **7–9** and modulo 8 scored
+**4–12** against the champion. All 32 games were complete and valid.
+
+Both settings were rejected before fresh validation, diverse opponents or
+judge sandbox. The exact tested hashes and decision are in
+`tactical-hunter-decision.json`; `research/tactical-hunter.patch` reproduces the
+code from `df5f1e0`. The result indicates that replacing pearl collection with
+full tactical pursuit is harmful even when restricted to visible contact and
+population-cap play. It is screening evidence, not measured Elo.
 
 Tracing the deterministic Weakhold seed505 B-side loss found the queen moving
 from (29,1) north to (29,0), then west along the corridor to (24,0), splitting

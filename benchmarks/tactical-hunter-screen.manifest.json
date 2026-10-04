@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/tactical-hunter4/.unswbc-build/bot",
+    ".experiments/tactical-hunter8/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/champion-ref2/.unswbc-build/bot"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    6868
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/tactical-hunter4/.unswbc-build/bot": "fefad12a0609063338bbdc24f21e822835bbf0d3832ab311b8adc9da35896226",
+    ".experiments/tactical-hunter8/.unswbc-build/bot": "b0691cb95272fa5fafbf852d17df3f77dd7323e6ac5b36e35836798ce79d9241",
+    ".experiments/champion-ref2/.unswbc-build/bot": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}
