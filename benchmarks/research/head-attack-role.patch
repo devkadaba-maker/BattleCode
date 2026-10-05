@@ -1,0 +1,48 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 8153d38..25f4273 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -8,6 +8,10 @@
+ #define HEAD_ATTACK_LAST_ROUND 500
+ #endif
+ 
++#ifndef HEAD_ATTACK_TARGET_ROLE
++#define HEAD_ATTACK_TARGET_ROLE 0
++#endif
++
+ #include <algorithm>
+ #include <array>
+ #include <cstdint>
+@@ -347,6 +351,11 @@ bool favourable_head_attack(Controller const& controller, Game const& game_state
+     auto const* enemy = tile ? tile->get_dragon() : nullptr;
+     if (!enemy || enemy->get_team() == controller.get_team() || !enemy->is_head() ||
+         (target_id.has_value() && enemy->get_id() != *target_id)) return false;
++    if constexpr (HEAD_ATTACK_TARGET_ROLE == 1) {
++        if (enemy->get_id() >= 2) return false;
++    } else if constexpr (HEAD_ATTACK_TARGET_ROLE == 2) {
++        if (enemy->get_id() < 2) return false;
++    }
+ 
+     int our_length = controller.get_length();
+     int enemy_visible_segments = 0;
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index a9cdd3a..609b762 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -30,6 +30,8 @@ parser.add_argument('--head-attack-visible-margin', type=int,
+                     help='minimum visible enemy length advantage for a head trade (default: 4)')
+ parser.add_argument('--head-attack-last-round', type=int,
+                     help='last round when an expendable head trade is allowed (default: 500)')
++parser.add_argument('--head-attack-target-role', type=int, choices=[0,1,2],
++                    help='0 all enemies, 1 queens only, 2 non-queens only')
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -59,6 +61,7 @@ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalt
+ defines['ENEMY_HEADING_ORDER_AWARE'] = args.enemy_heading_order_aware
+ defines['HEAD_ATTACK_VISIBLE_MARGIN'] = args.head_attack_visible_margin
+ defines['HEAD_ATTACK_LAST_ROUND'] = args.head_attack_last_round
++defines['HEAD_ATTACK_TARGET_ROLE'] = args.head_attack_target_role
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):

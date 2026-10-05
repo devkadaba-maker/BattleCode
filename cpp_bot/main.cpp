@@ -8,6 +8,10 @@
 #define HEAD_ATTACK_LAST_ROUND 500
 #endif
 
+#ifndef HEAD_ATTACK_TARGET_ROLE
+#define HEAD_ATTACK_TARGET_ROLE 0
+#endif
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -347,6 +351,11 @@ bool favourable_head_attack(Controller const& controller, Game const& game_state
     auto const* enemy = tile ? tile->get_dragon() : nullptr;
     if (!enemy || enemy->get_team() == controller.get_team() || !enemy->is_head() ||
         (target_id.has_value() && enemy->get_id() != *target_id)) return false;
+    if constexpr (HEAD_ATTACK_TARGET_ROLE == 1) {
+        if (enemy->get_id() >= 2) return false;
+    } else if constexpr (HEAD_ATTACK_TARGET_ROLE == 2) {
+        if (enemy->get_id() < 2) return false;
+    }
 
     int our_length = controller.get_length();
     int enemy_visible_segments = 0;

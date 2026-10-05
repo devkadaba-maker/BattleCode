@@ -30,6 +30,8 @@ parser.add_argument('--head-attack-visible-margin', type=int,
                     help='minimum visible enemy length advantage for a head trade (default: 4)')
 parser.add_argument('--head-attack-last-round', type=int,
                     help='last round when an expendable head trade is allowed (default: 500)')
+parser.add_argument('--head-attack-target-role', type=int, choices=[0,1,2],
+                    help='0 all enemies, 1 queens only, 2 non-queens only')
 parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
 args = parser.parse_args()
 if not args.name.replace('-','').replace('_','').isalnum():
@@ -59,6 +61,7 @@ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalt
 defines['ENEMY_HEADING_ORDER_AWARE'] = args.enemy_heading_order_aware
 defines['HEAD_ATTACK_VISIBLE_MARGIN'] = args.head_attack_visible_margin
 defines['HEAD_ATTACK_LAST_ROUND'] = args.head_attack_last_round
+defines['HEAD_ATTACK_TARGET_ROLE'] = args.head_attack_target_role
 prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
 (destination/'main.cpp').write_text(prefix+source)
 for name in ('helper.hpp','bot.toml'):
