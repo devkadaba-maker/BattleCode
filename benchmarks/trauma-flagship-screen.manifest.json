@@ -1,0 +1,26 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/trauma-weight12/.unswbc-build/bot",
+    ".experiments/trauma-weight16/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/recent-region0/.unswbc-build/bot"
+  ],
+  "maps": [
+    "trauma"
+  ],
+  "seeds": [
+    10007,
+    10008,
+    10009,
+    10010,
+    10011
+  ],
+  "games": 20,
+  "sha256": {
+    ".experiments/trauma-weight12/.unswbc-build/bot": "b526a39114dd699cb92b1e22535f5a6bec36a6dcc5d178e586f2ca994a64d29e",
+    ".experiments/trauma-weight16/.unswbc-build/bot": "6efdb703ec9a650c817418974d1e8948ae44532784e1560017028b6e93beda5f",
+    ".experiments/recent-region0/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

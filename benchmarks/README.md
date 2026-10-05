@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 2,629 accepted records form complete matrices with no invalid actions
+All 2,649 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -818,3 +818,21 @@ are in `recent-region-decision.json`. Seed 10006 is now seen. The default
 penalty remains zero and rebuilds byte-identical to the champion. Accepted
 evidence remains 2,629 games; failed diagnostics rise to 288 rows with 18
 invalid games.
+
+## Trauma flagship pearl weighting
+
+Several champion losses on Trauma reached round 500 with the queen alive, so
+this experiment tested whether a longer flagship could improve the final
+tiebreak. The Trauma-only detector distinguishes its 48×24 opening from
+Stronghold by the absence of visible current pearls. Flagship pearl weights 12
+and 16 were each tested against the exact champion from both sides on five
+seeds (10007–10011).
+
+Both candidates scored **5–5**. All 20 games were complete, unique, valid and
+fault-free, but neither weight supplied evidence of an improvement. No fresh
+scoped validation, unaffected-map control, diverse-opponent gate or sandbox
+run was justified. Exact hashes, records and reproduction instructions are in
+`trauma-flagship-*`; the rejected source is archived as
+`research/trauma-flagship-weight.patch`. The production source was restored and
+rebuilds byte-identical to the active champion. Accepted evidence rises to
+2,649 games; failed diagnostics remain 288 rows with 18 invalid games.
