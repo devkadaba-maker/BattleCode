@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_failed_screen",
+  "active_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Discourage returning to recently occupied local regions so collectors explore instead of looping and crowding their own routes.",
+  "screen": {
+    "seed": 10006,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "both_sides": true,
+    "penalty_12": {
+      "valid_wins": 7, "valid_losses": 8, "invalid_games": 1,
+      "native_sha256": "a616d34509aaed87862341e3a9b86220f916148b38354a578f4e74f8745eb397"
+    },
+    "penalty_30": {
+      "valid_wins": 7, "valid_losses": 9, "invalid_games": 0,
+      "native_sha256": "cbcea87a6c8637a68200b6cc6965a0f8a6f337578fda7936531027ad302259ff"
+    },
+    "matrix_status": "failed_and_fully_excluded",
+    "failed_matrix": "benchmarks/research/failed/recent-region-screen.jsonl",
+    "invalid_case": "penalty12 Schooltime A-side loss; opponent-side invalid action"
+  },
+  "fresh_all_map_gate": "not_run_after_negative_screen",
+  "diverse_opponents": "not_run",
+  "judge_sandbox": "not_run",
+  "reason": "Both history penalties underperformed the champion, so neither warranted clean confirmation or fresh validation.",
+  "reproduction": {
+    "base_commit": "906e6dd050b14a7eb01f577c7d9e9921d03fa1ea",
+    "patch": "benchmarks/research/recent-region.patch",
+    "build_flags": ["--recent-region-penalty 12", "--recent-region-penalty 30"]
+  },
+  "default_build_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "accepted_matrix_games_after": 2629,
+  "failed_diagnostic_rows_after": 288,
+  "failed_diagnostic_invalid_games_after": 18,
+  "local_results_are_measured_elo": false
+}

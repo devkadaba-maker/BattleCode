@@ -801,3 +801,20 @@ Exact hashes and reproduction details are in
 resource threshold remains zero and rebuilds byte-identical to the active
 champion; accepted evidence stays at 2,629 games. Failed diagnostics rise to
 256 rows with 17 invalid games.
+
+## Recent-region movement penalty — failed matrix
+
+This experiment penalized moves into tiles within distance two of positions the
+same dragon occupied during its preceding 24 history entries. Penalties 12 and
+30 were screened on the standard eight maps, both sides of seed 10006. Penalty
+12 scored **7–8 across valid rows**, with one additional Schooltime game that
+contained an opponent-side invalid action. Penalty 30 scored **7–9** in 16
+valid games.
+
+Both candidates underperformed. The whole combined 32-row matrix is retained
+under `research/failed/` and excluded from accepted evidence; no fresh,
+diverse-opponent or sandbox gate was run. Exact hashes and reproduction details
+are in `recent-region-decision.json`. Seed 10006 is now seen. The default
+penalty remains zero and rebuilds byte-identical to the champion. Accepted
+evidence remains 2,629 games; failed diagnostics rise to 288 rows with 18
+invalid games.

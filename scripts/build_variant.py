@@ -23,6 +23,7 @@ parser.add_argument('--queen-split-limit', type=int)
 parser.add_argument('--child-split-limit', type=int)
 parser.add_argument('--planned-split-min-length', type=int)
 parser.add_argument('--split-visible-pearl-requirement', type=int)
+parser.add_argument('--recent-region-penalty', type=int)
 parser.add_argument('--queen-hunt', type=int, choices=[0,1])
 parser.add_argument('--large-population-target', type=int)
 parser.add_argument('--friendly-head-destination-penalty', type=int)
@@ -47,6 +48,8 @@ if args.planned_split_min_length is not None and args.planned_split_min_length <
     parser.error('--planned-split-min-length must be at least 4')
 if args.split_visible_pearl_requirement is not None and args.split_visible_pearl_requirement < 0:
     parser.error('--split-visible-pearl-requirement must be non-negative')
+if args.recent_region_penalty is not None and args.recent_region_penalty < 0:
+    parser.error('--recent-region-penalty must be non-negative')
 if args.friendly_head_destination_penalty is not None and args.friendly_head_destination_penalty < 0:
     parser.error('--friendly-head-destination-penalty must be non-negative')
 if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
@@ -67,6 +70,7 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
 defines['CHILD_SPLIT_LIMIT'] = args.child_split_limit
 defines['PLANNED_SPLIT_MIN_LENGTH'] = args.planned_split_min_length
 defines['SPLIT_VISIBLE_PEARL_REQUIREMENT'] = args.split_visible_pearl_requirement
+defines['RECENT_REGION_PENALTY'] = args.recent_region_penalty
 defines['LARGE_POPULATION_TARGET'] = args.large_population_target
 defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
 defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty

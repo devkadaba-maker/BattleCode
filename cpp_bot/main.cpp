@@ -50,6 +50,9 @@ namespace {
 #ifndef SPLIT_VISIBLE_PEARL_REQUIREMENT
 #define SPLIT_VISIBLE_PEARL_REQUIREMENT 0
 #endif
+#ifndef RECENT_REGION_PENALTY
+#define RECENT_REGION_PENALTY 0
+#endif
 #ifndef QUEEN_HUNT
 #define QUEEN_HUNT 0
 #endif
@@ -768,6 +771,15 @@ bool recent_collision(Position target) {
     return std::find(history.begin() + begin, history.end(), target) != history.end();
 }
 
+int recent_region_visits(Game const& game_state, Position target) {
+    int count = 0;
+    int begin = std::max(0, static_cast<int>(history.size()) - 24);
+    for (auto it = history.begin() + begin; it != history.end(); ++it) {
+        if (distance(*it, target, game_state) <= 2) ++count;
+    }
+    return count;
+}
+
 bool portal_allowed(Edge const& edge) {
     if (!edge.is_portal()) return true;
     if (game->get_round_num() == last_portal_round + 1) return false;
@@ -850,6 +862,8 @@ int score_move(Direction direction) {
         chase_weight = 0;
     }
     int score = area * 12 + future_mobility * 12;
+    if constexpr (RECENT_REGION_PENALTY > 0)
+        score -= recent_region_visits(game_state, target) * RECENT_REGION_PENALTY;
     if (role == Role::COLLECTOR) {
         // A pearl tile is worth pursuing even when it is beside kelp or in a
         // narrow pocket.  The old mobility gate made the bot walk past those
