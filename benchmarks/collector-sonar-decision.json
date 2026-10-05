@@ -1,0 +1,55 @@
+{
+  "decision": "reject_after_failed_screen",
+  "hypothesis": "At population capacity, small non-flagship collectors can use fresh relayed enemy positions as a modest movement tiebreak without abandoning pearl collection.",
+  "base_commit": "89a4be2ee116599762b3875743c01675a411f2d9",
+  "champion_commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+  "champion_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "toolkit": "unswbc 1.2.9",
+  "matrix": {
+    "record": "benchmarks/research/failed/collector-sonar-screen.jsonl",
+    "manifest": "benchmarks/research/failed/collector-sonar-screen.manifest.json",
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "sides": "both",
+    "seeds": [10012],
+    "rows": 32,
+    "invalid_action_games": 2,
+    "runtime_faults": 0,
+    "accepted_strength_games": 0
+  },
+  "candidates": [
+    {
+      "collector_sonar_weight": 8,
+      "native_sha256": "0534c8a7ff4e79baf391a437d01baa41e1856fc863b94c4b922b4d66fb71968c",
+      "valid_wins": 6,
+      "valid_losses": 8,
+      "valid_draws": 0,
+      "invalid_games": 2,
+      "raw_outcomes_including_invalid": {"wins": 7, "losses": 9, "draws": 0}
+    },
+    {
+      "collector_sonar_weight": 20,
+      "native_sha256": "b065fc122fb20ff5d2baf994dec25986eca999b02b0b162a933929cbd7adf70a",
+      "valid_wins": 9,
+      "valid_losses": 7,
+      "valid_draws": 0,
+      "invalid_games": 0,
+      "raw_outcomes_including_invalid": {"wins": 9, "losses": 7, "draws": 0}
+    }
+  ],
+  "invalid_cases": [
+    {"candidate_weight": 8, "map": "big_empty", "side": "A", "outcome": "loss", "invalid_action_side": "opponent"},
+    {"candidate_weight": 8, "map": "schooltime", "side": "B", "outcome": "win", "invalid_action_side": "candidate"}
+  ],
+  "reproduction": {
+    "patch": "benchmarks/research/collector-sonar.patch",
+    "apply": "git apply benchmarks/research/collector-sonar.patch",
+    "build_weight_8": ".venv/bin/python scripts/build_variant.py sonar-collector8 --collector-sonar-weight 8 --compile",
+    "build_weight_20": ".venv/bin/python scripts/build_variant.py sonar-collector20 --collector-sonar-weight 20 --compile"
+  },
+  "reason": "The clean weight-20 subset was only 9-7, below the advancement threshold, while weight 8 underperformed and produced two invalid-action games. Because both variants share one failed matrix, all 32 rows are quarantined and excluded from strength evidence.",
+  "active_policy_changed": false,
+  "local_results_are_elo": false,
+  "accepted_evidence_after": 2649,
+  "failed_diagnostic_rows_after": 320,
+  "failed_invalid_games_after": 20
+}

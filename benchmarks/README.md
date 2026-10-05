@@ -836,3 +836,24 @@ run was justified. Exact hashes, records and reproduction instructions are in
 `research/trauma-flagship-weight.patch`. The production source was restored and
 rebuilds byte-identical to the active champion. Accepted evidence rises to
 2,649 games; failed diagnostics remain 288 rows with 18 invalid games.
+
+## Collector sonar interception — failed matrix
+
+The active bot relays visible enemy positions by sonar, but its all-collector
+movement policy did not use remote targets. This experiment kept pearl
+collection intact and, only at population capacity, offered short non-flagship
+collectors a safety-gated movement tiebreak toward a fresh relayed enemy.
+
+On the standard eight-map, both-side seed-10012 screen, weight 20 scored
+**9–7** in 16 valid games. Weight 8 scored **6–8 across valid rows**, with two
+additional invalid-action games: an opponent-side event on Big Empty and a
+candidate-side event on Schooltime. Raw outcomes including those invalid rows
+were 7–9. The complete 32-row combined matrix is quarantined under
+`research/failed/` and excluded from accepted evidence.
+
+Neither signal justified a clean confirmation, fresh gate, diverse-opponent
+test or sandbox run. Exact hashes and reproduction details are in
+`collector-sonar-decision.json`; the source is archived as
+`research/collector-sonar.patch`. Seed 10012 is now seen. Production was
+restored and rebuilds byte-identical to the champion. Accepted evidence stays
+at 2,649 games; failed diagnostics rise to 320 rows with 20 invalid games.
