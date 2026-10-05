@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 2,493 accepted records form complete matrices with no invalid actions
+All 2,525 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -742,3 +742,18 @@ so no fresh all-map, diverse-opponent or sandbox gate was run. Exact hashes and
 reproduction details are in `head-attack-role-decision.json`; seed 9898 is now
 seen evidence. The default build remains byte-identical to the active champion,
 which is unchanged. Accepted evidence rises to 2,493 games.
+
+## Descendant split limits
+
+This experiment kept queens at the proven split cap of three while limiting
+non-queen descendants to one or two planned splits. Child cap one scored
+**5–9–2** and child cap two scored **6–8–2** on the standard eight maps, both
+sides of seed 9999. All 32 games were complete and valid.
+
+Both lower descendant caps underperformed, so no fresh all-map,
+diverse-opponent or sandbox gate was run. A preceding sonar-interception idea
+was discarded without games because its hunter-only code path is unreachable
+under the active all-collector role policy and compiled byte-identical to the
+champion. Exact split hashes and reproduction details are in
+`child-split-decision.json`; seed 9999 is now seen evidence. The default build
+remains byte-identical to the active champion. Accepted evidence rises to 2,525.

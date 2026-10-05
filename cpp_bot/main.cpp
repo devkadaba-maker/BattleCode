@@ -41,6 +41,9 @@ namespace {
 #ifndef QUEEN_SPLIT_LIMIT
 #define QUEEN_SPLIT_LIMIT PARENT_SPLIT_LIMIT
 #endif
+#ifndef CHILD_SPLIT_LIMIT
+#define CHILD_SPLIT_LIMIT PARENT_SPLIT_LIMIT
+#endif
 #ifndef QUEEN_HUNT
 #define QUEEN_HUNT 0
 #endif
@@ -938,7 +941,11 @@ bool relay_target(bool safe_action) {
 
 int split_size(int target) {
     int round = game->get_round_num();
-    if (parent_split_count >= PARENT_SPLIT_LIMIT) return 0;
+    int split_limit = PARENT_SPLIT_LIMIT;
+    if constexpr (CHILD_SPLIT_LIMIT != PARENT_SPLIT_LIMIT) {
+        if (ct->get_id() >= 2) split_limit = CHILD_SPLIT_LIMIT;
+    }
+    if (parent_split_count >= split_limit) return 0;
     if (ct->get_id() < 2 && parent_split_count >= QUEEN_SPLIT_LIMIT) return 0;
     if (round >= 460 || ct->get_unit_count() >= target || !ct->can_split(2)) return 0;
     // Split at length four (the first legal two-segment child), rather than
