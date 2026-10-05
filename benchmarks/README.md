@@ -683,3 +683,20 @@ but neither setting produced a positive match-strength signal, so no all-map,
 diverse-opponent or sandbox gate was run. Exact hashes and reproduction details
 are in `head-attack-reserve-decision.json`. Seeds 8888 and 8989 are now seen;
 the active champion remains unchanged and accepted evidence rises to 2,355.
+
+## Move-order-aware enemy proximity
+
+The bot's soft proximity penalty treated every nearby enemy head as equally
+dangerous. This experiment ignored later-ID enemy heads that could react after
+our lower-ID dragon moved. Applying it to every dragon and to non-flagships only
+both scored **8–8** on the standard eight-map, both-side seed 9090 screen. The
+global candidate was 2–0 on Default and Default Small, but 0–2 on Big Empty and
+Schooltime.
+
+A Default-only candidate was frozen on the map's unique 32×32 geometry before
+new games. It then failed five fresh seeds from both sides at **3–7**. All 42
+games were complete and valid, but the apparent two-game map gain did not
+generalize; unaffected-map controls and sandbox were therefore not run. Exact
+hashes and reproduction details are in `enemy-proximity-order-decision.json`.
+Seeds 9090 and 9191–9595 are now seen; the champion remains unchanged and
+accepted evidence rises to 2,397.

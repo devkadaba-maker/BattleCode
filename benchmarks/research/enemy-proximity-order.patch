@@ -1,0 +1,65 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 62db418..5aa232b 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -44,6 +44,9 @@ namespace {
+ #ifndef ENEMY_HEADING_ORDER_AWARE
+ #define ENEMY_HEADING_ORDER_AWARE 2
+ #endif
++#ifndef ENEMY_PROXIMITY_ORDER_AWARE
++#define ENEMY_PROXIMITY_ORDER_AWARE 0
++#endif
+ 
+ int parent_split_count = 0;
+ std::array<int, 4> vision_target_bonuses{};
+@@ -134,12 +137,20 @@ bool enemy_head_ahead(Controller const& controller, Position target) {
+     return false;
+ }
+ 
++bool flagship_dragon(Controller const& controller, Game const& game_state);
++
+ bool enemy_collision_risk(Controller const& controller, Game const& game_state, Position target,
+                           std::optional<int> ignore_head_id = std::nullopt) {
+     for (auto const& tile : controller.get_tiles()) {
+         auto const* dragon = tile.get_dragon();
+         if (!dragon || dragon->get_team() == controller.get_team()) continue;
+         if (ignore_head_id.has_value() && dragon->get_id() == *ignore_head_id && dragon->is_head()) continue;
++        if constexpr (ENEMY_PROXIMITY_ORDER_AWARE > 0) {
++            bool enabled = ENEMY_PROXIMITY_ORDER_AWARE == 1 ||
++                (ENEMY_PROXIMITY_ORDER_AWARE == 2 && !flagship_dragon(controller, game_state)) ||
++                (ENEMY_PROXIMITY_ORDER_AWARE == 3 && game_state.width == 32 && game_state.height == 32);
++            if (enabled && dragon->is_head() && dragon->get_id() > controller.get_id()) continue;
++        }
+         int d = distance(target, dragon->get_position(), game_state);
+         if ((dragon->is_head() && d <= 2) || (!dragon->is_head() && d <= 1)) return true;
+     }
+@@ -156,8 +167,6 @@ bool portal_arrival_square(Controller const& controller, Position target) {
+     return false;
+ }
+ 
+-bool flagship_dragon(Controller const& controller, Game const& game_state);
+-
+ bool safe_step(Controller const& controller, Game const& game_state, Position start, Direction direction,
+                bool allow_portal = false, bool allow_head_attack = false) {
+     auto const* here = controller.get_tile(start);
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index d59fd12..24d51b5 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -26,6 +26,8 @@ parser.add_argument('--friendly-head-destination-penalty', type=int)
+ parser.add_argument('--friendly-priority-claim-penalty', type=int)
+ parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2],
+                     help='0 off, 1 all maps, 2 Schooltime 60x40 only')
++parser.add_argument('--enemy-proximity-order-aware', type=int, choices=[0,1,2,3],
++                    help='0 off, 1 all dragons, 2 non-flagships only, 3 Default 32x32 only')
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -49,6 +51,7 @@ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
+ defines['ENEMY_HEADING_ORDER_AWARE'] = args.enemy_heading_order_aware
++defines['ENEMY_PROXIMITY_ORDER_AWARE'] = args.enemy_proximity_order_aware
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):
