@@ -26,6 +26,8 @@ parser.add_argument('--friendly-head-destination-penalty', type=int)
 parser.add_argument('--friendly-priority-claim-penalty', type=int)
 parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2],
                     help='0 off, 1 all maps, 2 Schooltime 60x40 only')
+parser.add_argument('--head-attack-visible-margin', type=int,
+                    help='minimum visible enemy length advantage for a head trade (default: 4)')
 parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
 args = parser.parse_args()
 if not args.name.replace('-','').replace('_','').isalnum():
@@ -36,6 +38,8 @@ if args.friendly_head_destination_penalty is not None and args.friendly_head_des
     parser.error('--friendly-head-destination-penalty must be non-negative')
 if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
     parser.error('--friendly-priority-claim-penalty must be non-negative')
+if args.head_attack_visible_margin is not None and args.head_attack_visible_margin < 0:
+    parser.error('--head-attack-visible-margin must be non-negative')
 destination = ROOT / '.experiments' / args.name
 destination.mkdir(parents=True, exist_ok=True)
 if args.ref:
@@ -49,6 +53,7 @@ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
 defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
 defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
 defines['ENEMY_HEADING_ORDER_AWARE'] = args.enemy_heading_order_aware
+defines['HEAD_ATTACK_VISIBLE_MARGIN'] = args.head_attack_visible_margin
 prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
 (destination/'main.cpp').write_text(prefix+source)
 for name in ('helper.hpp','bot.toml'):

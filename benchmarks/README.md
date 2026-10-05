@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 2,259 accepted records form complete matrices with no invalid actions
+All 2,429 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -700,3 +700,18 @@ generalize; unaffected-map controls and sandbox were therefore not run. Exact
 hashes and reproduction details are in `enemy-proximity-order-decision.json`.
 Seeds 9090 and 9191–9595 are now seen; the champion remains unchanged and
 accepted evidence rises to 2,397.
+
+## Head-attack visible-length margin
+
+The bot normally lets a small non-flagship collector trade into an enemy head
+when the visible enemy body is at least four segments longer. This experiment
+tested stricter margins of six and eight without changing the population
+reserve or the rest of the combat policy. On the standard eight maps, both
+sides of seed 9696, each candidate scored exactly **8–8**. Every candidate was
+1–1 on every map, and all 32 games were complete and valid.
+
+Neither setting produced a positive match-strength signal, so no fresh all-map,
+diverse-opponent or sandbox gate was run. Exact hashes and reproduction details
+are in `head-attack-margin-decision.json`; seed 9696 is now seen evidence. The
+default-margin build remains byte-identical to the active champion, which is
+unchanged. Accepted evidence rises to 2,429 games.

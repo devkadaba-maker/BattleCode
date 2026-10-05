@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_after_screen",
+  "active_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Require a larger visible enemy length advantage before sacrificing a small non-flagship collector in a head attack.",
+  "screen": {
+    "seed": 9696,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "both_sides": true,
+    "margin_6": {
+      "wins": 8,
+      "losses": 8,
+      "draws": 0,
+      "native_sha256": "44c3f00d384a4f39e35f3715f33f5978d3cb1c8de66828feedbe33b5281a2506"
+    },
+    "margin_8": {
+      "wins": 8,
+      "losses": 8,
+      "draws": 0,
+      "native_sha256": "415d279a14b146c57c2f228135868fc43f1d11ec67cb4d8b698de5b6a5828808"
+    },
+    "valid_games": 32,
+    "runtime_or_invalid_action_faults": 0
+  },
+  "fresh_all_map_gate": "not_run_after_flat_screen",
+  "diverse_opponents": "not_run",
+  "judge_sandbox": "not_run",
+  "reason": "Both stricter attack-value margins were exactly flat at 8-8, including 1-1 on every screened map, so neither justified spending fresh evidence on a broad promotion gate.",
+  "reproduction": {
+    "base_commit": "86fba6c9b18bc741f78b393839d44caa8881a146",
+    "patch": "benchmarks/research/head-attack-margin.patch",
+    "build_flags": ["--head-attack-visible-margin 6", "--head-attack-visible-margin 8"]
+  },
+  "default_build_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "accepted_matrix_games_after": 2429,
+  "failed_diagnostic_rows_after": 192,
+  "failed_diagnostic_invalid_games_after": 9,
+  "local_results_are_measured_elo": false
+}

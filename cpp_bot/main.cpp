@@ -1,5 +1,9 @@
 #include "helper.hpp"
 
+#ifndef HEAD_ATTACK_VISIBLE_MARGIN
+#define HEAD_ATTACK_VISIBLE_MARGIN 4
+#endif
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -361,7 +365,7 @@ bool favourable_head_attack(Controller const& controller, Game const& game_state
         controller.get_unit_count() < population_target(controller, game_state)) return false;
     int worthwhile_length = std::max(6, our_length * 2);
     if (enemy_visible_segments >= worthwhile_length) return true;
-    return enemy_visible_segments >= our_length + 4;
+    return enemy_visible_segments >= our_length + HEAD_ATTACK_VISIBLE_MARGIN;
 }
 
 std::uint32_t sonar_checksum(std::uint32_t payload) {
