@@ -781,3 +781,23 @@ Exact records and reproduction details are in `split-timing-*`; seeds
 rebuilds byte-identical to the active champion. The 104 clean confirmation and
 fresh-gate games raise accepted evidence to 2,629; failed diagnostics rise to
 224 rows with 11 invalid games.
+
+## Resource-aware planned splits — failed matrix
+
+This experiment allowed a planned split only when the current 7×7 view held
+at least one or two current/imminent pearls. The combined standard-eight-map,
+both-side seed-10005 matrix recorded six invalid-action games, so all 32 rows
+are isolated under `research/failed/` and excluded from accepted evidence.
+
+Among valid rows, the one-resource candidate scored **5–7** with four invalid
+games; the two-resource candidate scored **8–6** with two invalid games. Raw
+outcomes including invalid rows were 8–8 for both candidates. The invalid
+events occurred on Default Small, Big Empty, Schooltime and Trophy, on both
+candidate and opponent sides. Neither threshold supplied a clean or sufficiently
+strong signal to justify a separate confirmation, fresh gate or sandbox run.
+
+Exact hashes and reproduction details are in
+`adaptive-split-decision.json`. Seed 10005 is now seen evidence. The default
+resource threshold remains zero and rebuilds byte-identical to the active
+champion; accepted evidence stays at 2,629 games. Failed diagnostics rise to
+256 rows with 17 invalid games.

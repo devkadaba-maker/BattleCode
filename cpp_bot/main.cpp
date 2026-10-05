@@ -47,6 +47,9 @@ namespace {
 #ifndef PLANNED_SPLIT_MIN_LENGTH
 #define PLANNED_SPLIT_MIN_LENGTH 4
 #endif
+#ifndef SPLIT_VISIBLE_PEARL_REQUIREMENT
+#define SPLIT_VISIBLE_PEARL_REQUIREMENT 0
+#endif
 #ifndef QUEEN_HUNT
 #define QUEEN_HUNT 0
 #endif
@@ -953,6 +956,14 @@ int split_size(int target) {
     if (round >= 460 || ct->get_unit_count() >= target || !ct->can_split(2)) return 0;
     if constexpr (PLANNED_SPLIT_MIN_LENGTH > 4) {
         if (ct->get_length() < PLANNED_SPLIT_MIN_LENGTH) return 0;
+    }
+    if constexpr (SPLIT_VISIBLE_PEARL_REQUIREMENT > 0) {
+        int nearby_resources = 0;
+        for (auto const& tile : ct->get_tiles()) {
+            if (tile.has_pearl() || (tile.get_pearl_time() >= 0 && tile.get_pearl_time() <= 2))
+                ++nearby_resources;
+        }
+        if (nearby_resources < SPLIT_VISIBLE_PEARL_REQUIREMENT) return 0;
     }
     // Split at length four (the first legal two-segment child), rather than
     // waiting for a long ramp. This lets collectors form before the opponent's

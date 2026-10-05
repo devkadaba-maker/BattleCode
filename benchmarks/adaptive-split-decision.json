@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_failed_screen",
+  "active_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Delay planned splitting in locally barren areas, but retain proven early split timing when current or imminent pearls can support parent and child.",
+  "screen": {
+    "seed": 10005,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "both_sides": true,
+    "minimum_visible_resources_1": {
+      "raw_wins": 8, "raw_losses": 8, "valid_wins": 5, "valid_losses": 7, "invalid_games": 4,
+      "native_sha256": "44bf841621edf0a16716e2b652b3825a4757c63452ab3c31d0a9a959e38248f1"
+    },
+    "minimum_visible_resources_2": {
+      "raw_wins": 8, "raw_losses": 8, "valid_wins": 8, "valid_losses": 6, "invalid_games": 2,
+      "native_sha256": "852c3fc1d48ce1ee7183520370405da4b675b7a11e4fc437002ef9570c1a6018"
+    },
+    "matrix_status": "failed_and_fully_excluded",
+    "failed_matrix": "benchmarks/research/failed/adaptive-split-screen.jsonl",
+    "invalid_maps": ["default_small", "big_empty", "schooltime", "trophy"]
+  },
+  "clean_confirmation": "not_run_after_failed_nonneutral_screen",
+  "fresh_all_map_gate": "not_run",
+  "diverse_opponents": "not_run",
+  "judge_sandbox": "not_run",
+  "reason": "The complete matrix is invalid. Raw outcomes were only 8-8 for each candidate, and the one-resource valid subset was negative; neither candidate justified spending fresh evidence on a clean confirmation.",
+  "reproduction": {
+    "base_commit": "7b177088bc24bbe2dad87569444c00aae7d7ff41",
+    "patch": "benchmarks/research/adaptive-split.patch",
+    "build_flags": ["--split-visible-pearl-requirement 1", "--split-visible-pearl-requirement 2"]
+  },
+  "default_build_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "accepted_matrix_games_after": 2629,
+  "failed_diagnostic_rows_after": 256,
+  "failed_diagnostic_invalid_games_after": 17,
+  "local_results_are_measured_elo": false
+}

@@ -1,0 +1,58 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 6327bc1..b02de7e 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -47,6 +47,9 @@ namespace {
+ #ifndef PLANNED_SPLIT_MIN_LENGTH
+ #define PLANNED_SPLIT_MIN_LENGTH 4
+ #endif
++#ifndef SPLIT_VISIBLE_PEARL_REQUIREMENT
++#define SPLIT_VISIBLE_PEARL_REQUIREMENT 0
++#endif
+ #ifndef QUEEN_HUNT
+ #define QUEEN_HUNT 0
+ #endif
+@@ -954,6 +957,14 @@ int split_size(int target) {
+     if constexpr (PLANNED_SPLIT_MIN_LENGTH > 4) {
+         if (ct->get_length() < PLANNED_SPLIT_MIN_LENGTH) return 0;
+     }
++    if constexpr (SPLIT_VISIBLE_PEARL_REQUIREMENT > 0) {
++        int nearby_resources = 0;
++        for (auto const& tile : ct->get_tiles()) {
++            if (tile.has_pearl() || (tile.get_pearl_time() >= 0 && tile.get_pearl_time() <= 2))
++                ++nearby_resources;
++        }
++        if (nearby_resources < SPLIT_VISIBLE_PEARL_REQUIREMENT) return 0;
++    }
+     // Split at length four (the first legal two-segment child), rather than
+     // waiting for a long ramp. This lets collectors form before the opponent's
+     // early split wave overruns us, but designated flagships must keep their
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 38e49e6..3637e51 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -22,6 +22,7 @@ parser.add_argument('--free-sprint', type=int, choices=[0,1,2], help='0 off, 1 a
+ parser.add_argument('--queen-split-limit', type=int)
+ parser.add_argument('--child-split-limit', type=int)
+ parser.add_argument('--planned-split-min-length', type=int)
++parser.add_argument('--split-visible-pearl-requirement', type=int)
+ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
+ parser.add_argument('--large-population-target', type=int)
+ parser.add_argument('--friendly-head-destination-penalty', type=int)
+@@ -44,6 +45,8 @@ if args.child_split_limit is not None and args.child_split_limit < 0:
+     parser.error('--child-split-limit must be non-negative')
+ if args.planned_split_min_length is not None and args.planned_split_min_length < 4:
+     parser.error('--planned-split-min-length must be at least 4')
++if args.split_visible_pearl_requirement is not None and args.split_visible_pearl_requirement < 0:
++    parser.error('--split-visible-pearl-requirement must be non-negative')
+ if args.friendly_head_destination_penalty is not None and args.friendly_head_destination_penalty < 0:
+     parser.error('--friendly-head-destination-penalty must be non-negative')
+ if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
+@@ -63,6 +66,7 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
+            'QUEEN_HUNT':args.queen_hunt, 'WEAKHOLD_VISION_WEIGHT':args.weakhold_vision_weight}
+ defines['CHILD_SPLIT_LIMIT'] = args.child_split_limit
+ defines['PLANNED_SPLIT_MIN_LENGTH'] = args.planned_split_min_length
++defines['SPLIT_VISIBLE_PEARL_REQUIREMENT'] = args.split_visible_pearl_requirement
+ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
