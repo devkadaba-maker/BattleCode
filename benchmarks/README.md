@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 2,525 accepted records form complete matrices with no invalid actions
+All 2,629 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -757,3 +757,27 @@ under the active all-collector role policy and compiled byte-identical to the
 champion. Exact split hashes and reproduction details are in
 `child-split-decision.json`; seed 9999 is now seen evidence. The default build
 remains byte-identical to the active champion. Accepted evidence rises to 2,525.
+
+## Planned split minimum length
+
+This experiment delayed every planned split beyond the first legal length of
+four while keeping the proven cap of three. Minimum length six scored **10–6**
+in a clean confirmation on the standard eight maps at seed 10002. Minimum
+length eight had already scored **5–11** in tuning. The combined tuning matrix
+is isolated under `research/failed/`: its minimum-six rows contained two
+invalid-action games, so all 32 tuning rows are excluded from accepted evidence.
+
+The frozen minimum-six binary then played all 22 maps from both sides on fresh
+seeds 10003 and 10004. It scored **48–36–4 in 88 valid games (56.82%)**, with a
+decisive-game Wilson 95% interval of **46.48–67.18%**. This misses both the 60%
+score target and the required lower bound above 50%. Trophy regressed to 0–4;
+Default, Islands, Queen of Spades and UNSW each returned 1–3. No diverse-opponent
+or sandbox gate was run after the failed champion gate.
+
+The tested minimum-six native SHA256 is
+`599ed84040dce5e77d9b92e02f4e3778c60a53f49338383fcf4f41b347bd6d67`.
+Exact records and reproduction details are in `split-timing-*`; seeds
+10001–10004 are now seen evidence. The default minimum length remains four and
+rebuilds byte-identical to the active champion. The 104 clean confirmation and
+fresh-gate games raise accepted evidence to 2,629; failed diagnostics rise to
+224 rows with 11 invalid games.

@@ -21,6 +21,7 @@ parser.add_argument('--weakhold-vision-weight', type=int)
 parser.add_argument('--free-sprint', type=int, choices=[0,1,2], help='0 off, 1 all dragons, 2 queens only')
 parser.add_argument('--queen-split-limit', type=int)
 parser.add_argument('--child-split-limit', type=int)
+parser.add_argument('--planned-split-min-length', type=int)
 parser.add_argument('--queen-hunt', type=int, choices=[0,1])
 parser.add_argument('--large-population-target', type=int)
 parser.add_argument('--friendly-head-destination-penalty', type=int)
@@ -41,6 +42,8 @@ if args.large_population_target is not None and args.large_population_target < 2
     parser.error('--large-population-target must be at least 2')
 if args.child_split_limit is not None and args.child_split_limit < 0:
     parser.error('--child-split-limit must be non-negative')
+if args.planned_split_min_length is not None and args.planned_split_min_length < 4:
+    parser.error('--planned-split-min-length must be at least 4')
 if args.friendly_head_destination_penalty is not None and args.friendly_head_destination_penalty < 0:
     parser.error('--friendly-head-destination-penalty must be non-negative')
 if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
@@ -59,6 +62,7 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
            'FREE_PEARL_SPRINT':args.free_sprint,'QUEEN_SPLIT_LIMIT':args.queen_split_limit,
            'QUEEN_HUNT':args.queen_hunt, 'WEAKHOLD_VISION_WEIGHT':args.weakhold_vision_weight}
 defines['CHILD_SPLIT_LIMIT'] = args.child_split_limit
+defines['PLANNED_SPLIT_MIN_LENGTH'] = args.planned_split_min_length
 defines['LARGE_POPULATION_TARGET'] = args.large_population_target
 defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
 defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty

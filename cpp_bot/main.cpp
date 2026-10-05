@@ -44,6 +44,9 @@ namespace {
 #ifndef CHILD_SPLIT_LIMIT
 #define CHILD_SPLIT_LIMIT PARENT_SPLIT_LIMIT
 #endif
+#ifndef PLANNED_SPLIT_MIN_LENGTH
+#define PLANNED_SPLIT_MIN_LENGTH 4
+#endif
 #ifndef QUEEN_HUNT
 #define QUEEN_HUNT 0
 #endif
@@ -948,6 +951,9 @@ int split_size(int target) {
     if (parent_split_count >= split_limit) return 0;
     if (ct->get_id() < 2 && parent_split_count >= QUEEN_SPLIT_LIMIT) return 0;
     if (round >= 460 || ct->get_unit_count() >= target || !ct->can_split(2)) return 0;
+    if constexpr (PLANNED_SPLIT_MIN_LENGTH > 4) {
+        if (ct->get_length() < PLANNED_SPLIT_MIN_LENGTH) return 0;
+    }
     // Split at length four (the first legal two-segment child), rather than
     // waiting for a long ramp. This lets collectors form before the opponent's
     // early split wave overruns us, but designated flagships must keep their
