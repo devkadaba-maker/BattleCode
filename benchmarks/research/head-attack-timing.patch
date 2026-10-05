@@ -1,0 +1,55 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 5367af7..8153d38 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -4,6 +4,10 @@
+ #define HEAD_ATTACK_VISIBLE_MARGIN 4
+ #endif
+ 
++#ifndef HEAD_ATTACK_LAST_ROUND
++#define HEAD_ATTACK_LAST_ROUND 500
++#endif
++
+ #include <algorithm>
+ #include <array>
+ #include <cstdint>
+@@ -352,6 +356,9 @@ bool favourable_head_attack(Controller const& controller, Game const& game_state
+     }
+     // Protect the long-term tiebreak dragon and avoid trading larger collectors.
+     if (our_length < 2 || our_length >= 10 || is_flagship(controller, game_state)) return false;
++    if constexpr (HEAD_ATTACK_LAST_ROUND < 500) {
++        if (game_state.get_round_num() > HEAD_ATTACK_LAST_ROUND) return false;
++    }
+     // A small expendable collector can remove the opponent's primary score,
+     // even when the enemy queen is still short. Our own queen never trades.
+     if constexpr (QUEEN_HUNT > 0) {
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 2a2ea1e..a9cdd3a 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -28,6 +28,8 @@ parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2],
+                     help='0 off, 1 all maps, 2 Schooltime 60x40 only')
+ parser.add_argument('--head-attack-visible-margin', type=int,
+                     help='minimum visible enemy length advantage for a head trade (default: 4)')
++parser.add_argument('--head-attack-last-round', type=int,
++                    help='last round when an expendable head trade is allowed (default: 500)')
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -40,6 +42,8 @@ if args.friendly_priority_claim_penalty is not None and args.friendly_priority_c
+     parser.error('--friendly-priority-claim-penalty must be non-negative')
+ if args.head_attack_visible_margin is not None and args.head_attack_visible_margin < 0:
+     parser.error('--head-attack-visible-margin must be non-negative')
++if args.head_attack_last_round is not None and args.head_attack_last_round < 0:
++    parser.error('--head-attack-last-round must be non-negative')
+ destination = ROOT / '.experiments' / args.name
+ destination.mkdir(parents=True, exist_ok=True)
+ if args.ref:
+@@ -54,6 +58,7 @@ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_pe
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
+ defines['ENEMY_HEADING_ORDER_AWARE'] = args.enemy_heading_order_aware
+ defines['HEAD_ATTACK_VISIBLE_MARGIN'] = args.head_attack_visible_margin
++defines['HEAD_ATTACK_LAST_ROUND'] = args.head_attack_last_round
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):

@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_after_screen",
+  "active_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Stop sacrificing small non-flagship collectors late in the match so their surviving length contributes to the round-500 score.",
+  "screen": {
+    "seed": 9797,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "both_sides": true,
+    "last_round_350": {
+      "wins": 6,
+      "losses": 10,
+      "draws": 0,
+      "native_sha256": "d51f088bb08b768200512d217c5e7538a5aefde00fab2b689b04f0b951b0ffe3"
+    },
+    "last_round_425": {
+      "wins": 5,
+      "losses": 11,
+      "draws": 0,
+      "native_sha256": "64c2bf31699a180e3cd23bd38eae270674bfb37bf51d8cf9dd5b779da2429865"
+    },
+    "valid_games": 32,
+    "runtime_or_invalid_action_faults": 0
+  },
+  "fresh_all_map_gate": "not_run_after_negative_screen",
+  "diverse_opponents": "not_run",
+  "judge_sandbox": "not_run",
+  "reason": "Both late-trade cutoffs were clearly negative against the champion, at 6-10 and 5-11, so neither justified fresh validation.",
+  "reproduction": {
+    "base_commit": "ffe987f8fe468368c39b4a786ffdfd4faeb41483",
+    "patch": "benchmarks/research/head-attack-timing.patch",
+    "build_flags": ["--head-attack-last-round 350", "--head-attack-last-round 425"]
+  },
+  "default_build_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "accepted_matrix_games_after": 2461,
+  "failed_diagnostic_rows_after": 192,
+  "failed_diagnostic_invalid_games_after": 9,
+  "local_results_are_measured_elo": false
+}

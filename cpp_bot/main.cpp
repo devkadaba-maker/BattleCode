@@ -4,6 +4,10 @@
 #define HEAD_ATTACK_VISIBLE_MARGIN 4
 #endif
 
+#ifndef HEAD_ATTACK_LAST_ROUND
+#define HEAD_ATTACK_LAST_ROUND 500
+#endif
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -352,6 +356,9 @@ bool favourable_head_attack(Controller const& controller, Game const& game_state
     }
     // Protect the long-term tiebreak dragon and avoid trading larger collectors.
     if (our_length < 2 || our_length >= 10 || is_flagship(controller, game_state)) return false;
+    if constexpr (HEAD_ATTACK_LAST_ROUND < 500) {
+        if (game_state.get_round_num() > HEAD_ATTACK_LAST_ROUND) return false;
+    }
     // A small expendable collector can remove the opponent's primary score,
     // even when the enemy queen is still short. Our own queen never trades.
     if constexpr (QUEEN_HUNT > 0) {

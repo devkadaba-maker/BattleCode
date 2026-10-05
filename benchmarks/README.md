@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 2,429 accepted records form complete matrices with no invalid actions
+All 2,461 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -715,3 +715,17 @@ diverse-opponent or sandbox gate was run. Exact hashes and reproduction details
 are in `head-attack-margin-decision.json`; seed 9696 is now seen evidence. The
 default-margin build remains byte-identical to the active champion, which is
 unchanged. Accepted evidence rises to 2,429 games.
+
+## Late head-attack cutoff
+
+This experiment stopped small non-flagship collectors from making otherwise
+favourable head trades after rounds 350 or 425, aiming to preserve their length
+for the round-500 score. On the standard eight maps, both sides of seed 9797,
+the round-350 cutoff scored **6–10** and the round-425 cutoff scored **5–11**.
+All 32 games were complete and valid.
+
+Both timing policies were clearly negative, so no fresh all-map,
+diverse-opponent or sandbox gate was run. Exact hashes and reproduction details
+are in `head-attack-timing-decision.json`; seed 9797 is now seen evidence. The
+default build remains byte-identical to the active champion, which is unchanged.
+Accepted evidence rises to 2,461 games.
