@@ -98,6 +98,9 @@ namespace {
 #ifndef EARNED_FLAGSHIP_LENGTH
 #define EARNED_FLAGSHIP_LENGTH 16
 #endif
+#ifndef PEARL_CLUSTER_GRAPH_MODE
+#define PEARL_CLUSTER_GRAPH_MODE 0
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -614,10 +617,30 @@ int pearl_value(Controller const& controller, Game const& game_state, Position s
     return value;
 }
 
+#if PEARL_CLUSTER_GRAPH_MODE > 0
+std::unordered_map<Position, int, PositionHash> visible_route_distances(
+        Controller const& controller, Game const& game_state, Position start) {
+    std::unordered_map<Position, int, PositionHash> distances{{start, 0}};
+    if (!controller.get_tile(start)) return distances;
+    std::deque<Position> queue{start};
+    while (!queue.empty()) {
+        Position current = queue.front(); queue.pop_front();
+        int steps = distances.at(current);
+        for (Direction direction : Direction::get_direction_list()) {
+            if (!safe_step(controller, game_state, current, direction)) continue;
+            Position next = current.add_dir(direction);
+            if (distances.emplace(next, steps + 1).second) queue.push_back(next);
+        }
+    }
+    return distances;
+}
+#endif
+
 // Prefer a route that enters a dense pearl pocket instead of chasing one
 // isolated pearl.  The visible window is small, so this remains cheap even
 // when the population has reached the large-map cap.
 int pearl_cluster_value(Controller const& controller, Game const& game_state, Position start) {
+#if PEARL_CLUSTER_GRAPH_MODE == 0
     int best = 0;
     for (auto const& centre : controller.get_tiles()) {
         if (!centre.has_pearl()) continue;
@@ -630,6 +653,29 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
         best = std::max(best, cluster * 70 + approach * 8 + imminent);
     }
     return best;
+#else
+    auto const reachable = visible_route_distances(controller, game_state, start);
+    int best = 0;
+    for (auto const& centre : controller.get_tiles()) {
+        if (!centre.has_pearl()) continue;
+        auto const centre_route = reachable.find(centre.get_position());
+        if (centre_route == reachable.end()) continue;
+        int cluster = 0;
+        for (auto const& tile : controller.get_tiles()) {
+            if (!tile.has_pearl() || distance(centre.get_position(), tile.get_position(), game_state) > 3) continue;
+            if (!reachable.contains(tile.get_position())) continue;
+            ++cluster;
+        }
+#if PEARL_CLUSTER_GRAPH_MODE >= 2
+        int approach = std::max(0, 12 - centre_route->second);
+#else
+        int approach = std::max(0, 12 - distance(start, centre.get_position(), game_state));
+#endif
+        int imminent = centre.get_pearl_time() <= 2 ? 24 : 0;
+        best = std::max(best, cluster * 70 + approach * 8 + imminent);
+    }
+    return best;
+#endif
 }
 
 int enemy_pressure(Controller const& controller, Game const& game_state, Position start) {

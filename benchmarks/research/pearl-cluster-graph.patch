@@ -1,0 +1,63 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 2abf47a..9da10f0 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -100,0 +101,3 @@ namespace {
++#ifndef PEARL_CLUSTER_GRAPH_MODE
++#define PEARL_CLUSTER_GRAPH_MODE 0
++#endif
+@@ -616,0 +620,19 @@ int pearl_value(Controller const& controller, Game const& game_state, Position s
++#if PEARL_CLUSTER_GRAPH_MODE > 0
++std::unordered_map<Position, int, PositionHash> visible_route_distances(
++        Controller const& controller, Game const& game_state, Position start) {
++    std::unordered_map<Position, int, PositionHash> distances{{start, 0}};
++    if (!controller.get_tile(start)) return distances;
++    std::deque<Position> queue{start};
++    while (!queue.empty()) {
++        Position current = queue.front(); queue.pop_front();
++        int steps = distances.at(current);
++        for (Direction direction : Direction::get_direction_list()) {
++            if (!safe_step(controller, game_state, current, direction)) continue;
++            Position next = current.add_dir(direction);
++            if (distances.emplace(next, steps + 1).second) queue.push_back(next);
++        }
++    }
++    return distances;
++}
++#endif
++
+@@ -620,0 +643 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
++#if PEARL_CLUSTER_GRAPH_MODE == 0
+@@ -632,0 +656,23 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
++#else
++    auto const reachable = visible_route_distances(controller, game_state, start);
++    int best = 0;
++    for (auto const& centre : controller.get_tiles()) {
++        if (!centre.has_pearl()) continue;
++        auto const centre_route = reachable.find(centre.get_position());
++        if (centre_route == reachable.end()) continue;
++        int cluster = 0;
++        for (auto const& tile : controller.get_tiles()) {
++            if (!tile.has_pearl() || distance(centre.get_position(), tile.get_position(), game_state) > 3) continue;
++            if (!reachable.contains(tile.get_position())) continue;
++            ++cluster;
++        }
++#if PEARL_CLUSTER_GRAPH_MODE >= 2
++        int approach = std::max(0, 12 - centre_route->second);
++#else
++        int approach = std::max(0, 12 - distance(start, centre.get_position(), game_state));
++#endif
++        int imminent = centre.get_pearl_time() <= 2 ? 24 : 0;
++        best = std::max(best, cluster * 70 + approach * 8 + imminent);
++    }
++    return best;
++#endif
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 280578b..bf293a9 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -52,0 +53,2 @@ parser.add_argument('--earned-flagship-length', type=int,
++parser.add_argument('--pearl-cluster-graph-mode', type=int, choices=[0,1,2],
++                    help='0 geometric, 1 reachable pearls, 2 also use route distance')
+@@ -123,0 +126 @@ defines['EARNED_FLAGSHIP_LENGTH'] = args.earned_flagship_length
++defines['PEARL_CLUSTER_GRAPH_MODE'] = args.pearl_cluster_graph_mode

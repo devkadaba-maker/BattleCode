@@ -1129,3 +1129,30 @@ Strategy source and champion hash are unchanged; accepted evidence remains
 **3,029 valid games**, while failed diagnostics remain separately excluded at
 448 rows with 42 invalid-action games. Seed 10046 was already seen, so this
 checkpoint adds no fresh seed.
+
+## Graph-reachable pearl clusters — rejected confirmation
+
+The active cluster bonus counts nearby visible pearls using toroidal geometric
+distance. That can value a visually close pocket even when kelp separates it
+from the proposed move. Two graph-aware variants left every other champion rule
+unchanged: mode 1 ignored cluster centres and member pearls outside the move's
+reachable visible component; mode 2 also used graph-route distance for the
+approach bonus.
+
+On the standard eight maps from both sides of new tuning seed 10047, both exact
+binaries scored **10–6**. They were therefore kept unchanged for an independent
+tuning confirmation on seed 10048. Mode 1 fell to **9–7** and mode 2 to **8–8**.
+Combined tuning totals were 19–13 (59.38%, decisive Wilson 95% 42.26–74.48%)
+and 18–14 (56.25%, 39.33–71.83%). Map signals were unstable: mode 1 moved from
+Schooltime 0–2 to 1–1 while Big Empty moved from 1–1 to 0–2; mode 2's 0–2 maps
+shifted from Default Small and Schooltime to Colosseum and Default.
+
+Both 32-game matrices pass `scripts/check_records.py`; all **64 games** were
+complete, unique, valid and fault-free. Neither candidate repeated the screen,
+so neither advanced to a fresh all-map gate, diverse opponents or sandbox.
+`pearl-cluster-graph-decision.json`, the two manifests, exact hashes, smoke test
+and `research/pearl-cluster-graph.patch` preserve the experiment. Seeds 10047
+and 10048 are now seen. Accepted evidence rises to **3,093 valid games**; failed
+diagnostics remain separately excluded at 448 rows with 42 invalid-action games.
+Mode 0 rebuilds byte-identically to champion 58a7d1f, so production policy is
+unchanged.

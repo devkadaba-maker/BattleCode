@@ -50,6 +50,8 @@ parser.add_argument('--late-harvest-round', type=int,
                     help='first round of the optional late harvesting policy (default: 400)')
 parser.add_argument('--earned-flagship-length', type=int,
                     help='length at which any collector gains flagship protection (default: 16)')
+parser.add_argument('--pearl-cluster-graph-mode', type=int, choices=[0,1,2],
+                    help='0 geometric, 1 reachable pearls, 2 also use route distance')
 parser.add_argument('--head-attack-visible-margin', type=int,
                     help='minimum visible enemy length advantage for a head trade (default: 4)')
 parser.add_argument('--head-attack-last-round', type=int,
@@ -121,6 +123,7 @@ defines['NEW_CHILD_CLEARANCE_WEIGHT'] = args.new_child_clearance_weight
 defines['LATE_HARVEST_MODE'] = args.late_harvest_mode
 defines['LATE_HARVEST_ROUND'] = args.late_harvest_round
 defines['EARNED_FLAGSHIP_LENGTH'] = args.earned_flagship_length
+defines['PEARL_CLUSTER_GRAPH_MODE'] = args.pearl_cluster_graph_mode
 defines['HEAD_ATTACK_VISIBLE_MARGIN'] = args.head_attack_visible_margin
 defines['HEAD_ATTACK_LAST_ROUND'] = args.head_attack_last_round
 defines['HEAD_ATTACK_TARGET_ROLE'] = args.head_attack_target_role
