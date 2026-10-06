@@ -982,3 +982,26 @@ Exact hashes and reproduction commands are in `enemy-memory-decision.json`;
 all four raw matrices pass `scripts/check_records.py`. Seeds 10020–10037 are
 now seen evidence. These 150 games raise accepted local evidence to **2,861**;
 failed diagnostics remain separate at 320 rows with 20 invalid-action games.
+
+## Short off-screen pearl memory — failed screen
+
+The next resource-history experiment remembered the best current or imminent
+pearl for eight rounds after it left a collector's 7×7 view. The memory was
+ignored whenever a useful resource was currently visible and during pressure
+or hunt mode, so it changed only otherwise unguided collect/balanced movement.
+
+On the standard eight maps, both sides of unseen seed 10039, memory weight 48
+returned **9–7 on raw outcomes** but only **6–5 across 11 valid games**, with
+five invalid-action games. Weight 96 returned **7–9 raw** and **6–8 across 14
+valid games**, with two invalid-action games. The seven invalid rows occurred
+on Big Empty, Schooltime and Trophy; one Big Empty row had invalid actions on
+both teams. No invalid row is treated as strength evidence.
+
+The complete shared 32-row matrix is quarantined under `research/failed/` and
+excluded from the accepted corpus. The weak lower-weight signal and negative
+higher-weight result do not justify a clean confirmation, fresh all-map gate,
+diverse opponents or sandbox execution. Exact hashes and reproduction details
+are in `pearl-memory-decision.json` and `research/pearl-memory.patch`. Seed
+10039 is now seen. Accepted evidence remains **2,861 valid games**; failed
+diagnostics rise to 384 rows with 28 invalid-action games. Production was
+restored and rebuilds byte-identical to the active champion.
