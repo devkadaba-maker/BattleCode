@@ -1,0 +1,42 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/childclear3/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/childclear-default/.unswbc-build/bot"
+  ],
+  "maps": [
+    "Colosseum",
+    "arena",
+    "australia",
+    "autarky",
+    "big_empty",
+    "default",
+    "default_small",
+    "devil",
+    "dilemma",
+    "islands",
+    "maze",
+    "portals",
+    "queen_of_spades",
+    "schooltime",
+    "slithery_fight",
+    "stripes",
+    "stronghold",
+    "tower_defense",
+    "trauma",
+    "trophy",
+    "unsw",
+    "weakhold"
+  ],
+  "seeds": [
+    10043,
+    10044
+  ],
+  "games": 88,
+  "sha256": {
+    ".experiments/childclear3/.unswbc-build/bot": "cc4f4434108ad9017a83fb48b5c87530221261ab90df8e73d7cec2531b957133",
+    ".experiments/childclear-default/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

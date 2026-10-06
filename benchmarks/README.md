@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 2,861 accepted records form complete matrices with no invalid actions
+All 3,029 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -1028,3 +1028,26 @@ and fault-free. `flagship-border-decision.json` and
 Seed 10040 is now seen. Accepted evidence rises to **2,893 valid games**;
 failed diagnostics remain separately excluded at 384 rows with 28 invalid
 actions. The default source rebuild is byte-identical to champion 58a7d1f.
+
+## New-child first-move clearance — rejected fresh gate
+
+This experiment added extra teammate separation only to a newly split
+non-queen child's first move. Established dragons and queens retained the exact
+champion movement policy. Weight 1 was neutral at **8–8** on the standard
+eight-map tuning seed 10041. Weight 3 scored **11–5**, then reproduced at
+**12–4** on independent confirmation seed 10042, so that exact binary advanced
+to a predeclared all-map gate.
+
+Across all 22 official maps, both sides and fresh seeds 10043/10044, the frozen
+weight-3 candidate fell to **41–43–4 in 88 valid games (48.86%)**. Its decisive
+Wilson 95% interval was **38.41–59.32%**, and Big Empty regressed to **0–4**.
+The 4–0 results on Stripes and UNSW are not selected as scoped repairs from the
+same failed gate.
+
+All 136 new games were complete, unique, valid and fault-free, and all three
+matrices pass `scripts/check_records.py`. The candidate is rejected before
+diverse-opponent or sandbox testing. Exact hashes, records and reproduction
+commands are in `new-child-clearance-decision.json`; seed 10041–10044 are now
+seen. Accepted evidence rises to **3,029 valid games**; failed diagnostics stay
+separate at 384 rows with 28 invalid-action games. Production rebuild remains
+byte-identical to champion 58a7d1f.

@@ -1,0 +1,59 @@
+{
+  "experiment": "newborn child first-move teammate clearance",
+  "status": "rejected after fresh broad gate; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "A newly split non-queen child is most vulnerable on its first move. Applying extra existing friendly-pressure only on that launch move could reduce local spawn congestion without changing established dragons.",
+  "candidates": {
+    "weight_1": {
+      "native_sha256": "24d125f1f297ed889ddf9c6ce310d9ca770947f3d55b11da5f1ab30e794839da",
+      "tuning": {"seed": 10041, "games": 16, "wins": 8, "losses": 8, "draws": 0}
+    },
+    "weight_3": {
+      "native_sha256": "cc4f4434108ad9017a83fb48b5c87530221261ab90df8e73d7cec2531b957133",
+      "tuning": {"seed": 10041, "games": 16, "wins": 11, "losses": 5, "draws": 0},
+      "confirmation": {"seed": 10042, "games": 16, "wins": 12, "losses": 4, "draws": 0},
+      "fresh_gate": {
+        "seeds": [10043, 10044],
+        "maps": 22,
+        "both_sides": true,
+        "games": 88,
+        "wins": 41,
+        "losses": 43,
+        "draws": 4,
+        "score_percent": 48.86,
+        "decisive_wilson_95_percent": [38.41, 59.32],
+        "notable_maps": {"big_empty": "0-4", "stripes": "4-0", "unsw": "4-0", "weakhold": "0-0-4"}
+      }
+    }
+  },
+  "verification": {
+    "screen_check_records": "passed: 32 complete, unique, valid games",
+    "confirmation_check_records": "passed: 16 complete, unique, valid games",
+    "fresh_gate_check_records": "passed: 88 complete, unique, valid games",
+    "runtime_faults": 0,
+    "invalid_action_games": 0,
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "diverse_opponents": "not run after failed champion gate",
+    "judge_sandbox": "not run after failed champion gate"
+  },
+  "decision": "The weight-3 candidate passed tuning and confirmation at 23-9 combined, but its predeclared all-map gate fell to 41-43-4 and seriously regressed Big Empty. Preliminary screens do not override the independent gate, and positive map subsets are not promoted.",
+  "new_valid_records": 136,
+  "accepted_record_total": 3029,
+  "failed_diagnostic_total": 384,
+  "failed_invalid_game_total": 28,
+  "new_seen_seeds": [10041, 10042, 10043, 10044],
+  "records": {
+    "tuning": "new-child-clearance-screen.jsonl",
+    "confirmation": "new-child-clearance-confirmation.jsonl",
+    "fresh_gate": "new-child-clearance-fresh-gate.jsonl"
+  },
+  "reproduction": {
+    "patch": "research/new-child-clearance.patch",
+    "weight_1_build": "python scripts/build_variant.py childclear1 --new-child-clearance-weight 1 --compile",
+    "weight_3_build": "python scripts/build_variant.py childclear3 --new-child-clearance-weight 3 --compile"
+  }
+}

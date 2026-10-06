@@ -86,6 +86,9 @@ namespace {
 #ifndef FLAGSHIP_BORDER_EXTRA_PENALTY
 #define FLAGSHIP_BORDER_EXTRA_PENALTY 0
 #endif
+#ifndef NEW_CHILD_CLEARANCE_WEIGHT
+#define NEW_CHILD_CLEARANCE_WEIGHT 0
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -690,6 +693,16 @@ int special_friendly_pressure(Controller const& controller, Game const& game_sta
     return score;
 }
 
+#if NEW_CHILD_CLEARANCE_WEIGHT > 0
+int new_child_clearance_adjustment(Controller const& controller, Game const& game_state,
+                                   Position target, bool special) {
+    if (controller.get_id() < 2 || history.size() != 1) return 0;
+    int pressure = special ? special_friendly_pressure(controller, game_state, target) :
+                             friendly_pressure(controller, game_state, target);
+    return pressure * NEW_CHILD_CLEARANCE_WEIGHT;
+}
+#endif
+
 // Search the actual visible graph, rather than steering through kelp towards
 // a geometrically close pearl. Score every reachable square at its arrival
 // round, including soon-to-spawn food and other dragons (never our own body).
@@ -914,6 +927,9 @@ int score_move(Direction direction) {
     }
     if (future_mobility == 1) score -= 80;
     score += special ? special_friendly_pressure(controller, game_state, target) : friendly_pressure(controller, game_state, target);
+#if NEW_CHILD_CLEARANCE_WEIGHT > 0
+    score += new_child_clearance_adjustment(controller, game_state, target, special);
+#endif
     if constexpr (FRIENDLY_HEAD_DESTINATION_PENALTY > 0)
         score -= friendly_head_destinations(controller, target) * FRIENDLY_HEAD_DESTINATION_PENALTY;
     if constexpr (FRIENDLY_PRIORITY_CLAIM_PENALTY > 0)
