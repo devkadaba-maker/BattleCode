@@ -1005,3 +1005,26 @@ are in `pearl-memory-decision.json` and `research/pearl-memory.patch`. Seed
 10039 is now seen. Accepted evidence remains **2,861 valid games**; failed
 diagnostics rise to 384 rows with 28 invalid-action games. Production was
 restored and rebuilds byte-identical to the active champion.
+
+## Extra flagship perimeter cost — inconclusive screen
+
+Several earlier queen-death traces ended against perimeter walls or inside
+border corridors. The bot already applies a fixed edge cost of 150 to every
+dragon. This screen added a separate cost only for designated flagships, with
+weights 200 and 500; ordinary collector scoring and all other policy rules
+were unchanged.
+
+On eight border/corridor-heavy maps from both sides at seed 10040, both variants
+returned **8 wins, 6 losses and 2 draws across 16 valid games (56.25%)**. The
+weights traded different map outcomes: weight 200 went 2–0 on Devil but 0–2 on
+Maze and Queen of Spades; weight 500 went 2–0 on Maze but 0–2 on Colosseum.
+Weakhold was 0–0–2 for both. This mixed single-seed result does not establish a
+general perimeter repair or justify selecting a map by its two-game sample.
+
+Both variants are rejected before fresh validation, diverse opponents or
+sandbox. The matrix passes `scripts/check_records.py`; all 32 games were valid
+and fault-free. `flagship-border-decision.json` and
+`research/flagship-border.patch` retain exact hashes and reproduction details.
+Seed 10040 is now seen. Accepted evidence rises to **2,893 valid games**;
+failed diagnostics remain separately excluded at 384 rows with 28 invalid
+actions. The default source rebuild is byte-identical to champion 58a7d1f.

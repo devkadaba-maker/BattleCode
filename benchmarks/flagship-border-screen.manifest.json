@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/border-200b/.unswbc-build/bot",
+    ".experiments/border-500/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/border-default2/.unswbc-build/bot"
+  ],
+  "maps": [
+    "weakhold",
+    "unsw",
+    "devil",
+    "queen_of_spades",
+    "Colosseum",
+    "maze",
+    "trauma",
+    "stronghold"
+  ],
+  "seeds": [
+    10040
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/border-200b/.unswbc-build/bot": "1e57c1bc3dc0cbc3625c4f515e109c39fdf32c6372dd31080ddca3108fd6f7c1",
+    ".experiments/border-500/.unswbc-build/bot": "24e27179b068545c2b13a76352ffcc7e68f49ddb5942c20e3becc1f9ea4f0e39",
+    ".experiments/border-default2/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

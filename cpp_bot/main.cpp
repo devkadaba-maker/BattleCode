@@ -83,6 +83,9 @@ namespace {
 #ifndef PRESSURE_PEARL_WEIGHT
 #define PRESSURE_PEARL_WEIGHT 2
 #endif
+#ifndef FLAGSHIP_BORDER_EXTRA_PENALTY
+#define FLAGSHIP_BORDER_EXTRA_PENALTY 0
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -798,6 +801,15 @@ int recent_region_visits(Game const& game_state, Position target) {
     return count;
 }
 
+#if FLAGSHIP_BORDER_EXTRA_PENALTY > 0
+int extra_flagship_border_penalty(Controller const& controller, Game const& game_state, Position target) {
+        bool border = target.x == 0 || target.y == 0 ||
+            target.x == game_state.width - 1 || target.y == game_state.height - 1;
+        if (border && is_flagship(controller, game_state)) return FLAGSHIP_BORDER_EXTRA_PENALTY;
+    return 0;
+}
+#endif
+
 bool portal_allowed(Edge const& edge) {
     if (!edge.is_portal()) return true;
     if (game->get_round_num() == last_portal_round + 1) return false;
@@ -909,7 +921,12 @@ int score_move(Direction direction) {
     if (enemy_collision_risk(controller, game_state, target)) {
         score -= special ? (role == Role::HUNTER ? 260 : 550) : (role == Role::HUNTER ? 300 : 500);
     }
-    if (target.x == 0 || target.y == 0 || target.x == game_state.width - 1 || target.y == game_state.height - 1) score -= special ? (role == Role::COLLECTOR ? 220 : 120) : 150;
+    if (target.x == 0 || target.y == 0 || target.x == game_state.width - 1 || target.y == game_state.height - 1) {
+        score -= special ? (role == Role::COLLECTOR ? 220 : 120) : 150;
+#if FLAGSHIP_BORDER_EXTRA_PENALTY > 0
+        score -= extra_flagship_border_penalty(controller, game_state, target);
+#endif
+    }
     if (here->get_edge(direction).is_portal()) score -= 55;
     if (direction == controller.get_dir()) score += 5; else if (direction == controller.get_dir().get_opposite()) score -= 10;
     auto directions = Direction::get_direction_list();

@@ -40,6 +40,8 @@ parser.add_argument('--hunt-pearl-weight', type=int,
                     help='pearl-drive weight while at the population target (default: 2)')
 parser.add_argument('--pressure-pearl-weight', type=int,
                     help='pearl-drive weight while ahead but below the population target (default: 2)')
+parser.add_argument('--flagship-border-extra-penalty', type=int,
+                    help='extra penalty for flagship moves onto the map perimeter (default: 0)')
 parser.add_argument('--head-attack-visible-margin', type=int,
                     help='minimum visible enemy length advantage for a head trade (default: 4)')
 parser.add_argument('--head-attack-last-round', type=int,
@@ -72,6 +74,8 @@ if args.hunt_pearl_weight is not None and args.hunt_pearl_weight < 0:
     parser.error('--hunt-pearl-weight must be non-negative')
 if args.pressure_pearl_weight is not None and args.pressure_pearl_weight < 0:
     parser.error('--pressure-pearl-weight must be non-negative')
+if args.flagship_border_extra_penalty is not None and args.flagship_border_extra_penalty < 0:
+    parser.error('--flagship-border-extra-penalty must be non-negative')
 if args.head_attack_visible_margin is not None and args.head_attack_visible_margin < 0:
     parser.error('--head-attack-visible-margin must be non-negative')
 if args.head_attack_last_round is not None and args.head_attack_last_round < 0:
@@ -98,6 +102,7 @@ defines['SPECIAL_ENEMY_MEMORY_ROUNDS'] = args.special_enemy_memory_rounds
 defines['SCHOOLTIME_CONTACT_MEMORY'] = args.schooltime_contact_memory
 defines['HUNT_PEARL_WEIGHT'] = args.hunt_pearl_weight
 defines['PRESSURE_PEARL_WEIGHT'] = args.pressure_pearl_weight
+defines['FLAGSHIP_BORDER_EXTRA_PENALTY'] = args.flagship_border_extra_penalty
 defines['HEAD_ATTACK_VISIBLE_MARGIN'] = args.head_attack_visible_margin
 defines['HEAD_ATTACK_LAST_ROUND'] = args.head_attack_last_round
 defines['HEAD_ATTACK_TARGET_ROLE'] = args.head_attack_target_role
