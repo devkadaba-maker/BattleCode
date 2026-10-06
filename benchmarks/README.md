@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 2,665 accepted records form complete matrices with no invalid actions
+All 2,711 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -898,3 +898,28 @@ native hash remain unchanged. Exact records, manifest, tested hash and source
 are in `late-flagship-*` and `research/late-flagship.patch`. Seed 10014 is now
 seen evidence. Accepted local matrix evidence rises to 2,681 valid games;
 failed diagnostics remain separate at 320 rows with 20 invalid-action games.
+
+## Move-order-aware enemy heading on 48x24 maps — rejected validation
+
+The already-rejected broad move-order policy had scored 9–3 across Maze,
+Stronghold and Trauma in its seen all-map gate. Because these official maps
+share a 48×24 outer-fortress geometry and cannot reliably be distinguished
+from the bot's local opening view, a single geometry-family extension was
+frozen before new games. The earlier 9–3 selected the hypothesis and is not
+counted as promotion evidence.
+
+Against the exact Schooltime-scoped champion, the frozen candidate scored only
+**14–16 in 30 fresh, complete, unique and valid games**: Maze 4–6,
+Stronghold 5–5 and Trauma 5–5. Its score was 46.67%, with a decisive-game
+Wilson 95% interval of 30.23–63.86%. The selected signal did not reproduce, so
+unaffected-map controls, diverse opponents and judge sandbox were not run.
+
+The candidate native SHA256 was
+`2eab6f189dfa5695de0e93384f4da3376d9bb19854b16cc86269916c7dae0060`.
+The default production build remains byte-identical to the active champion at
+`74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533`.
+Exact records, manifest, decision and reproduction patch are in
+`enemy-order-48x24-*` and `research/enemy-order-48x24.patch`. Seeds
+10015–10019 are now seen evidence. Accepted local matrix evidence rises to
+2,711 valid games; failed diagnostics remain separate at 320 rows with 20
+invalid-action games. The Schooltime-only repair remains active.

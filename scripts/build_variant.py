@@ -28,8 +28,8 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
 parser.add_argument('--large-population-target', type=int)
 parser.add_argument('--friendly-head-destination-penalty', type=int)
 parser.add_argument('--friendly-priority-claim-penalty', type=int)
-parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2],
-                    help='0 off, 1 all maps, 2 Schooltime 60x40 only')
+parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2,3],
+                    help='0 off, 1 all maps, 2 Schooltime 60x40 only, 3 Schooltime plus 48x24 maps')
 parser.add_argument('--head-attack-visible-margin', type=int,
                     help='minimum visible enemy length advantage for a head trade (default: 4)')
 parser.add_argument('--head-attack-last-round', type=int,

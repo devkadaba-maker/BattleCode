@@ -150,7 +150,8 @@ bool enemy_head_ahead(Controller const& controller, Position target) {
         // A later enemy has not moved yet. If we take its projected square
         // first, it must choose another move or collide with occupied space.
         bool enabled = ENEMY_HEADING_ORDER_AWARE == 1 ||
-            (ENEMY_HEADING_ORDER_AWARE == 2 && game && game->width == 60 && game->height == 40);
+            (ENEMY_HEADING_ORDER_AWARE >= 2 && game && game->width == 60 && game->height == 40) ||
+            (ENEMY_HEADING_ORDER_AWARE == 3 && game && game->width == 48 && game->height == 24);
         if (enabled && dragon->get_id() > controller.get_id()) continue;
 #endif
         if (dragon->get_position().add_dir(dragon->get_dir()) == target) return true;

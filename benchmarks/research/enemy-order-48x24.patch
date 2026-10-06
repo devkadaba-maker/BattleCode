@@ -1,0 +1,29 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index d5764d7..f7c3538 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -150,7 +150,8 @@ bool enemy_head_ahead(Controller const& controller, Position target) {
+         // A later enemy has not moved yet. If we take its projected square
+         // first, it must choose another move or collide with occupied space.
+         bool enabled = ENEMY_HEADING_ORDER_AWARE == 1 ||
+-            (ENEMY_HEADING_ORDER_AWARE == 2 && game && game->width == 60 && game->height == 40);
++            (ENEMY_HEADING_ORDER_AWARE >= 2 && game && game->width == 60 && game->height == 40) ||
++            (ENEMY_HEADING_ORDER_AWARE == 3 && game && game->width == 48 && game->height == 24);
+         if (enabled && dragon->get_id() > controller.get_id()) continue;
+ #endif
+         if (dragon->get_position().add_dir(dragon->get_dir()) == target) return true;
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index ccd6484..222edb0 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -28,8 +28,8 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
+ parser.add_argument('--large-population-target', type=int)
+ parser.add_argument('--friendly-head-destination-penalty', type=int)
+ parser.add_argument('--friendly-priority-claim-penalty', type=int)
+-parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2],
+-                    help='0 off, 1 all maps, 2 Schooltime 60x40 only')
++parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2,3],
++                    help='0 off, 1 all maps, 2 Schooltime 60x40 only, 3 Schooltime plus 48x24 maps')
+ parser.add_argument('--head-attack-visible-margin', type=int,
+                     help='minimum visible enemy length advantage for a head trade (default: 4)')
+ parser.add_argument('--head-attack-last-round', type=int,
