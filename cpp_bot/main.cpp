@@ -95,6 +95,9 @@ namespace {
 #ifndef LATE_HARVEST_ROUND
 #define LATE_HARVEST_ROUND 400
 #endif
+#ifndef EARNED_FLAGSHIP_LENGTH
+#define EARNED_FLAGSHIP_LENGTH 16
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -277,6 +280,10 @@ Role role_for_controller(Controller const& controller, Game const& game_state) {
     return role_for(controller.get_id());
 }
 
+#if EARNED_FLAGSHIP_LENGTH != 16
+bool earned_flagship(int length) { return length >= EARNED_FLAGSHIP_LENGTH; }
+#endif
+
 bool special_pressure_policy(Controller const& controller, Game const& game_state) {
     return ((game_state.width == 11 && game_state.height == 11 && controller.get_team() == Team(Team::A)) ||
             (game_state.width == 25 && game_state.height == 35 && controller.get_team() == Team(Team::B)));
@@ -324,13 +331,21 @@ Role movement_role(Controller const& controller, Game const& game_state, bool sp
 
 bool special_is_flagship(Controller const& controller, Game const& game_state) {
     Role role = special_pressure_role(controller, game_state);
+#if EARNED_FLAGSHIP_LENGTH == 16
     return role == Role::COLLECTOR && (controller.get_id() < 2 || controller.get_length() >= 16 ||
+#else
+    return role == Role::COLLECTOR && (controller.get_id() < 2 || earned_flagship(controller.get_length()) ||
+#endif
         role_hash(controller.get_id()) % special_population_target(game_state) < flagship_target(game_state) - 1);
 }
 
 bool is_flagship(Controller const& controller, Game const& game_state) {
     Role role = role_for_controller(controller, game_state);
+#if EARNED_FLAGSHIP_LENGTH == 16
     return role == Role::COLLECTOR && (controller.get_id() < 2 || controller.get_length() >= 16 ||
+#else
+    return role == Role::COLLECTOR && (controller.get_id() < 2 || earned_flagship(controller.get_length()) ||
+#endif
         role_hash(controller.get_id()) % population_target(controller, game_state) < flagship_target(game_state) - 1);
 }
 

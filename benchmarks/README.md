@@ -1073,3 +1073,28 @@ Exact hashes and reproduction details are in `late-harvest-decision.json` and
 `research/late-harvest.patch`. Seed 10045 is now seen. Accepted evidence remains
 **3,029 valid games**; failed diagnostics rise to 416 rows with 30 invalid-action
 games. The default build remains byte-identical to champion 58a7d1f.
+
+## Earned-flagship thresholds — failed screen
+
+The active bot automatically gives any collector flagship protection at length
+16, in addition to queens and the intended hashed flagship set. This experiment
+raised that earned threshold to 20 or 24 so medium-long collectors retained
+normal phase movement instead of immediately switching to protected pearl-only
+behavior.
+
+On the standard eight maps from both sides of unseen seed 10046, threshold 20
+had raw outcomes of **7–9** and threshold 24 had raw outcomes of **9–7**. The
+matrix was not valid, however: threshold 20 had seven invalid-action games and
+threshold 24 had five. Their remaining incomplete valid subsets were only 5–4
+and 6–5. Nine failed rows included candidate-side invalid actions, eight included
+opponent-side invalid actions, and five included both, so these counts overlap.
+
+The complete shared 32-row matrix is quarantined under `research/failed/` and
+excluded from accepted evidence. No invalid row or selected valid subset is
+used as strength evidence, and the weak signal does not warrant a rerun,
+confirmation, fresh gate, diverse opponents or sandbox. Exact hashes and
+reproduction details are in `earned-flagship-threshold-decision.json` and
+`research/earned-flagship-threshold.patch`. Seed 10046 is now seen. Accepted
+evidence remains **3,029 valid games**; failed diagnostics rise to 448 rows with
+42 invalid-action games. The default threshold remains 16 and rebuilds
+byte-identically to champion 58a7d1f.
