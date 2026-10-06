@@ -1,0 +1,6 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -209 +209 @@
+-int flagship_target(Game const& game_state) { return game_state.width * game_state.height >= 600 ? 5 : 4; }
++int flagship_target(Game const& game_state) { return game_state.width * game_state.height >= 600 ? 4 : 4; }

@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 2,649 accepted records form complete matrices with no invalid actions
+All 2,665 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -857,3 +857,22 @@ test or sandbox run. Exact hashes and reproduction details are in
 `research/collector-sonar.patch`. Seed 10012 is now seen. Production was
 restored and rebuilds byte-identical to the champion. Accepted evidence stays
 at 2,649 games; failed diagnostics rise to 320 rows with 20 invalid games.
+
+## Large-map flagship count — neutral screen
+
+The current policy reserves five hashed flagship roles on maps with at least
+600 tiles, and four on smaller maps. To test whether one fewer protected
+snake leaves enough extra collectors to improve growth, a candidate changed
+only the large-map target from five to four. It was compared with the exact
+champion binary on both sides of eight screening maps at unseen seed 10013.
+
+The candidate scored **8–8 in 16 valid games**. Default was 2–0 for the
+candidate; Schooltime was 0–2; the other six maps were each 1–1. This mixed,
+small result does not justify fresh all-map validation, sandbox testing, or
+promotion. The active champion remains unchanged. Exact records, manifest,
+native hashes, and the one-line reproduction patch are archived in
+`flagship-count-screen.jsonl`, `flagship-count-screen.manifest.json`,
+`flagship-count-decision.json`, and `research/flagship-count.patch`.
+Accepted local matrix evidence rises to 2,665 valid games; failed diagnostics
+remain separate at 320 rows with 20 invalid-action games. These are local
+results, not Elo measurements.
