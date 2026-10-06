@@ -68,6 +68,15 @@ namespace {
 #ifndef ENEMY_HEADING_ORDER_AWARE
 #define ENEMY_HEADING_ORDER_AWARE 2
 #endif
+#ifndef ENEMY_MEMORY_ROUNDS
+#define ENEMY_MEMORY_ROUNDS 24
+#endif
+#ifndef SPECIAL_ENEMY_MEMORY_ROUNDS
+#define SPECIAL_ENEMY_MEMORY_ROUNDS 18
+#endif
+#ifndef SCHOOLTIME_CONTACT_MEMORY
+#define SCHOOLTIME_CONTACT_MEMORY 0
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -335,15 +344,17 @@ Mode strategy_mode(int unit_count, std::optional<int> enemy_count, int populatio
 
 Mode combat_mode(Controller const& controller, Game const& game_state) {
     int visible = visible_enemy_count(controller), round = game_state.get_round_num();
+    int memory_rounds = SCHOOLTIME_CONTACT_MEMORY && game_state.width == 60 && game_state.height == 40
+        ? 0 : ENEMY_MEMORY_ROUNDS;
     if (visible) { enemy_memory_count = std::max(enemy_memory_count, visible); enemy_memory_round = round; }
-    else if (round - enemy_memory_round > 24) { enemy_memory_count = std::max(0, enemy_memory_count - 1); enemy_memory_round = round; }
+    else if (round - enemy_memory_round > memory_rounds) { enemy_memory_count = std::max(0, enemy_memory_count - 1); enemy_memory_round = round; }
     return strategy_mode(controller.get_unit_count(), enemy_memory_count ? std::optional<int>(enemy_memory_count) : std::nullopt, population_target(controller, game_state));
 }
 
 Mode special_combat_mode(Controller const& controller, Game const& game_state) {
     int visible = visible_enemy_count(controller), round = game_state.get_round_num();
     if (visible) { enemy_memory_count = std::max(enemy_memory_count, visible); enemy_memory_round = round; }
-    else if (round - enemy_memory_round > 18) { enemy_memory_count = std::max(0, enemy_memory_count - 1); enemy_memory_round = round; }
+    else if (round - enemy_memory_round > SPECIAL_ENEMY_MEMORY_ROUNDS) { enemy_memory_count = std::max(0, enemy_memory_count - 1); enemy_memory_round = round; }
     return strategy_mode(controller.get_unit_count(), enemy_memory_count ? std::optional<int>(enemy_memory_count) : std::nullopt, special_population_target(game_state));
 }
 

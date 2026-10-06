@@ -3,7 +3,7 @@
 Engine/toolkit: `unswbc==1.2.9`; current bundled maps; native C++ built with
 `g++ -std=c++20 -O2`. Recorded matches are checked against their full manifests
 with `scripts/check_records.py`, including uniqueness and engine-winner consistency.
-All 2,711 accepted records form complete matrices with no invalid actions
+All 2,861 accepted records form complete matrices with no invalid actions
 or bot runtime faults. These are local games, not Elo measurements.
 
 ## Selection and limitations
@@ -923,3 +923,36 @@ Exact records, manifest, decision and reproduction patch are in
 10015–10019 are now seen evidence. Accepted local matrix evidence rises to
 2,711 valid games; failed diagnostics remain separate at 320 rows with 20
 invalid-action games. The Schooltime-only repair remains active.
+
+## Enemy sighting memory — rejected broad and scoped tests
+
+The bot normally remembers a visible enemy count and decays it one unit every
+24 rounds (18 under the small-map special policy). This experiment tested
+whether stale sightings were keeping collectors in pressure or hunt modes after
+contact ended. On the standard eight-map, both-side seed-10020 screen, an 8/6
+round memory scored **7–9**; contact-only memory scored **10–6**. All 32 games
+were valid, so contact-only memory was frozen for fresh validation.
+
+Across all 22 maps, both sides and fresh seeds 10021–10022, the frozen broad
+candidate scored **47–37–4 in 88 valid games (55.68%)**. Its decisive-game
+Wilson 95% interval was **45.31–66.08%**, missing both broad promotion targets.
+Islands, Queen of Spades and Slithery Fight each regressed to 1–3. Schooltime
+was 4–0 in that gate and 2–0 in tuning, so a 60×40-only candidate was frozen;
+those selected six games were not counted as final evidence.
+
+The scoped candidate returned **7–3** on its first five fresh seeds, but only
+**9–11** on a pre-declared ten-seed extension. Combined independent Schooltime
+validation was therefore **16–14 in 30 complete valid games**, 53.33% with a
+decisive Wilson 95% interval of 36.14–69.77%. A reproducible seed-10024 A-side
+loss reached the round limit with both queens alive; the candidate ended with
+50 dragons and total length 213 versus the champion's 63 and 337. Shortening
+memory did not fix that growth deficit.
+
+Both broad and scoped policies are rejected, so no diverse-opponent,
+unaffected-map equivalence or judge-sandbox promotion gate was run. The default
+source rebuild remains byte-identical to the active champion at
+`74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533`.
+Exact hashes and reproduction commands are in `enemy-memory-decision.json`;
+all four raw matrices pass `scripts/check_records.py`. Seeds 10020–10037 are
+now seen evidence. These 150 games raise accepted local evidence to **2,861**;
+failed diagnostics remain separate at 320 rows with 20 invalid-action games.

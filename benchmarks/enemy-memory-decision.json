@@ -1,0 +1,97 @@
+{
+  "experiment": "enemy sighting memory decay",
+  "status": "rejected; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "default_memory_rounds": 24,
+    "special_memory_rounds": 18
+  },
+  "hypothesis": "Shorter sighting memory would return collectors to pearl gathering sooner after enemies leave vision, avoiding stale pressure and hunt decisions.",
+  "screen": {
+    "matrix": "enemy-memory-screen.jsonl",
+    "seed": 10020,
+    "maps": 8,
+    "both_sides": true,
+    "complete_valid_games": 32,
+    "short_8_6": {
+      "native_sha256": "a725d09b7ef64ed16435c3d5ce18c56a76c48327a570b661b446ceb95b7993f9",
+      "wins": 7,
+      "losses": 9,
+      "draws": 0
+    },
+    "contact_only_0_0": {
+      "native_sha256": "932c51049fcc57b68fab7f9d723c4035386d1286d289b332d1a2873ae8182b77",
+      "wins": 10,
+      "losses": 6,
+      "draws": 0
+    }
+  },
+  "broad_fresh_gate": {
+    "matrix": "enemy-memory-fresh.jsonl",
+    "seeds": [10021, 10022],
+    "maps": 22,
+    "both_sides": true,
+    "complete_valid_games": 88,
+    "wins": 47,
+    "losses": 37,
+    "draws": 4,
+    "score_percent": 55.68,
+    "decisive_wilson_95_percent": [45.31, 66.08],
+    "promotion_gate": "failed: score below 60% and Wilson lower bound below 50%",
+    "serious_regressions": {
+      "islands": "1-3",
+      "queen_of_spades": "1-3",
+      "slithery_fight": "1-3"
+    },
+    "selected_positive_maps": {
+      "schooltime": "4-0",
+      "stronghold": "4-0"
+    }
+  },
+  "schooltime_scope": {
+    "reason": "The tuning screen and broad gate were 6-0 on Schooltime, so a 60x40-only candidate was frozen before new validation. Those six selected games are not promotion evidence.",
+    "native_sha256": "29a68ceebf640e638aee5719c7bbed23135be8c0d237ed0437e3ca7f79a49a5d",
+    "first_fresh_matrix": "enemy-memory-schooltime-fresh.jsonl",
+    "first_fresh_seeds": [10023, 10024, 10025, 10026, 10027],
+    "first_fresh_result": "7-3",
+    "extension_matrix": "enemy-memory-schooltime-extension.jsonl",
+    "extension_seeds": [10028, 10029, 10030, 10031, 10032, 10033, 10034, 10035, 10036, 10037],
+    "extension_result": "9-11",
+    "combined_complete_valid_games": 30,
+    "combined_wins": 16,
+    "combined_losses": 14,
+    "combined_draws": 0,
+    "combined_score_percent": 53.33,
+    "combined_decisive_wilson_95_percent": [36.14, 69.77],
+    "decision": "rejected; the selected 6-0 signal did not reproduce convincingly"
+  },
+  "loss_trace": {
+    "file": "research/enemy-memory-schooltime-10024-A-trace.json",
+    "case": "Schooltime seed 10024 side A",
+    "matches_original": true,
+    "result": "candidate loss at the round limit",
+    "candidate_final": {"dragons": 50, "total_length": 213, "queen_length": 3, "longest": 13},
+    "champion_final": {"dragons": 63, "total_length": 337, "queen_length": 3, "longest": 19},
+    "interpretation": "Both queens survived; contact-only memory did not repair the growth and population deficit in this loss."
+  },
+  "verification": {
+    "check_records": "all four matrices pass",
+    "invalid_actions": 0,
+    "runtime_faults": 0,
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "diverse_opponents": "not run after both promotion paths failed",
+    "judge_sandbox": "not run after both promotion paths failed",
+    "unaffected_map_equivalence": "not run after scoped validation failed"
+  },
+  "new_accepted_records": 150,
+  "accepted_record_total": 2861,
+  "new_seen_seeds": [10020, 10021, 10022, 10023, 10024, 10025, 10026, 10027, 10028, 10029, 10030, 10031, 10032, 10033, 10034, 10035, 10036, 10037],
+  "reproduction": {
+    "patch": "research/enemy-memory.patch",
+    "short_build": "python scripts/build_variant.py memory-short --enemy-memory-rounds 8 --special-enemy-memory-rounds 6 --compile",
+    "contact_build": "python scripts/build_variant.py memory-contact --enemy-memory-rounds 0 --special-enemy-memory-rounds 0 --compile",
+    "schooltime_build": "python scripts/build_variant.py memory-scoped --schooltime-contact-memory 1 --compile"
+  }
+}

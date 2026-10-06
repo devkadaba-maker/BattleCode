@@ -1,0 +1,58 @@
+{
+  "candidate": "/workspace/scratch/a337ad5c7b54/BattleCode-next/.experiments/memory-scoped/.unswbc-build/bot",
+  "opponent": "/workspace/scratch/a337ad5c7b54/BattleCode-next/.experiments/memory-default3/.unswbc-build/bot",
+  "map": "schooltime",
+  "seed": 10024,
+  "side": "A",
+  "outcome": "loss",
+  "valid": true,
+  "result": {
+    "rounds": 499,
+    "winner": "B",
+    "end_reason": 1,
+    "a_dragons": 50,
+    "b_dragons": 63,
+    "a_length": 213,
+    "b_length": 337,
+    "events": 116803,
+    "a_queen": 3,
+    "b_queen": 3,
+    "a_longest": 13,
+    "b_longest": 19
+  },
+  "deaths": {
+    "A": {
+      "W": 64,
+      "H": 44,
+      "O": 16,
+      "S": 7
+    },
+    "B": {
+      "W": 238,
+      "S": 16,
+      "O": 66,
+      "H": 86
+    }
+  },
+  "queen_deaths": {},
+  "peak_population": {
+    "A": 50,
+    "B": 64
+  },
+  "faults": [],
+  "notices": [],
+  "seconds": 9.482,
+  "diagnostic": {
+    "kind": "reproduction; excluded from match matrix evidence",
+    "matrix": "benchmarks/enemy-memory-schooltime-fresh.jsonl",
+    "matches_original": true,
+    "different_fields": [],
+    "native_sha256": {
+      "candidate": "29a68ceebf640e638aee5719c7bbed23135be8c0d237ed0437e3ca7f79a49a5d",
+      "opponent": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+    },
+    "toolkit": "1.2.9",
+    "map_sha256": "5b9481d0c65454b6d0a6747a581c582414cba37dd99273cc5a23dbca63b31724",
+    "window": 8
+  }
+}

@@ -30,6 +30,12 @@ parser.add_argument('--friendly-head-destination-penalty', type=int)
 parser.add_argument('--friendly-priority-claim-penalty', type=int)
 parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2,3],
                     help='0 off, 1 all maps, 2 Schooltime 60x40 only, 3 Schooltime plus 48x24 maps')
+parser.add_argument('--enemy-memory-rounds', type=int,
+                    help='rounds before ordinary-map enemy memory begins to decay (default: 24)')
+parser.add_argument('--special-enemy-memory-rounds', type=int,
+                    help='rounds before special-policy enemy memory begins to decay (default: 18)')
+parser.add_argument('--schooltime-contact-memory', type=int, choices=[0,1],
+                    help='1 limits enemy memory to current contact on Schooltime only')
 parser.add_argument('--head-attack-visible-margin', type=int,
                     help='minimum visible enemy length advantage for a head trade (default: 4)')
 parser.add_argument('--head-attack-last-round', type=int,
@@ -54,6 +60,10 @@ if args.friendly_head_destination_penalty is not None and args.friendly_head_des
     parser.error('--friendly-head-destination-penalty must be non-negative')
 if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
     parser.error('--friendly-priority-claim-penalty must be non-negative')
+if args.enemy_memory_rounds is not None and args.enemy_memory_rounds < 0:
+    parser.error('--enemy-memory-rounds must be non-negative')
+if args.special_enemy_memory_rounds is not None and args.special_enemy_memory_rounds < 0:
+    parser.error('--special-enemy-memory-rounds must be non-negative')
 if args.head_attack_visible_margin is not None and args.head_attack_visible_margin < 0:
     parser.error('--head-attack-visible-margin must be non-negative')
 if args.head_attack_last_round is not None and args.head_attack_last_round < 0:
@@ -75,6 +85,9 @@ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
 defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
 defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
 defines['ENEMY_HEADING_ORDER_AWARE'] = args.enemy_heading_order_aware
+defines['ENEMY_MEMORY_ROUNDS'] = args.enemy_memory_rounds
+defines['SPECIAL_ENEMY_MEMORY_ROUNDS'] = args.special_enemy_memory_rounds
+defines['SCHOOLTIME_CONTACT_MEMORY'] = args.schooltime_contact_memory
 defines['HEAD_ATTACK_VISIBLE_MARGIN'] = args.head_attack_visible_margin
 defines['HEAD_ATTACK_LAST_ROUND'] = args.head_attack_last_round
 defines['HEAD_ATTACK_TARGET_ROLE'] = args.head_attack_target_role

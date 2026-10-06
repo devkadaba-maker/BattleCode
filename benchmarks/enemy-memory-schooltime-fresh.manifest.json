@@ -1,0 +1,24 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/memory-scoped/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/memory-default3/.unswbc-build/bot"
+  ],
+  "maps": [
+    "schooltime"
+  ],
+  "seeds": [
+    10023,
+    10024,
+    10025,
+    10026,
+    10027
+  ],
+  "games": 10,
+  "sha256": {
+    ".experiments/memory-scoped/.unswbc-build/bot": "29a68ceebf640e638aee5719c7bbed23135be8c0d237ed0437e3ca7f79a49a5d",
+    ".experiments/memory-default3/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}
