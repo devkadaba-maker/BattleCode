@@ -876,3 +876,25 @@ native hashes, and the one-line reproduction patch are archived in
 Accepted local matrix evidence rises to 2,665 valid games; failed diagnostics
 remain separate at 320 rows with 20 invalid-action games. These are local
 results, not Elo measurements.
+
+## Late earned-flagship promotion — rejected screen
+
+The official round-limit comparison is queen length, then longest dragon, then
+total length. This experiment therefore promoted any collector reaching length
+12 after round 299 into the existing flagship movement and split policy, rather
+than changing global population or split thresholds. The existing unconditional
+length-16 promotion remained intact.
+
+Against the exact champion from both sides of the standard eight maps at unseen
+seed 10014, the candidate scored **7–9 in 16 complete, unique, valid games**.
+Big Empty was 0–2; the other seven maps were each 1–1. Fourteen games reached
+the round limit, yet the candidate's mean queen, longest-dragon and total-length
+deltas were respectively -0.125, -2.0625 and -11.25 across the screen. Earlier
+flagship treatment did not preserve a better scoring dragon.
+
+The candidate is rejected before confirmation, fresh all-map validation,
+diverse-opponent testing or sandbox execution. The active champion and its
+native hash remain unchanged. Exact records, manifest, tested hash and source
+are in `late-flagship-*` and `research/late-flagship.patch`. Seed 10014 is now
+seen evidence. Accepted local matrix evidence rises to 2,681 valid games;
+failed diagnostics remain separate at 320 rows with 20 invalid-action games.

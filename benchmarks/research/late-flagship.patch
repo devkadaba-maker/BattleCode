@@ -1,0 +1,20 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -296,12 +296,14 @@ Role movement_role(Controller const& controller, Game const& game_state, bool sp
+ 
+ bool special_is_flagship(Controller const& controller, Game const& game_state) {
+     Role role = special_pressure_role(controller, game_state);
+-    return role == Role::COLLECTOR && (controller.get_id() < 2 || controller.get_length() >= 16 ||
++    bool earned_late_flagship = game_state.get_round_num() >= 300 && controller.get_length() >= 12;
++    return role == Role::COLLECTOR && (controller.get_id() < 2 || controller.get_length() >= 16 || earned_late_flagship ||
+         role_hash(controller.get_id()) % special_population_target(game_state) < flagship_target(game_state) - 1);
+ }
+ 
+ bool is_flagship(Controller const& controller, Game const& game_state) {
+     Role role = role_for_controller(controller, game_state);
+-    return role == Role::COLLECTOR && (controller.get_id() < 2 || controller.get_length() >= 16 ||
++    bool earned_late_flagship = game_state.get_round_num() >= 300 && controller.get_length() >= 12;
++    return role == Role::COLLECTOR && (controller.get_id() < 2 || controller.get_length() >= 16 || earned_late_flagship ||
+         role_hash(controller.get_id()) % population_target(controller, game_state) < flagship_target(game_state) - 1);
+ }
