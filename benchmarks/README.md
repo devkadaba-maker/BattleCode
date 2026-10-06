@@ -1098,3 +1098,34 @@ reproduction details are in `earned-flagship-threshold-decision.json` and
 evidence remains **3,029 valid games**; failed diagnostics rise to 448 rows with
 42 invalid-action games. The default threshold remains 16 and rebuilds
 byte-identically to champion 58a7d1f.
+
+## Invalid-action diagnostic capture
+
+The earned-flagship screen exposed a gap in the benchmark tooling: death reason
+`A` means the engine received no valid action, but the runner retained the last
+protocol exchange only for queens. In addition, all compiled variants end in
+`.unswbc-build/bot`, so loss-replay names such as `bot-bot-...` could overwrite
+another variant's replay for the same map, seed and side.
+
+The runner now adds an `invalid_actions` array whenever any dragon dies for
+reason `A`. Each entry includes the dragon ID, team, round, and its complete
+final engine input and bot output. With `--loss-replays`, it also saves every
+invalid-action replay regardless of the final winner. Replay filenames include
+the readable variant directories and the first 12 digits of both exact binary
+SHA256 values, preventing collisions between compiled variants.
+
+An exact-hash diagnostic rerun targeted the worst recorded case: threshold 20
+versus the champion on Schooltime, seed 10046, candidate on side A. The failed
+matrix row was a candidate loss with five candidate and three opponent invalid
+actions. The rerun was valid, had no invalid actions, and changed to a candidate
+win. It therefore did not reproduce the fault, does not replace the failed row,
+and is excluded from strength evidence. The result reinforces that rerunning a
+failed game is diagnostic, not a valid substitution.
+
+`invalid-action-diagnostics-decision.json` records the exact hashes and
+comparison. The runner compiles cleanly, its diagnostic helpers have a focused
+regression test, and the one-row rerun passes `scripts/check_records.py`.
+Strategy source and champion hash are unchanged; accepted evidence remains
+**3,029 valid games**, while failed diagnostics remain separately excluded at
+448 rows with 42 invalid-action games. Seed 10046 was already seen, so this
+checkpoint adds no fresh seed.

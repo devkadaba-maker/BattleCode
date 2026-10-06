@@ -27,11 +27,29 @@ from unswbc.run import _resolve
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def replay_bot_label(value):
+    """Return a readable, collision-resistant label for a replay filename."""
+    path = Path(value)
+    if path.name == 'bot' and path.parent.name == '.unswbc-build':
+        name = path.parent.parent.name
+    else:
+        name = path.stem or path.name or 'bot'
+    identity = (hashlib.sha256(path.read_bytes()).hexdigest()[:12]
+                if path.is_file() else hashlib.sha256(str(path.resolve()).encode()).hexdigest()[:12])
+    return f'{name}-{identity}'
+
+
+def invalid_action_diagnostic(dragon_id, team, round_num, last_turn):
+    """Preserve the engine input and bot output immediately before death A."""
+    return {'id': dragon_id, 'team': team, 'round': round_num,
+            'last_turn': last_turn}
+
+
 def match(candidate, opponent, map_path, seed, side, replay_dir=None):
     paths = {side: candidate, ('B' if side == 'A' else 'A'): opponent}
     pools, live, teams = {}, {}, {}
     deaths = {'A': Counter(), 'B': Counter()}
-    queen_deaths, queen_turns, faults, notices = {}, {}, [], []
+    queen_deaths, queen_turns, last_turns, invalid_actions, faults, notices = {}, {}, {}, [], [], []
     peaks = {'A': 0, 'B': 0}
     started = time.monotonic()
     engine = EngineModule()
@@ -50,18 +68,24 @@ def match(candidate, opponent, map_path, seed, side, replay_dir=None):
         def reply(dragon_id, block):
             bot = live[dragon_id]
             response = bot.ask(block)
+            turn = {'input': block.decode(errors='replace'),
+                    'output': response.decode(errors='replace')}
+            last_turns[dragon_id] = turn
             if dragon_id < 2:
-                queen_turns[teams[dragon_id]] = {'input': block.decode(errors='replace'),
-                                               'output': response.decode(errors='replace')}
+                queen_turns[teams[dragon_id]] = turn
             if bot.error is not None:
                 faults.append({'id': dragon_id, 'team': teams[dragon_id], 'error': str(bot.error)})
             return response
 
         def death(dragon_id, round_num, reason):
             deaths[teams[dragon_id]][reason] += 1
+            if reason == 'A':
+                invalid_actions.append(invalid_action_diagnostic(
+                    dragon_id, teams[dragon_id], round_num, last_turns.get(dragon_id)))
             if dragon_id < 2:
                 queen_deaths[teams[dragon_id]] = {'round': round_num, 'reason': reason,
                                                  'last_turn': queen_turns.get(teams[dragon_id])}
+            last_turns.pop(dragon_id, None)
             bot = live.pop(dragon_id, None)
             if bot:
                 bot.stop()
@@ -75,10 +99,13 @@ def match(candidate, opponent, map_path, seed, side, replay_dir=None):
                       result=asdict(result), deaths={t: dict(c) for t, c in deaths.items()},
                       queen_deaths=queen_deaths, peak_population=peaks, faults=faults,
                       notices=notices, seconds=round(time.monotonic()-started, 3))
-        if replay_dir and outcome == 'loss':
+        if invalid_actions:
+            record['invalid_actions'] = invalid_actions
+        if replay_dir and (outcome == 'loss' or invalid_actions):
             replay_dir = Path(replay_dir)
             replay_dir.mkdir(parents=True, exist_ok=True)
-            name = f'{Path(candidate).name}-{Path(opponent).name}-{Path(map_path).stem}-{seed}-{side}.replay'
+            name = (f'{replay_bot_label(candidate)}-{replay_bot_label(opponent)}-'
+                    f'{Path(map_path).stem}-{seed}-{side}.replay')
             (replay_dir/name).write_bytes(engine.replay(str(paths['A']), str(paths['B'])))
             record['replay'] = str(replay_dir/name)
         return record
