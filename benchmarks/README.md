@@ -1156,3 +1156,27 @@ and 10048 are now seen. Accepted evidence rises to **3,093 valid games**; failed
 diagnostics remain separately excluded at 448 rows with 42 invalid-action games.
 Mode 0 rebuilds byte-identically to champion 58a7d1f, so production policy is
 unchanged.
+
+## Visible-queen pearl priority — rejected screen
+
+The engine's round-limit score checks queen length before longest dragon and
+total length. This experiment therefore made ordinary collectors yield a
+contested visible pearl only when a friendly queen was at least as close. It
+did not repeat the earlier nearest-friendly ownership policy: non-queen
+teammates never claimed food, and uncontested pearls retained full value.
+
+On the standard eight maps from both sides of new tuning seed 10049, retaining
+25% of a queen-claimed pearl's value scored **7–9**. Removing its value entirely
+scored **6–10**. Both candidates also worsened the intended queen-length proxy:
+their mean candidate-minus-champion queen deltas were -1.375 and -1.688. Both
+lost Big Empty and Queen of Spades 0–2; the zero-residual candidate also lost
+Schooltime 0–2.
+
+All **32 games** were complete, unique, valid and fault-free, and the matrix
+passes `scripts/check_records.py`. The negative screen stops both candidates
+before confirmation, fresh all-map validation, diverse opponents or sandbox.
+`queen-pearl-claim-decision.json`, the manifest, exact hashes, smoke test and
+`research/queen-pearl-claim.patch` preserve the experiment. Seed 10049 is now
+seen. Accepted evidence rises to **3,125 valid games**; failed diagnostics stay
+separately excluded at 448 rows with 42 invalid-action games. The 100% default
+rebuilds byte-identically to champion 58a7d1f, so production policy is unchanged.

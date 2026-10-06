@@ -101,6 +101,9 @@ namespace {
 #ifndef PEARL_CLUSTER_GRAPH_MODE
 #define PEARL_CLUSTER_GRAPH_MODE 0
 #endif
+#ifndef QUEEN_PEARL_CLAIM_PERCENT
+#define QUEEN_PEARL_CLAIM_PERCENT 100
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -566,6 +569,24 @@ bool visible_pearl_near(Controller const& controller, Game const& game_state, Po
     return false;
 }
 
+#if QUEEN_PEARL_CLAIM_PERCENT < 100
+// Preserve the engine's first round-limit tiebreak without assigning every
+// pearl to a teammate. An ordinary collector yields only when a visible
+// friendly queen is at least as close to that specific pearl.
+bool pearl_claimed_by_visible_queen(Controller const& controller,
+                                    Game const& game_state, Position pearl) {
+    if (controller.get_id() < 2) return false;
+    int our_distance = distance(controller.get_position(), pearl, game_state);
+    for (auto const& tile : controller.get_tiles()) {
+        auto const* dragon = tile.get_dragon();
+        if (!dragon || !dragon->is_head() || dragon->get_team() != controller.get_team() ||
+            dragon->get_id() >= 2) continue;
+        if (distance(dragon->get_position(), pearl, game_state) <= our_distance) return true;
+    }
+    return false;
+}
+#endif
+
 bool has_enemy_near(Controller const& controller, Game const& game_state, Position centre, int radius) {
     for (auto const& tile : controller.get_tiles()) {
         auto const* dragon = tile.get_dragon();
@@ -612,7 +633,13 @@ int pearl_value(Controller const& controller, Game const& game_state, Position s
     for (auto const& tile : controller.get_tiles()) if (tile.has_pearl()) {
         int d = distance(start, tile.get_position(), game_state), candidate = std::max(0, 100 - d * 10);
         if (tile.get_pearl_time() <= 2 && d <= 3) candidate += 30;
+#if QUEEN_PEARL_CLAIM_PERCENT == 100
         value = std::max(value, candidate);
+#else
+        if (pearl_claimed_by_visible_queen(controller, game_state, tile.get_position()))
+            candidate = candidate * QUEEN_PEARL_CLAIM_PERCENT / 100;
+        value = std::max(value, candidate);
+#endif
     }
     return value;
 }
@@ -650,7 +677,14 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
         }
         int approach = std::max(0, 12 - distance(start, centre.get_position(), game_state));
         int imminent = centre.get_pearl_time() <= 2 ? 24 : 0;
+#if QUEEN_PEARL_CLAIM_PERCENT == 100
         best = std::max(best, cluster * 70 + approach * 8 + imminent);
+#else
+        int candidate = cluster * 70 + approach * 8 + imminent;
+        if (pearl_claimed_by_visible_queen(controller, game_state, centre.get_position()))
+            candidate = candidate * QUEEN_PEARL_CLAIM_PERCENT / 100;
+        best = std::max(best, candidate);
+#endif
     }
     return best;
 #else
@@ -672,7 +706,14 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
         int approach = std::max(0, 12 - distance(start, centre.get_position(), game_state));
 #endif
         int imminent = centre.get_pearl_time() <= 2 ? 24 : 0;
+#if QUEEN_PEARL_CLAIM_PERCENT == 100
         best = std::max(best, cluster * 70 + approach * 8 + imminent);
+#else
+        int candidate = cluster * 70 + approach * 8 + imminent;
+        if (pearl_claimed_by_visible_queen(controller, game_state, centre.get_position()))
+            candidate = candidate * QUEEN_PEARL_CLAIM_PERCENT / 100;
+        best = std::max(best, candidate);
+#endif
     }
     return best;
 #endif
@@ -805,8 +846,16 @@ int visible_target_value(Controller const& controller, Game const& game_state,
     }
     int congestion = friendly_pressure(controller, game_state, target.get_position()) +
         enemy_pressure(controller, game_state, target.get_position()) * 2;
+#if QUEEN_PEARL_CLAIM_PERCENT == 100
     return food + pocket + congestion - (4 - exits) * 45 -
         (exits <= 1 ? 220 : 0) - arrival_steps * 95;
+#else
+    int value = food + pocket + congestion - (4 - exits) * 45 -
+        (exits <= 1 ? 220 : 0) - arrival_steps * 95;
+    if (pearl_claimed_by_visible_queen(controller, game_state, target.get_position()))
+        value = value * QUEEN_PEARL_CLAIM_PERCENT / 100;
+    return value;
+#endif
 }
 
 std::array<int, 4> visible_target_scores(Controller const& controller, Game const& game_state) {
