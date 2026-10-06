@@ -44,6 +44,10 @@ parser.add_argument('--flagship-border-extra-penalty', type=int,
                     help='extra penalty for flagship moves onto the map perimeter (default: 0)')
 parser.add_argument('--new-child-clearance-weight', type=int,
                     help='extra friendly-pressure multiplier on a new child first move (default: 0)')
+parser.add_argument('--late-harvest-mode', type=int, choices=[0,1,2],
+                    help='after the cutoff: 1 disables chase, 2 also raises pearl weight to 3')
+parser.add_argument('--late-harvest-round', type=int,
+                    help='first round of the optional late harvesting policy (default: 400)')
 parser.add_argument('--head-attack-visible-margin', type=int,
                     help='minimum visible enemy length advantage for a head trade (default: 4)')
 parser.add_argument('--head-attack-last-round', type=int,
@@ -80,6 +84,8 @@ if args.flagship_border_extra_penalty is not None and args.flagship_border_extra
     parser.error('--flagship-border-extra-penalty must be non-negative')
 if args.new_child_clearance_weight is not None and args.new_child_clearance_weight < 0:
     parser.error('--new-child-clearance-weight must be non-negative')
+if args.late_harvest_round is not None and not 0 <= args.late_harvest_round <= 500:
+    parser.error('--late-harvest-round must be between 0 and 500')
 if args.head_attack_visible_margin is not None and args.head_attack_visible_margin < 0:
     parser.error('--head-attack-visible-margin must be non-negative')
 if args.head_attack_last_round is not None and args.head_attack_last_round < 0:
@@ -108,6 +114,8 @@ defines['HUNT_PEARL_WEIGHT'] = args.hunt_pearl_weight
 defines['PRESSURE_PEARL_WEIGHT'] = args.pressure_pearl_weight
 defines['FLAGSHIP_BORDER_EXTRA_PENALTY'] = args.flagship_border_extra_penalty
 defines['NEW_CHILD_CLEARANCE_WEIGHT'] = args.new_child_clearance_weight
+defines['LATE_HARVEST_MODE'] = args.late_harvest_mode
+defines['LATE_HARVEST_ROUND'] = args.late_harvest_round
 defines['HEAD_ATTACK_VISIBLE_MARGIN'] = args.head_attack_visible_margin
 defines['HEAD_ATTACK_LAST_ROUND'] = args.head_attack_last_round
 defines['HEAD_ATTACK_TARGET_ROLE'] = args.head_attack_target_role

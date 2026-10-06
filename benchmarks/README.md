@@ -1051,3 +1051,25 @@ commands are in `new-child-clearance-decision.json`; seed 10041–10044 are now
 seen. Accepted evidence rises to **3,029 valid games**; failed diagnostics stay
 separate at 384 rows with 28 invalid-action games. Production rebuild remains
 byte-identical to champion 58a7d1f.
+
+## Round-400 late harvesting — failed screen
+
+Because most historical losses reached the round limit, this experiment made
+ordinary collectors stop enemy-chase scoring after round 400. A second mode
+also raised late pearl weight from two to three. Flagships retained their
+existing protected collection policy, and all earlier-round decisions were
+unchanged.
+
+On the standard eight maps, both sides of seed 10045, chase-off scored **8–7
+across 15 valid games**, plus one candidate-side invalid-action win on Queen of
+Spades. Chase-off with pearl weight three scored **7–8 across 15 valid games**,
+plus one candidate-side invalid-action loss on Default. Raw outcomes were 9–7
+and 7–9 respectively, but invalid rows are not strength evidence.
+
+The complete shared 32-row matrix is quarantined under `research/failed/` and
+excluded from the accepted corpus. The neutral-to-negative valid signal does
+not justify a clean confirmation, fresh gate, diverse opponents or sandbox.
+Exact hashes and reproduction details are in `late-harvest-decision.json` and
+`research/late-harvest.patch`. Seed 10045 is now seen. Accepted evidence remains
+**3,029 valid games**; failed diagnostics rise to 416 rows with 30 invalid-action
+games. The default build remains byte-identical to champion 58a7d1f.

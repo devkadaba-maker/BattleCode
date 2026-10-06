@@ -89,6 +89,12 @@ namespace {
 #ifndef NEW_CHILD_CLEARANCE_WEIGHT
 #define NEW_CHILD_CLEARANCE_WEIGHT 0
 #endif
+#ifndef LATE_HARVEST_MODE
+#define LATE_HARVEST_MODE 0
+#endif
+#ifndef LATE_HARVEST_ROUND
+#define LATE_HARVEST_ROUND 400
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -377,6 +383,16 @@ std::pair<int, int> strategy_weights(Mode mode) {
 std::pair<int, int> special_strategy_weights(Mode mode) {
     switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 2}; case Mode::PRESSURE: return {PRESSURE_PEARL_WEIGHT, 3}; default: return {HUNT_PEARL_WEIGHT, 4}; }
 }
+
+#if LATE_HARVEST_MODE > 0
+std::pair<int, int> late_harvest_weights(Game const& game_state, bool flagship,
+                                         std::pair<int, int> weights) {
+    if (flagship || game_state.get_round_num() < LATE_HARVEST_ROUND) return weights;
+    weights.second = 0;
+    if constexpr (LATE_HARVEST_MODE == 2) weights.first = std::max(weights.first, 3);
+    return weights;
+}
+#endif
 
 bool favourable_head_attack(Controller const& controller, Game const& game_state, Position target,
                            std::optional<int> target_id, bool local_visible,
@@ -904,6 +920,10 @@ int score_move(Direction direction) {
         pearl_weight = 8;
         chase_weight = 0;
     }
+#if LATE_HARVEST_MODE > 0
+    std::tie(pearl_weight, chase_weight) =
+        late_harvest_weights(game_state, flagship, {pearl_weight, chase_weight});
+#endif
     int score = area * 12 + future_mobility * 12;
     if constexpr (RECENT_REGION_PENALTY > 0)
         score -= recent_region_visits(game_state, target) * RECENT_REGION_PENALTY;
