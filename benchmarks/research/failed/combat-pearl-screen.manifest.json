@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/growth-hunt3/.unswbc-build/bot",
+    ".experiments/growth-combat3/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/growth-default/.unswbc-build/bot"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    10038
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/growth-hunt3/.unswbc-build/bot": "4e1b2231570764d4cd150baa1dce03d627190f643bfa30ba875a1b6126b2c9f7",
+    ".experiments/growth-combat3/.unswbc-build/bot": "457ee4b2e566333d4a7ee5533f476760c32bf0e79e979f7cc8f6a28304a520cc",
+    ".experiments/growth-default/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

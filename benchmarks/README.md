@@ -899,6 +899,32 @@ are in `late-flagship-*` and `research/late-flagship.patch`. Seed 10014 is now
 seen evidence. Accepted local matrix evidence rises to 2,681 valid games;
 failed diagnostics remain separate at 320 rows with 20 invalid-action games.
 
+## Combat-state pearl weighting — failed screen
+
+The preceding enemy-memory loss trace ended with both queens alive but a large
+population and total-length deficit. This experiment therefore kept the
+champion's enemy memory and pursuit weights intact while raising pearl-drive
+weight from two to three during selected combat states. On the standard
+eight-map, both-side seed-10038 screen, raising only the population-cap hunt
+weight scored **7–9** in 16 valid games. Raising both pressure and hunt weights
+scored **6–9 across valid rows**, with one additional candidate-side invalid
+action on Big Empty.
+
+Neither variant improved the intended growth proxies: the hunt-only candidate
+averaged 5.5 fewer total segments and 1.5 fewer dragons than the champion; the
+broader candidate averaged 5.6 fewer segments and 2.87 fewer dragons across its
+valid games. An exact-hash diagnostic rerun of the invalid case completed
+validly and flipped the loss to a win, but changed the result and death
+diagnostics, so it does not replace the original row.
+
+The complete 32-row matrix is quarantined under `research/failed/` and excluded
+from accepted strength evidence. No clean confirmation, fresh all-map,
+diverse-opponent or sandbox gate was justified. Seed 10038 is now seen. The
+accepted corpus remains **2,861 games**; failed diagnostics rise to 352 rows
+with 21 invalid-action games. Production rebuild remains byte-identical to the
+active champion at
+`74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533`.
+
 ## Move-order-aware enemy heading on 48x24 maps — rejected validation
 
 The already-rejected broad move-order policy had scored 9–3 across Maze,

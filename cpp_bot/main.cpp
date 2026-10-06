@@ -77,6 +77,12 @@ namespace {
 #ifndef SCHOOLTIME_CONTACT_MEMORY
 #define SCHOOLTIME_CONTACT_MEMORY 0
 #endif
+#ifndef HUNT_PEARL_WEIGHT
+#define HUNT_PEARL_WEIGHT 2
+#endif
+#ifndef PRESSURE_PEARL_WEIGHT
+#define PRESSURE_PEARL_WEIGHT 2
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -359,11 +365,11 @@ Mode special_combat_mode(Controller const& controller, Game const& game_state) {
 }
 
 std::pair<int, int> strategy_weights(Mode mode) {
-    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 1}; case Mode::PRESSURE: return {2, 2}; default: return {2, 3}; }
+    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 1}; case Mode::PRESSURE: return {PRESSURE_PEARL_WEIGHT, 2}; default: return {HUNT_PEARL_WEIGHT, 3}; }
 }
 
 std::pair<int, int> special_strategy_weights(Mode mode) {
-    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 2}; case Mode::PRESSURE: return {2, 3}; default: return {2, 4}; }
+    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 2}; case Mode::PRESSURE: return {PRESSURE_PEARL_WEIGHT, 3}; default: return {HUNT_PEARL_WEIGHT, 4}; }
 }
 
 bool favourable_head_attack(Controller const& controller, Game const& game_state, Position target,
