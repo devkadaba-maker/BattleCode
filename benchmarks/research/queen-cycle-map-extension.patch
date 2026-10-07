@@ -1,0 +1,12 @@
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -1376,1 +1376,6 @@
+-        dynamic_queen_map=ct->get_id()<2 && game->width==64 && game->height==64 && ct->get_unit_count()==10;
++        bool unsw_scope=game->width==64 && game->height==64 && ct->get_unit_count()==10;
++        bool experimental_scope=
++#if QUEEN_CYCLE_MAP_EXTENSION == 1
++            game->width==32 && game->height==16;
++#else
++            game->width==56 && game->height==40;
++#endif
++        dynamic_queen_map=ct->get_id()<2 && (unsw_scope || experimental_scope);
