@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/directpearl1/.unswbc-build/bot",
+    ".experiments/directpearl2/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/directpearl0/.unswbc-build/bot"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    10050
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/directpearl1/.unswbc-build/bot": "9c7161436e51aee337acfed036ef0ecd63de7d5a85305d911e4db20dbfcfa9dd",
+    ".experiments/directpearl2/.unswbc-build/bot": "b781593ea0cacf4cf8c4a53e068cd8ce1d682dafaecd1201eea622663cc72d8e",
+    ".experiments/directpearl0/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

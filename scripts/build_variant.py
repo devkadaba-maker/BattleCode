@@ -54,6 +54,8 @@ parser.add_argument('--pearl-cluster-graph-mode', type=int, choices=[0,1,2],
                     help='0 geometric, 1 reachable pearls, 2 also use route distance')
 parser.add_argument('--queen-pearl-claim-percent', type=int,
                     help='residual pearl value when a visible friendly queen is at least as close')
+parser.add_argument('--pearl-target-mode', type=int, choices=[0,1,2],
+                    help='0 adjacent pearl, 1 current landing pearl, 2 also timer-zero landing pearl')
 parser.add_argument('--head-attack-visible-margin', type=int,
                     help='minimum visible enemy length advantage for a head trade (default: 4)')
 parser.add_argument('--head-attack-last-round', type=int,
@@ -129,6 +131,7 @@ defines['LATE_HARVEST_ROUND'] = args.late_harvest_round
 defines['EARNED_FLAGSHIP_LENGTH'] = args.earned_flagship_length
 defines['PEARL_CLUSTER_GRAPH_MODE'] = args.pearl_cluster_graph_mode
 defines['QUEEN_PEARL_CLAIM_PERCENT'] = args.queen_pearl_claim_percent
+defines['PEARL_TARGET_MODE'] = args.pearl_target_mode
 defines['HEAD_ATTACK_VISIBLE_MARGIN'] = args.head_attack_visible_margin
 defines['HEAD_ATTACK_LAST_ROUND'] = args.head_attack_last_round
 defines['HEAD_ATTACK_TARGET_ROLE'] = args.head_attack_target_role

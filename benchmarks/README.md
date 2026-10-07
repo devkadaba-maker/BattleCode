@@ -1180,3 +1180,27 @@ before confirmation, fresh all-map validation, diverse opponents or sandbox.
 seen. Accepted evidence rises to **3,125 valid games**; failed diagnostics stay
 separately excluded at 448 rows with 42 invalid-action games. The 100% default
 rebuilds byte-identically to champion 58a7d1f, so production policy is unchanged.
+
+## Direct pearl-target classification — rejected screen
+
+The movement scorer previously treated a move ending beside any visible pearl
+as a `pearl_target`. That label grants pocket and late-safety exemptions as well
+as a direct bonus, even though the move does not land on food. This experiment
+kept the existing route, pearl-value and cluster guidance, but reserved that
+label for the landing tile itself. Mode 1 recognized only a current pearl; mode
+2 also recognized a timer-zero pearl expected on arrival.
+
+On the standard eight maps from both sides of new tuning seed 10050, both exact
+candidates scored **9–7** (56.25%, decisive Wilson 95% 33.18–76.90%) with the
+same per-map outcomes. Both went 0–2 on Big Empty and Default Small, while the
+positive Schooltime, Trophy and Queen of Spades results were insufficient to
+meet the established 10–6 screen threshold.
+
+The matrix passes `scripts/check_records.py`; all **32 games** were complete,
+unique, valid and fault-free. Both candidates stop before confirmation, fresh
+all-map validation, diverse opponents or sandbox. The decision, exact hashes,
+manifest, smoke test and `research/direct-pearl-target.patch` preserve the
+experiment. Seed 10050 is now seen. Accepted evidence rises to **3,157 valid
+games**; failed diagnostics remain separately excluded at 448 rows with 42
+invalid-action games. Mode 0 rebuilds byte-identically to champion 58a7d1f, so
+production policy is unchanged.

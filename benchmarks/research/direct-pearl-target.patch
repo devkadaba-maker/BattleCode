@@ -1,0 +1,35 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index a4ea56e..8ae2d63 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -106,0 +107,3 @@ namespace {
++#ifndef PEARL_TARGET_MODE
++#define PEARL_TARGET_MODE 0
++#endif
+@@ -571,0 +575,9 @@ bool visible_pearl_near(Controller const& controller, Game const& game_state, Po
++#if PEARL_TARGET_MODE > 0
++bool direct_pearl_target(Tile const* tile) {
++    if (!tile) return false;
++    if (tile->has_pearl()) return true;
++    if constexpr (PEARL_TARGET_MODE >= 2) return tile->get_pearl_time() == 0;
++    return false;
++}
++#endif
++
+@@ -1002,0 +1015 @@ int score_move(Direction direction) {
++#if PEARL_TARGET_MODE == 0
+@@ -1003,0 +1017,5 @@ int score_move(Direction direction) {
++#else
++    // Experimental modes reserve the pocket/safety exemptions for food on
++    // the landing square instead of any pearl merely adjacent to it.
++    bool pearl_target = direct_pearl_target(ahead);
++#endif
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 3a8cf45..8d08977 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -56,0 +57,2 @@ parser.add_argument('--queen-pearl-claim-percent', type=int,
++parser.add_argument('--pearl-target-mode', type=int, choices=[0,1,2],
++                    help='0 adjacent pearl, 1 current landing pearl, 2 also timer-zero landing pearl')
+@@ -131,0 +134 @@ defines['QUEEN_PEARL_CLAIM_PERCENT'] = args.queen_pearl_claim_percent
++defines['PEARL_TARGET_MODE'] = args.pearl_target_mode

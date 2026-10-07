@@ -104,6 +104,9 @@ namespace {
 #ifndef QUEEN_PEARL_CLAIM_PERCENT
 #define QUEEN_PEARL_CLAIM_PERCENT 100
 #endif
+#ifndef PEARL_TARGET_MODE
+#define PEARL_TARGET_MODE 0
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -569,6 +572,15 @@ bool visible_pearl_near(Controller const& controller, Game const& game_state, Po
     return false;
 }
 
+#if PEARL_TARGET_MODE > 0
+bool direct_pearl_target(Tile const* tile) {
+    if (!tile) return false;
+    if (tile->has_pearl()) return true;
+    if constexpr (PEARL_TARGET_MODE >= 2) return tile->get_pearl_time() == 0;
+    return false;
+}
+#endif
+
 #if QUEEN_PEARL_CLAIM_PERCENT < 100
 // Preserve the engine's first round-limit tiebreak without assigning every
 // pearl to a teammate. An ordinary collector yields only when a visible
@@ -1000,7 +1012,13 @@ int score_move(Direction direction) {
         auto const* enemy = ahead->get_dragon();
         return QUEEN_HUNT > 0 && enemy && enemy->get_id() < 2 ? 10000 : 1800;
     }
+#if PEARL_TARGET_MODE == 0
     bool pearl_target = visible_pearl_near(controller, game_state, target, 1);
+#else
+    // Experimental modes reserve the pocket/safety exemptions for food on
+    // the landing square instead of any pearl merely adjacent to it.
+    bool pearl_target = direct_pearl_target(ahead);
+#endif
     bool small_map = game_state.width * game_state.height <= 144;
     bool flagship = special ? special_is_flagship(controller, game_state) : is_flagship(controller, game_state);
     if (flagship && portal_arrival_square(controller, target)) return INT_MIN_SCORE;
