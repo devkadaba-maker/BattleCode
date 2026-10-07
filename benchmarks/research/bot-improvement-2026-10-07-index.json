@@ -1,0 +1,346 @@
+{
+  "archive_sha256": "d462ab1ca0ae5dbe3da4947fefb9ec19c66433408eda8212ef4eaf6ff81604ba",
+  "matrix_status": [
+    {
+      "path": "benchmarks/all-start-sprint-fresh-validation.jsonl",
+      "records": 88,
+      "expected": 88,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "loss": 45,
+        "win": 39,
+        "draw": 4
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/all-start-sprint-screen.jsonl",
+      "records": 32,
+      "expected": 32,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 16,
+        "loss": 16
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/border-topology-screen.jsonl",
+      "records": 32,
+      "expected": 32,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 15,
+        "loss": 17
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/colosseum-wrap-validation.jsonl",
+      "records": 10,
+      "expected": 10,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 6,
+        "loss": 4
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/compact-population-validation.jsonl",
+      "records": 20,
+      "expected": 20,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "loss": 10,
+        "win": 10
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/dynamic-queen-cycles-screen.jsonl",
+      "records": 10,
+      "expected": 10,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 7,
+        "loss": 3
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/dynamic-queen-screen.jsonl",
+      "records": 10,
+      "expected": 10,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 4,
+        "loss": 6
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/frontier-exploration-screen.jsonl",
+      "records": 32,
+      "expected": 32,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "loss": 15,
+        "win": 17
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/harvest-path-confirmation.jsonl",
+      "records": 16,
+      "expected": 16,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 13,
+        "loss": 3
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/harvest-path-screen.jsonl",
+      "records": 32,
+      "expected": 32,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 18,
+        "loss": 14
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/harvest-safe-extended-validation.jsonl",
+      "records": 220,
+      "expected": 220,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 100,
+        "loss": 108,
+        "draw": 12
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/harvest-safe-fresh-gate.jsonl",
+      "records": 88,
+      "expected": 88,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "loss": 34,
+        "win": 50,
+        "draw": 4
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/history-queen-screen.jsonl",
+      "records": 20,
+      "expected": 20,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 11,
+        "loss": 9
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/pearl-allocation-retest-validation.jsonl",
+      "records": 220,
+      "expected": 220,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 113,
+        "loss": 96,
+        "draw": 11
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/queen-growth-screen.jsonl",
+      "records": 32,
+      "expected": 32,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 16,
+        "loss": 16
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/queen-intercept-screen.jsonl",
+      "records": 32,
+      "expected": 32,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "loss": 15,
+        "win": 17
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/queen-route-fresh-validation.jsonl",
+      "records": 88,
+      "expected": 88,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 50,
+        "loss": 34,
+        "draw": 4
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/queen-route-independent-validation.jsonl",
+      "records": 84,
+      "expected": 132,
+      "complete": false,
+      "all_valid": true,
+      "outcomes": {
+        "loss": 41,
+        "win": 43
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/queen-trade-current-screen.jsonl",
+      "records": 88,
+      "expected": 88,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "loss": 38,
+        "win": 46,
+        "draw": 4
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/queen-wait-protocol-probe.jsonl",
+      "records": 1,
+      "expected": 1,
+      "complete": true,
+      "all_valid": false,
+      "outcomes": {
+        "win": 1
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/quiet-queen-cycle-screen.jsonl",
+      "records": 10,
+      "expected": 10,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 8,
+        "loss": 2
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/route-safety-screen.jsonl",
+      "records": 32,
+      "expected": 32,
+      "complete": true,
+      "all_valid": false,
+      "outcomes": {
+        "loss": 20,
+        "win": 12
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/small-population-screen.jsonl",
+      "records": 20,
+      "expected": 20,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 11,
+        "loss": 9
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/sprint-history-extended-validation.jsonl",
+      "records": 400,
+      "expected": 400,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "loss": 216,
+        "win": 184
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/sprint-history-fresh-validation.jsonl",
+      "records": 100,
+      "expected": 100,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "loss": 45,
+        "win": 55
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/timed-dynamic-queen-fresh-validation.jsonl",
+      "records": 100,
+      "expected": 100,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 54,
+        "loss": 46
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/timed-dynamic-queen-screen.jsonl",
+      "records": 10,
+      "expected": 10,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "win": 7,
+        "loss": 3
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    },
+    {
+      "path": "benchmarks/trophy-escape-retest-validation.jsonl",
+      "records": 20,
+      "expected": 20,
+      "complete": true,
+      "all_valid": true,
+      "outcomes": {
+        "loss": 12,
+        "win": 8
+      },
+      "status": "tuning or rejected; excluded from promotion proof"
+    }
+  ]
+}

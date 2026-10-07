@@ -1,0 +1,48 @@
+{
+  "decision": "promote",
+  "scope": "Queens with a 64x64 board and ten initial own-team dragons; only official UNSW matches this start.",
+  "wins": 85,
+  "losses": 15,
+  "draws": 0,
+  "score_percent": 85.0,
+  "decisive_wilson95_percent": [
+    76.71626666784216,
+    90.6940968088377
+  ],
+  "paired_seeds": {
+    "positive": 36,
+    "negative": 1,
+    "ties": 13,
+    "one_sided_sign_p": 2.764863893389702e-10
+  },
+  "queen_alive_at_end": {
+    "candidate": 71,
+    "champion": 1
+  },
+  "unaffected_maps": 21,
+  "exactly_equal_candidate_control_pairs": 42,
+  "sandbox": [
+    {
+      "candidate_side": "A",
+      "maximum_points": 24500000,
+      "rounds": 500
+    },
+    {
+      "candidate_side": "B",
+      "maximum_points": 23900000,
+      "rounds": 500
+    }
+  ],
+  "diverse_opponents": {
+    "original-baseline-20261007": {
+      "win": 10
+    },
+    "hard_bot_v2": {
+      "win": 10
+    }
+  },
+  "candidate_sha256": "e790e2ab49da5dda35397ceb5973712735cb16a79c01de3f02907ba5ee525bec",
+  "champion_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "screening_excluded": true,
+  "limitations": "Local UNSW matches against frozen opponents, not measured ladder Elo."
+}

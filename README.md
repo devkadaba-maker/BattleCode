@@ -19,6 +19,14 @@ handling allows an earlier dragon to consider a square projected by a later-ID
 enemy. Free pearl sprinting, disabling queen splits, and queen hunting were
 tested but remain disabled by default.
 
+The latest verified repair protects queens on UNSW's starting footprint. It
+keeps a checked food-free loop and uses moving-body escape search when needed.
+Against the previous champion it scored **85–15 on 100 independent both-side
+UNSW games** (Wilson 95% 76.72–90.69%; paired-seed p=2.76e-10).
+All 42 comparisons on the other 21 maps exactly matched champion controls;
+both judge-sandbox checks passed below 25M maximum CPU points per turn.
+See [the full verification and reproduction report](benchmarks/persistent-queen-cycle-report.md).
+
 ## Setup
 
 From a checkout, install the environment with one command (Python 3.11+):

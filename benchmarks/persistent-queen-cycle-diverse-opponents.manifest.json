@@ -1,0 +1,26 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/persistent-queen-cycle/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/original-baseline-20261007/.unswbc-build/bot",
+    "hard_bot_v2"
+  ],
+  "maps": [
+    "unsw"
+  ],
+  "seeds": [
+    10570,
+    10571,
+    10572,
+    10573,
+    10574
+  ],
+  "games": 20,
+  "sha256": {
+    ".experiments/persistent-queen-cycle/.unswbc-build/bot": "e790e2ab49da5dda35397ceb5973712735cb16a79c01de3f02907ba5ee525bec",
+    ".experiments/original-baseline-20261007/.unswbc-build/bot": "0a2d515e2c83918b1e4f458ec00843346cdb23111bfe089b5b5605892ebab263"
+  },
+  "explicit_endturn": true
+}

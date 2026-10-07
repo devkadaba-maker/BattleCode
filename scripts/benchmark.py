@@ -27,6 +27,19 @@ from unswbc.run import _resolve
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class ExplicitEndturnBot(Bot):
+    """For bots promising ENDTURN, avoid native /proc stdin-park races.
+
+    The official sandbox remains the execution gate. Native /proc sampling
+    can observe stdin parked before a queued stdout record has been drained.
+    An explicit terminator (or exit/wall timeout) is unambiguous instead.
+    Opt in only for bots that emit ENDTURN after every action.
+    """
+    def _poll(self, timeout):
+        state = super()._poll(timeout)
+        return 'wait' if state == 'park' else state
+
+
 def replay_bot_label(value):
     """Return a readable, collision-resistant label for a replay filename."""
     path = Path(value)
@@ -45,7 +58,7 @@ def invalid_action_diagnostic(dragon_id, team, round_num, last_turn):
             'last_turn': last_turn}
 
 
-def match(candidate, opponent, map_path, seed, side, replay_dir=None):
+def match(candidate, opponent, map_path, seed, side, replay_dir=None, explicit_endturn=False):
     paths = {side: candidate, ('B' if side == 'A' else 'A'): opponent}
     pools, live, teams = {}, {}, {}
     deaths = {'A': Counter(), 'B': Counter()}
@@ -62,7 +75,8 @@ def match(candidate, opponent, map_path, seed, side, replay_dir=None):
             team = next(line.split()[1] for line in init.decode().splitlines()
                         if line.startswith('TEAM '))
             teams[dragon_id] = team
-            live[dragon_id] = Bot(pools[team], init=init, name=str(dragon_id))
+            bot_type = ExplicitEndturnBot if explicit_endturn else Bot
+            live[dragon_id] = bot_type(pools[team], init=init, name=str(dragon_id))
             peaks[team] = max(peaks[team], sum(teams[i] == team for i in live))
 
         def reply(dragon_id, block):
@@ -146,6 +160,8 @@ def main():
     parser.add_argument('--output', required=True)
     parser.add_argument('--loss-replays')
     parser.add_argument('--resume', action='store_true', help='Continue an interrupted batch with the identical manifest')
+    parser.add_argument('--explicit-endturn', action='store_true',
+                        help='Require ENDTURN on native replies; use only when both bots promise it')
     args = parser.parse_args()
     missing_maps = [name for name in args.maps if not (ROOT/'maps'/f'{name}.map').is_file()]
     if missing_maps:
@@ -161,6 +177,8 @@ def main():
                            for p in args.candidates + args.opponents if Path(p).is_file()}}
     if args.sides != ['A', 'B']:
         metadata['sides'] = args.sides
+    if args.explicit_endturn:
+        metadata['explicit_endturn'] = True
     records = []
     manifest = output.with_suffix('.manifest.json')
     if args.resume and output.exists():
@@ -174,8 +192,10 @@ def main():
     total = metadata['games']
     # The parent never runs Wasmtime concurrently in threads. One subprocess
     # owns each engine, avoiding reuse and process-pool worker lifecycle stalls.
-    with output.open('a' if args.resume else 'w') as log, ThreadPoolExecutor(max_workers=args.workers) as executor:
-        futures = {executor.submit(isolated_match, *job, args.loss_replays): job for job in jobs}
+    if not args.resume:
+        output.write_text('')
+    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+        futures = {executor.submit(isolated_match, *job, args.loss_replays, args.explicit_endturn): job for job in jobs}
         for future in as_completed(futures):
             job = futures[future]
             try:
@@ -184,9 +204,15 @@ def main():
                 record = {'candidate':job[0], 'opponent':job[1], 'map':job[2].stem,
                           'seed':job[3], 'side':job[4], 'valid':False, 'error':str(error)}
             records.append(record)
-            log.write(json.dumps(record)+'\n')
-            log.flush()
+            # Reopen for each record so a workspace checkpoint replacing the
+            # file cannot leave this process appending to an unlinked inode.
+            with output.open('a') as log:
+                log.write(json.dumps(record)+'\n')
+                log.flush()
             print(f"[{len(records)}/{total}] {Path(job[0]).name} vs {Path(job[1]).name} {job[2].stem} seed={job[3]} side={job[4]}: {record.get('outcome', record.get('error'))}", flush=True)
+    # Publish the completed in-memory matrix again so its final tally and
+    # saved records agree even if a workspace checkpoint replaced a live log.
+    output.write_text(''.join(json.dumps(record) + '\n' for record in records))
     for candidate in args.candidates:
         valid = [r for r in records if r['candidate']==str(Path(candidate).resolve()) and r['valid']]
         tally = Counter(r['outcome'] for r in valid)

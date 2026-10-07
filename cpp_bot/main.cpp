@@ -1206,7 +1206,175 @@ int split_size(int target) {
     return 2;
 }
 
+
+bool dynamic_queen_map = false, dynamic_queen_classified = false;
+
+std::vector<Position> visible_queen_body() {
+    int length=ct->get_length();
+    std::vector<Position> body{ct->get_position()};
+    int visible=0;
+    for (auto const& tile:ct->get_tiles()) {
+        auto const* part=tile.get_dragon();
+        if (part && part->get_id()==ct->get_id()) ++visible;
+    }
+    if (visible != length) {
+        if (static_cast<int>(history.size())<length) return {};
+        std::vector<Position> remembered;
+        for (int i=0;i<length;++i) remembered.push_back(history[history.size()-1-i]);
+        for (int i=1;i<length;++i) {
+            if ((std::abs(remembered[i].x-remembered[i-1].x)+std::abs(remembered[i].y-remembered[i-1].y))!=1) return {};
+            auto const* tile=ct->get_tile(remembered[i]);
+            if (tile && (!tile->get_dragon() || tile->get_dragon()->get_id()!=ct->get_id())) return {};
+        }
+        return remembered;
+    }
+    while (static_cast<int>(body.size())<length) {
+        bool found=false;
+        for (auto const& tile:ct->get_tiles()) {
+            auto const* part=tile.get_dragon();
+            if (!part || part->get_id()!=ct->get_id() || part->is_head()) continue;
+            Position pos=part->get_position();
+            if (std::find(body.begin(),body.end(),pos)!=body.end() || pos.add_dir(part->get_dir())!=body.back()) continue;
+            body.push_back(pos);found=true;break;
+        }
+        if (!found) return {};
+    }
+    return body;
+}
+
+bool queen_body_step(std::vector<Position>& body, std::vector<Position>& eaten,
+                     Direction direction, int cost, bool actual_action, int arrival_round = 0) {
+    auto const* here=ct->get_tile(body.front());
+    if (!here || !here->get_edge(direction).is_passable() || here->get_edge(direction).is_portal()) return false;
+    Position next=body.front().add_dir(direction);
+    auto const* ahead=ct->get_tile(next);
+    if (!ahead || std::find(body.begin(),body.end(),next)!=body.end()) return false;
+    auto const* part=ahead->get_dragon();
+    if (part && part->get_id()!=ct->get_id()) return false;
+    if (actual_action && enemy_head_ahead(*ct,next)) return false;
+    if (portal_arrival_square(*ct,next)) return false;
+    bool food=(ahead->has_pearl() || (!actual_action && ahead->get_pearl_time()>=0 && ahead->get_pearl_time()<=arrival_round)) &&
+        std::find(eaten.begin(),eaten.end(),next)==eaten.end();
+    int length=static_cast<int>(body.size())+food-cost;
+    if (length<2) return false;
+    if (food) eaten.push_back(next);
+    body.insert(body.begin(),next);body.resize(length);
+    return true;
+}
+
+int moving_queen_depth(std::vector<Position> const& body, std::vector<Position> const& eaten, int remaining, int arrival_round = 1) {
+    if (!remaining) return 0;
+    auto const* here=ct->get_tile(body.front());
+    if (!here) return remaining;
+    int best=0;
+    for (Direction direction:Direction::get_direction_list()) {
+        if (!here->get_edge(direction).is_passable() || here->get_edge(direction).is_portal()) continue;
+        Position next=body.front().add_dir(direction);
+        if (!ct->get_tile(next)) continue;
+        auto next_body=body;auto next_eaten=eaten;
+        if (!queen_body_step(next_body,next_eaten,direction,0,false,arrival_round)) continue;
+        best=std::max(best,1+moving_queen_depth(next_body,next_eaten,remaining-1,arrival_round+1));
+        if (best==remaining) break;
+    }
+    return best;
+}
+
+std::deque<Direction> quiet_route;
+std::vector<Direction> quiet_loop;
+Position quiet_expected{};
+bool quiet_active=false;
+std::vector<Direction> quiet_queen_cycle(std::vector<Position> const& body) {
+    if (quiet_active && body.front()==quiet_expected && body.size()<quiet_loop.size()) {
+        Direction next=quiet_route.front();
+        auto next_body=body;std::vector<Position> eaten;
+        auto const* tile=ct->get_tile(body.front().add_dir(next));
+        if (tile && !tile->has_pearl() && tile->get_pearl_time()<0 && queen_body_step(next_body,eaten,next,0,true)) {
+            quiet_route.pop_front();
+            if (quiet_route.empty()) quiet_route.assign(quiet_loop.begin(),quiet_loop.end());
+            quiet_expected=next_body.front();
+            return {next};
+        }
+    }
+    quiet_active=false;quiet_route.clear();quiet_loop.clear();
+    struct Route {std::vector<Position> body,positions; std::vector<Direction> moves;};
+    std::vector<Route> queue{{body,{body.front()}, {}}};
+    int nodes=0;
+    while (!queue.empty() && ++nodes<=2500) {
+        Route route=std::move(queue.back());queue.pop_back();
+        if (route.moves.size()>=14) continue;
+        for (Direction direction:Direction::get_direction_list()) {
+            auto next_body=route.body;std::vector<Position> eaten;
+            auto const* tile=ct->get_tile(next_body.front().add_dir(direction));
+            if (!tile || tile->has_pearl() || tile->get_pearl_time()>=0) continue;
+            if (!queen_body_step(next_body,eaten,direction,0,true)) continue;
+            auto moves=route.moves;moves.push_back(direction);
+            auto found=std::find(route.positions.begin(),route.positions.end(),next_body.front());
+            if (found!=route.positions.end()) {
+                int cycle_size=route.positions.end()-found;
+                if (cycle_size>static_cast<int>(body.size())) {
+                    int start=found-route.positions.begin();
+                    quiet_loop.assign(moves.begin()+start,moves.end());
+                    quiet_route.assign(moves.begin()+1,moves.end());
+                    if (quiet_route.empty()) quiet_route.assign(quiet_loop.begin(),quiet_loop.end());
+                    quiet_expected=body.front().add_dir(moves.front());
+                    quiet_active=true;
+                    return {moves.front()};
+                }
+                continue;
+            }
+            auto positions=route.positions;positions.push_back(next_body.front());
+            queue.push_back({std::move(next_body),std::move(positions),std::move(moves)});
+        }
+    }
+    return {};
+}
+
+std::vector<Direction> dynamic_queen_escape(Direction baseline) {
+    if (!dynamic_queen_map || ct->get_id()>=2 || ct->get_length()>24) return {};
+    auto body=visible_queen_body();
+    if (body.empty()) return {};
+    auto cycle=quiet_queen_cycle(body);
+    if (!cycle.empty()) return {cycle.front()};
+    int horizon=std::min(12,std::max(0,499-game->get_round_num()));
+    auto base_body=body;std::vector<Position> base_eaten;
+    int baseline_depth=queen_body_step(base_body,base_eaten,baseline,0,true)
+        ? moving_queen_depth(base_body,base_eaten,horizon) : -1;
+    if (baseline_depth==horizon) return {};
+    int best_depth=baseline_depth;
+    std::vector<Direction> best;
+    for (Direction direction:Direction::get_direction_list()) {
+        auto next_body=body;std::vector<Position> eaten;
+        if (!queen_body_step(next_body,eaten,direction,0,true)) continue;
+        int depth=moving_queen_depth(next_body,eaten,horizon);
+        if (depth>best_depth) {best_depth=depth;best={direction};}
+    }
+    if (best_depth==horizon || ct->get_length()<3 || ct->get_length()>12) return best;
+    int free_steps=(ct->get_length()+3)/4;
+    struct Route {std::vector<Position> body,eaten;std::vector<Direction> moves;};
+    std::deque<Route> queue{{body,{},{}}};
+    while (!queue.empty()) {
+        Route route=std::move(queue.front());queue.pop_front();
+        if (static_cast<int>(route.moves.size())==free_steps+1) {
+            int depth=moving_queen_depth(route.body,route.eaten,horizon);
+            if (depth>best_depth) {best_depth=depth;best=route.moves;}
+            continue;
+        }
+        for (Direction direction:Direction::get_direction_list()) {
+            auto next_body=route.body;auto eaten=route.eaten;
+            int cost=static_cast<int>(route.moves.size())>=free_steps ? 1 : 0;
+            if (!queen_body_step(next_body,eaten,direction,cost,true) || !eaten.empty()) continue;
+            auto moves=route.moves;moves.push_back(direction);
+            queue.push_back({std::move(next_body),std::move(eaten),std::move(moves)});
+        }
+    }
+    return best;
+}
+
 void execute_turn() {
+    if (!dynamic_queen_classified) {
+        dynamic_queen_classified=true;
+        dynamic_queen_map=ct->get_id()<2 && game->width==64 && game->height==64 && ct->get_unit_count()==10;
+    }
     update_target_memory(*ct, *game);
     history.push_back(ct->get_position());
     // A capped 256-step history stops protecting long dragons from revisiting
@@ -1229,6 +1397,12 @@ void execute_turn() {
     else vision_target_bonuses.fill(0);
     Direction best = ct->get_dir(); int best_score = INT_MIN_SCORE;
     for (Direction direction : Direction::get_direction_list()) { int score = score_move(direction); if (score > best_score) { best = direction; best_score = score; } }
+    auto escape=dynamic_queen_escape(best);
+    if (!escape.empty()) {
+        Position position=ct->get_position();
+        for (std::size_t i=0;i+1<escape.size();++i) {position=position.add_dir(escape[i]);history.push_back(position);}
+        ct->make_moves(escape);relay_target(true);return;
+    }
     bool attack_step = favourable_head_attack(*ct, *game, ct->get_position().add_dir(best));
     if (best_score != INT_MIN_SCORE && !safe_step(*ct, *game, ct->get_position(), best, false, attack_step)) best_score = INT_MIN_SCORE;
     if (best_score == INT_MIN_SCORE) {
