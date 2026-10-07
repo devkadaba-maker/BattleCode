@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_after_fresh_validation",
+  "active_champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "active_champion_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypothesis": "Penalize only a flagship transition from a currently open square into a destination with exactly one onward move.",
+  "tuning_screen": {
+    "seed": 7272,
+    "maps": 8,
+    "both_sides": true,
+    "penalty_400": {"wins": 8, "losses": 8, "draws": 0, "sha256": "8bcf65f3fb5870af3a83f31ac6b051ac69d12a7cf9b9ddedc818fe85a2c58f53"},
+    "penalty_1000": {"wins": 10, "losses": 6, "draws": 0, "sha256": "b650024d34045b464421b71e8ab51523307af3983a589b100c49700889a472ee"}
+  },
+  "fresh_validation": {
+    "candidate": "penalty_1000",
+    "seeds": [7373, 7474],
+    "maps": 22,
+    "both_sides": true,
+    "games": 88,
+    "wins": 33,
+    "losses": 51,
+    "draws": 4,
+    "score_percent": 39.77,
+    "decisive_wilson_95_percent": [29.53, 49.98],
+    "valid_games": 88,
+    "runtime_or_invalid_faults": 0,
+    "serious_regressions": {"portals": "0-4", "Colosseum": "1-3", "arena": "1-3", "autarky": "1-3", "big_empty": "1-3", "queen_of_spades": "1-3", "schooltime": "1-3", "stronghold": "1-3", "trauma": "1-3", "unsw": "1-3"}
+  },
+  "diverse_opponent_gate": false,
+  "judge_sandbox_gate": false,
+  "reason": "The frozen candidate failed both fresh promotion thresholds and regressed ten maps, so further gates were not justified.",
+  "reproduction": "Apply research/corridor-entry.patch to 896122c and build with --flagship-corridor-entry-penalty 400 or 1000.",
+  "accepted_matrix_records_after_iteration": 2061,
+  "failed_diagnostic_rows_after_iteration": 160,
+  "note": "These are local match outcomes, not Elo measurements. The active bot remains unchanged."
+}

@@ -1,0 +1,43 @@
+{
+  "status": "rejected_screen",
+  "hypothesis": "Because round-limit scoring compares queen length, longest dragon, then total length, a collector that reaches length 12 after round 300 may be worth promoting to flagship behavior before the existing length-16 threshold.",
+  "champion_commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+  "champion_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "candidate": {
+    "rule": "After round 299, collector length at least 12 also satisfies is_flagship and special_is_flagship; all existing flagship behavior is retained.",
+    "native_sha256": "5bfcca5cb3bbe4ad68a8534238ddc103d0f4bb92c4fd55025fdb25679caa5f9a",
+    "source_patch": "research/late-flagship.patch"
+  },
+  "screen": {
+    "seed": 10014,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "sides": ["A", "B"],
+    "games": 16,
+    "valid_games": 16,
+    "wins": 7,
+    "losses": 9,
+    "draws": 0,
+    "score_percent": 43.75,
+    "round_limit_games": 14,
+    "mean_candidate_queen_delta": -0.125,
+    "mean_candidate_longest_delta": -2.0625,
+    "mean_candidate_total_length_delta": -11.25,
+    "map_outcomes": {
+      "big_empty": "0-2",
+      "all_other_screen_maps": "1-1 each"
+    },
+    "records": "late-flagship-screen.jsonl",
+    "manifest": "late-flagship-screen.manifest.json"
+  },
+  "decision": "Reject before confirmation, fresh all-map validation, diverse opponents, or sandbox. The candidate underperformed and worsened all three official round-limit score components on average. Retain the exact champion.",
+  "accepted_evidence_total_after_screen": 2681,
+  "failed_diagnostics": {
+    "rows": 320,
+    "invalid_action_games": 20
+  },
+  "limitations": [
+    "This is a tuning screen, not fresh promotion evidence.",
+    "The aggregate score-component deltas include elimination games as well as round-limit games.",
+    "Local match outcomes are not competition Elo."
+  ]
+}

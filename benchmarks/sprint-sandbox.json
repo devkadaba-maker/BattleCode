@@ -1,0 +1,42 @@
+{
+  "toolkit": "unswbc 1.2.9",
+  "candidate": {
+    "project": ".experiments/sprint-vision6",
+    "vision_weight": 6,
+    "split_limit": 3,
+    "free_pearl_sprint": 1
+  },
+  "opponent": {
+    "project": ".experiments/vision6-project",
+    "vision_weight": 6,
+    "split_limit": 3,
+    "free_pearl_sprint": 0
+  },
+  "map": "unsw",
+  "seed": 1515,
+  "sandbox": true,
+  "result": "candidate A won after500 rounds; longest dragon18 vs15",
+  "candidate_points_per_turn": {
+    "p50": 5300000,
+    "p99": 23800000,
+    "mean": 6500000,
+    "max": 24500000,
+    "turns": 25948
+  },
+  "opponent_points_per_turn": {
+    "p50": 5000000,
+    "p99": 23600000,
+    "mean": 6200000,
+    "max": 24500000,
+    "turns": 25876
+  },
+  "cpu_limit": 100000000,
+  "log_tail": [
+    "round 497: bot 661 (team B) died: hit another dragon",
+    "round 499: bot 529 (team B) died: hit a wall",
+    "team A wins after 500 rounds (longest dragon, 18 to 15) (1m35s)",
+    "team A points per turn: p50 5.3M  p99 23.8M  mean 6.5M  max 24.5M  (25948 turns)",
+    "team B points per turn: p50 5.0M  p99 23.6M  mean 6.2M  max 24.5M  (25876 turns)",
+    "wrote replay: replays/sprint-vision6-vs-vision6-project-on-unsw-2026-10-04-004817.replay"
+  ]
+}

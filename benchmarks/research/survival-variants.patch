@@ -1,0 +1,66 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 4a242ed..ade10b0 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -31,0 +32,6 @@ namespace {
++#ifndef HEAD_RISK_WEIGHT
++#define HEAD_RISK_WEIGHT 0
++#endif
++#ifndef PATH_LOOKAHEAD_WEIGHT
++#define PATH_LOOKAHEAD_WEIGHT 0
++#endif
+@@ -440,0 +447,34 @@ int mobility(Controller const& controller, Game const& game_state, Position star
++// A nearby head can turn into our destination even when it currently points
++// elsewhere. Include teammates: crowding can kill the queen just as easily.
++int head_destination_threats(Controller const& controller, Position target) {
++    int threats = 0;
++    for (auto const& tile : controller.get_tiles()) {
++        auto const* head = tile.get_dragon();
++        if (!head || !head->is_head() || head->get_id() == controller.get_id()) continue;
++        for (Direction direction : Direction::get_direction_list()) {
++            if (direction == head->get_dir().get_opposite()) continue;
++            if (tile.get_edge(direction).is_passable() && !tile.get_edge(direction).is_portal() &&
++                tile.get_position().add_dir(direction) == target) ++threats;
++        }
++    }
++    return threats;
++}
++
++// Reachability alone can count tiles behind a dead end that our newly laid
++// body will block. Require a short simple path through the visible graph.
++int escape_depth(Controller const& controller, Game const& game_state,
++                 Position start, std::vector<Position>& trail, int remaining) {
++    if (remaining == 0) return 0;
++    int depth = 0;
++    for (Direction direction : Direction::get_direction_list()) {
++        Position next = start.add_dir(direction);
++        if (!safe_step(controller, game_state, start, direction) ||
++            std::find(trail.begin(), trail.end(), next) != trail.end()) continue;
++        trail.push_back(next);
++        depth = std::max(depth, 1 + escape_depth(controller, game_state, next, trail, remaining - 1));
++        trail.pop_back();
++        if (depth == remaining) break;
++    }
++    return depth;
++}
++
+@@ -791,0 +832,8 @@ int score_move(Direction direction) {
++    if constexpr (HEAD_RISK_WEIGHT > 0) {
++        score -= head_destination_threats(controller, target) * HEAD_RISK_WEIGHT *
++            (controller.get_id() < 2 ? 3 : 1);
++    }
++    if constexpr (PATH_LOOKAHEAD_WEIGHT > 0) {
++        std::vector<Position> trail{start, target};
++        score -= (3 - escape_depth(controller, game_state, target, trail, 3)) * PATH_LOOKAHEAD_WEIGHT;
++    }
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 568c667..e489ea4 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -22,0 +23,2 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
++parser.add_argument('--head-risk-weight', type=int)
++parser.add_argument('--path-lookahead-weight', type=int)
+@@ -35 +37,2 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
+-           'QUEEN_HUNT':args.queen_hunt}
++           'QUEEN_HUNT':args.queen_hunt, 'HEAD_RISK_WEIGHT':args.head_risk_weight,
++           'PATH_LOOKAHEAD_WEIGHT':args.path_lookahead_weight}

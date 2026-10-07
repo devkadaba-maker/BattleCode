@@ -1,0 +1,27 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 8ae2d63..f7ce506 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -109,0 +110,3 @@ namespace {
++#ifndef COMBAT_CONTACT_THRESHOLD
++#define COMBAT_CONTACT_THRESHOLD 1
++#endif
+@@ -381,0 +385,6 @@ Mode strategy_mode(int unit_count, std::optional<int> enemy_count, int populatio
++#if COMBAT_CONTACT_THRESHOLD > 1
++    // A local sighting is only a lower bound on the enemy team population.
++    // Do not compare our global population with a lone visible head and infer
++    // that the whole team should leave collection mode.
++    if (*enemy_count < COMBAT_CONTACT_THRESHOLD) return Mode::COLLECT;
++#endif
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 8d08977..34af378 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -58,0 +59,2 @@ parser.add_argument('--pearl-target-mode', type=int, choices=[0,1,2],
++parser.add_argument('--combat-contact-threshold', type=int,
++                    help='visible/remembered enemy heads required before pressure or hunt mode (default: 1)')
+@@ -100,0 +103,2 @@ if args.queen_pearl_claim_percent is not None and not 0 <= args.queen_pearl_clai
++if args.combat_contact_threshold is not None and args.combat_contact_threshold < 1:
++    parser.error('--combat-contact-threshold must be at least 1')
+@@ -134,0 +139 @@ defines['PEARL_TARGET_MODE'] = args.pearl_target_mode
++defines['COMBAT_CONTACT_THRESHOLD'] = args.combat_contact_threshold

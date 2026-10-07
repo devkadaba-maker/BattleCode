@@ -1,0 +1,15 @@
+{
+  "decision": "reject",
+  "date": "2026-10-07",
+  "champion_commit": "1a5fc64dafc1ddf135fecdf45a711494fd8b510b",
+  "champion_sha256": "e790e2ab49da5dda35397ceb5973712735cb16a79c01de3f02907ba5ee525bec",
+  "experiments": [
+    {"scope": "Tower Defense queens (32x16 geometry)", "candidate_sha256": "def28164b793fb0ecec7534278ab0c1671eadc8c22ce4eea44692e1bbf696a92", "seeds": [10575,10576,10577,10578,10579], "wins": 6, "losses": 4, "draws": 0},
+    {"scope": "Islands queens (56x40 geometry)", "candidate_sha256": "dd2a59af446ab05e6022946504adee0e1871b514ea0330b80f34d3f9984d5d46", "seeds": [10580,10581,10582,10583,10584], "wins": 3, "losses": 7, "draws": 0}
+  ],
+  "valid_games": 20,
+  "invalid_games": 0,
+  "rationale": "The proven UNSW cycle mechanism did not produce a strong repeatable signal on other wall-death maps. Tower Defense missed the scoped screen threshold and Islands regressed. Neither advances to independent validation, unaffected controls or sandbox.",
+  "production_changed": false,
+  "limitations": "Local matches against the frozen champion, not measured competition Elo."
+}

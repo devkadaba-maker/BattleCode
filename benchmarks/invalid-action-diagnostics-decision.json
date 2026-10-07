@@ -1,0 +1,53 @@
+{
+  "experiment": "invalid-action diagnostic capture",
+  "status": "diagnostic tooling improvement; no strategy or champion change",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "motivation": "The earned-flagship screen recorded 12 invalid-action games on both candidate and champion sides, but existing records retained the final turn only for queens and replay filenames collapsed every compiled variant to bot-bot, allowing files to overwrite one another.",
+  "changes": [
+    "Record the final engine input and complete bot output for every dragon killed with engine reason A (no valid action).",
+    "Save a replay for any invalid-action game even when the candidate won.",
+    "Include readable variant names and 12 hexadecimal digits of each binary SHA256 in replay filenames to prevent cross-variant overwrites."
+  ],
+  "diagnostic_rerun": {
+    "matrix": "research/earned-flagship-schooltime-10046-A-rerun.jsonl",
+    "manifest": "research/earned-flagship-schooltime-10046-A-rerun.manifest.json",
+    "candidate_native_sha256": "321eeac6a109082a5800a601c9ed60f1800b74d02533a57f4cffcba3dc5c132d",
+    "opponent_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "map": "schooltime",
+    "seed": 10046,
+    "side": "A",
+    "original": {
+      "outcome": "loss",
+      "valid": false,
+      "candidate_invalid_actions": 5,
+      "opponent_invalid_actions": 3,
+      "candidate_population_peak": 61,
+      "opponent_population_peak": 64
+    },
+    "rerun": {
+      "outcome": "win",
+      "valid": true,
+      "candidate_invalid_actions": 0,
+      "opponent_invalid_actions": 0,
+      "candidate_population_peak": 64,
+      "opponent_population_peak": 64
+    },
+    "conclusion": "The exact-hash rerun did not reproduce the invalid actions and reversed the original result. It is diagnostic only, is excluded from strength evidence, and does not replace the failed row."
+  },
+  "verification": {
+    "python_compile": "passed",
+    "diagnostic_unit_test": "passed",
+    "rerun_check_records": "passed as one complete valid diagnostic replay",
+    "production_source_changed": false,
+    "champion_native_sha256_unchanged": true
+  },
+  "accepted_record_total": 3029,
+  "failed_diagnostic_total": 448,
+  "failed_invalid_game_total": 42,
+  "new_seen_seeds": [],
+  "limitations": "The root cause remains unresolved because the exact case did not reproduce. The new fields will preserve the actionable protocol evidence if another invalid action occurs."
+}

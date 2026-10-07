@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-04",
+  "decision": "reject_before_fresh_validation",
+  "active_champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "active_champion_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypothesis": "At the population target, designate a hashed subset of non-queen, non-flagship snakes as tactical hunters only while an enemy head is visible.",
+  "screen": {
+    "seed": 6868,
+    "maps": 8,
+    "sides": ["A", "B"],
+    "hunter_modulo_4": {"wins": 7, "losses": 9, "draws": 0, "sha256": "fefad12a0609063338bbdc24f21e822835bbf0d3832ab311b8adc9da35896226"},
+    "hunter_modulo_8": {"wins": 4, "losses": 12, "draws": 0, "sha256": "b0691cb95272fa5fafbf852d17df3f77dd7323e6ac5b36e35836798ce79d9241"},
+    "valid_games": 32,
+    "runtime_faults": 0,
+    "invalid_actions": 0
+  },
+  "fresh_validation_run": false,
+  "diverse_opponent_gate_run": false,
+  "judge_sandbox_run": false,
+  "reason": "Both role allocations lost the tuning screen; the more selective policy was substantially worse.",
+  "records": ["tactical-hunter-screen.jsonl"],
+  "reproduction": "Apply research/tactical-hunter.patch to df5f1e0, then build with --tactical-hunter-modulo 4 or 8.",
+  "accepted_matrix_records_after_iteration": 1925,
+  "note": "These are local match outcomes, not Elo measurements. The active bot remains unchanged."
+}

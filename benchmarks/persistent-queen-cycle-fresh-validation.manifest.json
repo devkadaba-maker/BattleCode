@@ -1,0 +1,70 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/persistent-queen-cycle/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/contact1/.unswbc-build/bot"
+  ],
+  "maps": [
+    "unsw"
+  ],
+  "seeds": [
+    10500,
+    10501,
+    10502,
+    10503,
+    10504,
+    10505,
+    10506,
+    10507,
+    10508,
+    10509,
+    10510,
+    10511,
+    10512,
+    10513,
+    10514,
+    10515,
+    10516,
+    10517,
+    10518,
+    10519,
+    10520,
+    10521,
+    10522,
+    10523,
+    10524,
+    10525,
+    10526,
+    10527,
+    10528,
+    10529,
+    10530,
+    10531,
+    10532,
+    10533,
+    10534,
+    10535,
+    10536,
+    10537,
+    10538,
+    10539,
+    10540,
+    10541,
+    10542,
+    10543,
+    10544,
+    10545,
+    10546,
+    10547,
+    10548,
+    10549
+  ],
+  "games": 100,
+  "sha256": {
+    ".experiments/persistent-queen-cycle/.unswbc-build/bot": "e790e2ab49da5dda35397ceb5973712735cb16a79c01de3f02907ba5ee525bec",
+    ".experiments/contact1/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "explicit_endturn": true
+}

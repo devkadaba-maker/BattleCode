@@ -1,0 +1,146 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 00a84b5..3230eed 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -34,0 +35,12 @@ namespace {
++#ifndef QUEEN_ESCAPE_WEIGHT
++#define QUEEN_ESCAPE_WEIGHT 0
++#endif
++#ifndef QUEEN_ESCAPE_SCOPE
++#define QUEEN_ESCAPE_SCOPE 0
++#endif
++#ifndef QUEEN_ESCAPE_ROUNDS
++#define QUEEN_ESCAPE_ROUNDS 16
++#endif
++#ifndef QUEEN_ESCAPE_RELEASE
++#define QUEEN_ESCAPE_RELEASE 0
++#endif
+@@ -37,0 +50 @@ std::array<int, 4> vision_target_bonuses{};
++std::array<int, 4> queen_escape_depths{};
+@@ -452,0 +466,102 @@ int mobility(Controller const& controller, Game const& game_state, Position star
++std::vector<std::pair<Position, int>> queen_body_release(Controller const& controller) {
++    std::vector<std::pair<Position, int>> release;
++    Position position = controller.get_position();
++    for (int index = 0; index < controller.get_length(); ++index) {
++        auto const* tile = controller.get_tile(position);
++        auto const* part = tile ? tile->get_dragon() : nullptr;
++        if (!part || part->get_id() != controller.get_id()) break;
++        if (std::any_of(release.begin(), release.end(), [&](auto const& item) { return item.first == position; })) break;
++        release.emplace_back(position, controller.get_length() - index);
++        // Body facing points towards the head. Follow the unique adjacent
++        // segment whose facing leads into this segment, including bends.
++        std::optional<Position> previous;
++        bool ambiguous = false;
++        for (Direction direction : Direction::get_direction_list()) {
++            if (!tile->get_edge(direction).is_passable() || tile->get_edge(direction).is_portal()) continue;
++            Position neighbor = position.add_dir(direction);
++            auto const* next_tile = controller.get_tile(neighbor);
++            auto const* next_part = next_tile ? next_tile->get_dragon() : nullptr;
++            if (!next_part || next_part->get_id() != controller.get_id() || next_part->is_head() ||
++                next_part->get_position().add_dir(next_part->get_dir()) != position) continue;
++            if (previous.has_value()) { ambiguous = true; break; }
++            previous = neighbor;
++        }
++        if (ambiguous || !previous.has_value()) break;
++        position = *previous;
++    }
++    return release;
++}
++
++int queen_escape_depth(Controller const& controller, Position start,
++                       std::vector<Position>& trail, std::vector<Position> const& forecast, int remaining,
++                       std::vector<std::pair<Position, int>> const& release, int growth = 0) {
++    if (!remaining) return 0;
++    auto const* tile = controller.get_tile(start);
++    if (!tile) return remaining; // An unseen continuation is not a known trap.
++    int best = 0;
++    for (Direction direction : Direction::get_direction_list()) {
++        auto const& edge = tile->get_edge(direction);
++        if (!edge.is_passable() || edge.is_portal()) continue;
++        Position next = start.add_dir(direction);
++        if (std::find(forecast.begin(), forecast.end(), next) != forecast.end()) continue;
++        auto const* ahead = controller.get_tile(next);
++        if constexpr (QUEEN_ESCAPE_RELEASE == 0) {
++            if (std::find(trail.begin(), trail.end(), next) != trail.end() || occupied(ahead)) continue;
++        } else {
++            int step = static_cast<int>(trail.size());
++            bool body_blocked = false;
++            for (int index = 0; index < step; ++index) {
++                if (trail[index] == next && step - index <= controller.get_length() + growth) body_blocked = true;
++            }
++            if (body_blocked) continue;
++            if (occupied(ahead)) {
++                auto const* part = ahead->get_dragon();
++                if (part->get_id() != controller.get_id()) continue;
++                auto freed = std::find_if(release.begin(), release.end(), [&](auto const& item) { return item.first == next; });
++                // Collision checks may precede the tail update, so require an
++                // extra move beyond the estimated release; unknown stays blocked.
++                if (freed == release.end() || step <= freed->second + growth) continue;
++            }
++        }
++        int next_growth = growth;
++        if constexpr (QUEEN_ESCAPE_RELEASE > 0) {
++            if (ahead && (ahead->has_pearl() ||
++                (ahead->get_pearl_time() >= 0 && ahead->get_pearl_time() <= static_cast<int>(trail.size())))) ++next_growth;
++        }
++        trail.push_back(next);
++        best = std::max(best, 1 + queen_escape_depth(controller, next, trail, forecast, remaining - 1, release, next_growth));
++        trail.pop_back();
++        if (best == remaining) break;
++    }
++    return best;
++}
++
++std::array<int, 4> opening_queen_escape_scores(Controller const& controller, Game const& game_state) {
++    std::array<int, 4> scores{};
++    if (controller.get_id() >= 2 || game_state.get_round_num() >= QUEEN_ESCAPE_ROUNDS) return scores;
++    if constexpr (QUEEN_ESCAPE_SCOPE == 1) {
++        if (game_state.width != 64 || game_state.height != 64) return scores;
++    }
++    std::vector<Position> forecast;
++    auto release = queen_body_release(controller);
++    for (auto const& tile : controller.get_tiles()) {
++        auto const* head = tile.get_dragon();
++        if (!head || !head->is_head() || head->get_id() == controller.get_id()) continue;
++        auto const& edge = tile.get_edge(head->get_dir());
++        if (edge.is_passable() && !edge.is_portal()) forecast.push_back(head->get_position().add_dir(head->get_dir()));
++    }
++    for (Direction direction : Direction::get_direction_list()) {
++        if (!safe_step(controller, game_state, controller.get_position(), direction)) continue;
++        Position target = controller.get_position().add_dir(direction);
++        if (std::find(forecast.begin(), forecast.end(), target) != forecast.end()) continue;
++        std::vector<Position> trail{controller.get_position(), target};
++        int growth = 0;
++        if constexpr (QUEEN_ESCAPE_RELEASE > 0) {
++            auto const* tile = controller.get_tile(target);
++            if (tile && (tile->has_pearl() || (tile->get_pearl_time() >= 0 && tile->get_pearl_time() <= 1))) growth = 1;
++        }
++        scores[direction_index(direction)] = 1 + queen_escape_depth(controller, target, trail, forecast, 5, release, growth);
++    }
++    return scores;
++}
++
+@@ -675,0 +791 @@ void reset_target_state() {
++    queen_escape_depths = {};
+@@ -803,0 +920 @@ int score_move(Direction direction) {
++    score += queen_escape_depths[direction_index(direction)] * QUEEN_ESCAPE_WEIGHT;
+@@ -908,0 +1026 @@ void execute_turn() {
++    if constexpr (QUEEN_ESCAPE_WEIGHT > 0) queen_escape_depths = opening_queen_escape_scores(*ct, *game);
+@@ -928 +1046,2 @@ void execute_turn() {
+-                int score = two_step_area * 16 + future_mobility * 24 + area * 5 + enemy_pressure(*ct, *game, target);
++                int score = two_step_area * 16 + future_mobility * 24 + area * 5 + enemy_pressure(*ct, *game, target) +
++                    queen_escape_depths[direction_index(direction)] * QUEEN_ESCAPE_WEIGHT;
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index dd26565..6e1785a 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -23,0 +24,4 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
++parser.add_argument('--queen-escape-weight', type=int)
++parser.add_argument('--queen-escape-rounds', type=int)
++parser.add_argument('--queen-escape-release', type=int, choices=[0,1])
++parser.add_argument('--queen-escape-scope', type=int, choices=[0,1], help='0 all maps, 1 UNSW geometry only')
+@@ -36 +40,3 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
+-           'QUEEN_HUNT':args.queen_hunt, 'WEAKHOLD_VISION_WEIGHT':args.weakhold_vision_weight}
++           'QUEEN_HUNT':args.queen_hunt, 'WEAKHOLD_VISION_WEIGHT':args.weakhold_vision_weight,
++           'QUEEN_ESCAPE_WEIGHT':args.queen_escape_weight, 'QUEEN_ESCAPE_ROUNDS':args.queen_escape_rounds, 'QUEEN_ESCAPE_SCOPE':args.queen_escape_scope,
++           'QUEEN_ESCAPE_RELEASE':args.queen_escape_release}

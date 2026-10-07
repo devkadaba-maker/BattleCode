@@ -1,0 +1,69 @@
+{
+  "experiment": "direct pearl-target classification",
+  "status": "rejected at screening; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "A move ending beside a pearl should not receive the same pocket and late-safety exemptions as a move that actually lands on food; route and pearl-value guidance remain unchanged.",
+  "matrix": "direct-pearl-target-screen.jsonl",
+  "manifest": "direct-pearl-target-screen.manifest.json",
+  "seed": 10050,
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "both_sides": true,
+  "current_landing_pearl_only": {
+    "native_sha256": "9c7161436e51aee337acfed036ef0ecd63de7d5a85305d911e4db20dbfcfa9dd",
+    "wins": 9,
+    "losses": 7,
+    "draws": 0,
+    "score_percent": 56.25,
+    "decisive_wilson95": [33.18, 76.90],
+    "serious_map_results": {
+      "big_empty": "0-2",
+      "default_small": "0-2"
+    }
+  },
+  "current_or_timer_zero_landing_pearl": {
+    "native_sha256": "b781593ea0cacf4cf8c4a53e068cd8ce1d682dafaecd1201eea622663cc72d8e",
+    "wins": 9,
+    "losses": 7,
+    "draws": 0,
+    "score_percent": 56.25,
+    "decisive_wilson95": [33.18, 76.90],
+    "serious_map_results": {
+      "big_empty": "0-2",
+      "default_small": "0-2"
+    }
+  },
+  "decision": "Both exact candidates produced the same map outcomes and stopped below the established 10-6 screen threshold. Neither advances to confirmation, fresh all-map validation, diverse opponents or judge sandbox.",
+  "verification": {
+    "record_check": "passed: 32 complete unique valid fault-free games",
+    "smoke_test": "passed: only a current or timer-zero landing tile is classified as a direct pearl target in mode 2",
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "fresh_all_map_gate": "not run after sub-threshold screen",
+    "diverse_opponents": "not run after sub-threshold screen",
+    "judge_sandbox": "not run after sub-threshold screen"
+  },
+  "accepted_record_total": 3157,
+  "failed_diagnostic_total": 448,
+  "failed_invalid_game_total": 42,
+  "new_seen_seeds": [10050],
+  "reproduction": {
+    "base_commit": "1ba1d7b505e1bc84165ecd242c223f4ac49c21aa",
+    "patch": "research/direct-pearl-target.patch",
+    "current_only_build": "python scripts/build_variant.py directpearl1 --pearl-target-mode 1 --compile",
+    "timer_zero_build": "python scripts/build_variant.py directpearl2 --pearl-target-mode 2 --compile",
+    "champion_control_build": "python scripts/build_variant.py directpearl0 --pearl-target-mode 0 --compile"
+  },
+  "local_results_are_measured_elo": false
+}

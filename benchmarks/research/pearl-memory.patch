@@ -1,0 +1,209 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 0ffeb0c..07764fd 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -83,6 +83,12 @@ namespace {
+ #ifndef PRESSURE_PEARL_WEIGHT
+ #define PRESSURE_PEARL_WEIGHT 2
+ #endif
++#ifndef PEARL_MEMORY_WEIGHT
++#define PEARL_MEMORY_WEIGHT 0
++#endif
++#ifndef PEARL_MEMORY_TTL
++#define PEARL_MEMORY_TTL 8
++#endif
+ 
+ int parent_split_count = 0;
+ std::array<int, 4> vision_target_bonuses{};
+@@ -141,6 +147,16 @@ std::optional<bool> role_map_colosseum;
+ int special_pressure_sample_round = -1, special_pressure_sample_count = 0, special_pressure_visible_sum = 0;
+ bool special_pressure_enabled = false;
+ 
++#if PEARL_MEMORY_WEIGHT > 0
++struct PearlMemory {
++    Position position;
++    int ready_round = 0;
++    int last_seen_round = 0;
++};
++
++std::optional<PearlMemory> pearl_memory;
++#endif
++
+ int direction_index(Direction direction) {
+     switch (direction.value) {
+     case Direction::NORTH: return 0;
+@@ -526,6 +542,56 @@ bool visible_pearl_near(Controller const& controller, Game const& game_state, Po
+     return false;
+ }
+ 
++#if PEARL_MEMORY_WEIGHT > 0
++bool visible_resource_now(Controller const& controller) {
++    for (auto const& tile : controller.get_tiles()) {
++        if (tile.has_pearl() || (tile.get_pearl_time() >= 0 && tile.get_pearl_time() <= 3)) return true;
++    }
++    return false;
++}
++
++void update_pearl_memory(Controller const& controller, Game const& game_state) {
++    int round = game_state.get_round_num();
++    if (pearl_memory.has_value() &&
++        (round - pearl_memory->last_seen_round > PEARL_MEMORY_TTL ||
++         round - pearl_memory->ready_round > PEARL_MEMORY_TTL)) {
++        pearl_memory.reset();
++    }
++
++    std::optional<PearlMemory> best;
++    int best_value = INT_MIN_SCORE;
++    for (auto const& tile : controller.get_tiles()) {
++        int timer = tile.get_pearl_time();
++        if (!tile.has_pearl() && (timer < 0 || timer > PEARL_MEMORY_TTL)) continue;
++        int wait = tile.has_pearl() ? 0 : timer;
++        int value = (tile.has_pearl() ? 1000 : 400 - wait * 25) -
++            distance(controller.get_position(), tile.get_position(), game_state) * 12;
++        if (!best.has_value() || value > best_value) {
++            best = PearlMemory{tile.get_position(), round + wait, round};
++            best_value = value;
++        }
++    }
++    if (best.has_value()) pearl_memory = best;
++    else if (pearl_memory.has_value()) {
++        auto const* remembered = controller.get_tile(pearl_memory->position);
++        if (remembered && !remembered->has_pearl() && remembered->get_pearl_time() < 0)
++            pearl_memory.reset();
++    }
++}
++
++int remembered_pearl_value(Controller const& controller, Game const& game_state, Position start) {
++    if (!pearl_memory.has_value() || controller.get_tile(pearl_memory->position) ||
++        visible_resource_now(controller)) return 0;
++    int round = game_state.get_round_num();
++    if (round - pearl_memory->last_seen_round > PEARL_MEMORY_TTL ||
++        round - pearl_memory->ready_round > PEARL_MEMORY_TTL) return 0;
++    int before = distance(controller.get_position(), pearl_memory->position, game_state);
++    int after = distance(start, pearl_memory->position, game_state);
++    if (before > PEARL_MEMORY_TTL + 4) return 0;
++    return (before - after) * PEARL_MEMORY_WEIGHT;
++}
++#endif
++
+ bool has_enemy_near(Controller const& controller, Game const& game_state, Position centre, int radius) {
+     for (auto const& tile : controller.get_tiles()) {
+         auto const* dragon = tile.get_dragon();
+@@ -782,6 +848,9 @@ void reset_target_state() {
+     special_pressure_enabled = false;
+     portal_uses.clear();
+     last_portal_round = -10000;
++#if PEARL_MEMORY_WEIGHT > 0
++    pearl_memory.reset();
++#endif
+ }
+ 
+ bool recent_collision(Position target) {
+@@ -892,6 +961,10 @@ int score_move(Direction direction) {
+         }
+         score += pearl_cluster_value(controller, game_state, target) * (small_map ? 3 : 2);
+         if (pearl_target) score += small_map ? 480 : 320;
++#if PEARL_MEMORY_WEIGHT > 0
++        if (mode == Mode::COLLECT || mode == Mode::BALANCED)
++            score += remembered_pearl_value(controller, game_state, target);
++#endif
+         score += enemy_pressure(controller, game_state, target);
+         if (special) score += special_enemy_chase_value(controller, game_state, target) * chase_weight / 2;
+         else if (chase_weight > 0) score += enemy_chase_value(controller, game_state, target) * chase_weight / 4;
+@@ -1018,6 +1091,9 @@ int split_size(int target) {
+ 
+ void execute_turn() {
+     update_target_memory(*ct, *game);
++#if PEARL_MEMORY_WEIGHT > 0
++    update_pearl_memory(*ct, *game);
++#endif
+     history.push_back(ct->get_position());
+     // A capped 256-step history stops protecting long dragons from revisiting
+     // older segments of their own body. Keep at least one full body-length.
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 1d36de0..1ee3931 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -40,6 +40,10 @@ parser.add_argument('--hunt-pearl-weight', type=int,
+                     help='pearl-drive weight while at the population target (default: 2)')
+ parser.add_argument('--pressure-pearl-weight', type=int,
+                     help='pearl-drive weight while ahead but below the population target (default: 2)')
++parser.add_argument('--pearl-memory-weight', type=int,
++                    help='short off-screen pearl-target memory weight (default: 0)')
++parser.add_argument('--pearl-memory-ttl', type=int,
++                    help='rounds to retain an off-screen pearl target (default: 8)')
+ parser.add_argument('--head-attack-visible-margin', type=int,
+                     help='minimum visible enemy length advantage for a head trade (default: 4)')
+ parser.add_argument('--head-attack-last-round', type=int,
+@@ -72,6 +76,10 @@ if args.hunt_pearl_weight is not None and args.hunt_pearl_weight < 0:
+     parser.error('--hunt-pearl-weight must be non-negative')
+ if args.pressure_pearl_weight is not None and args.pressure_pearl_weight < 0:
+     parser.error('--pressure-pearl-weight must be non-negative')
++if args.pearl_memory_weight is not None and args.pearl_memory_weight < 0:
++    parser.error('--pearl-memory-weight must be non-negative')
++if args.pearl_memory_ttl is not None and args.pearl_memory_ttl < 1:
++    parser.error('--pearl-memory-ttl must be positive')
+ if args.head_attack_visible_margin is not None and args.head_attack_visible_margin < 0:
+     parser.error('--head-attack-visible-margin must be non-negative')
+ if args.head_attack_last_round is not None and args.head_attack_last_round < 0:
+@@ -98,6 +106,8 @@ defines['SPECIAL_ENEMY_MEMORY_ROUNDS'] = args.special_enemy_memory_rounds
+ defines['SCHOOLTIME_CONTACT_MEMORY'] = args.schooltime_contact_memory
+ defines['HUNT_PEARL_WEIGHT'] = args.hunt_pearl_weight
+ defines['PRESSURE_PEARL_WEIGHT'] = args.pressure_pearl_weight
++defines['PEARL_MEMORY_WEIGHT'] = args.pearl_memory_weight
++defines['PEARL_MEMORY_TTL'] = args.pearl_memory_ttl
+ defines['HEAD_ATTACK_VISIBLE_MARGIN'] = args.head_attack_visible_margin
+ defines['HEAD_ATTACK_LAST_ROUND'] = args.head_attack_last_round
+ defines['HEAD_ATTACK_TARGET_ROLE'] = args.head_attack_target_role
+diff --git a/tests/pearl_memory_smoke.cpp b/tests/pearl_memory_smoke.cpp
+new file mode 100644
+index 0000000..4fde245
+--- /dev/null
++++ b/tests/pearl_memory_smoke.cpp
+@@ -0,0 +1,46 @@
++#define PEARL_MEMORY_WEIGHT 48
++#define PEARL_MEMORY_TTL 8
++#define main battlecode_bot_main
++#include "../cpp_bot/main.cpp"
++#undef main
++
++#include <cassert>
++
++int main() {
++    Game scenario(16, 16, 64);
++    scenario.round_num = 100;
++    game = &scenario;
++    std::vector<Tile> tiles;
++    for (int y = 1; y <= 7; ++y) for (int x = 1; x <= 7; ++x) {
++        std::array<Edge, 4> edges{Edge(false, EdgeType::EMPTY), Edge(false, EdgeType::EMPTY),
++                                  Edge(false, EdgeType::EMPTY), Edge(false, EdgeType::EMPTY)};
++        tiles.emplace_back(Position(x, y), std::nullopt, -1, false, edges);
++    }
++    Controller controller(4, Team(Team::A), Direction::EAST, Vision(std::move(tiles)), 64);
++    controller.head.position = Position(4, 4);
++    controller.length = 6;
++    controller.unit_count = 1;
++    ct = &controller;
++    controller.get_tile(Position(4, 4))->dragon_part =
++        DragonPart(Position(4, 4), 4, Team(Team::A), Direction::EAST, true);
++    reset_target_state();
++
++    pearl_memory = PearlMemory{Position(10, 4), 100, 100};
++    assert(remembered_pearl_value(controller, scenario, Position(5, 4)) > 0);
++    assert(remembered_pearl_value(controller, scenario, Position(3, 4)) < 0);
++
++    // Current visible food takes priority over an uncertain off-screen memory.
++    controller.get_tile(Position(5, 4))->pearl = true;
++    assert(remembered_pearl_value(controller, scenario, Position(5, 4)) == 0);
++    controller.get_tile(Position(5, 4))->pearl = false;
++
++    // Revisiting a remembered tile after it becomes permanently barren clears it.
++    pearl_memory = PearlMemory{Position(6, 4), 100, 100};
++    update_pearl_memory(controller, scenario);
++    assert(!pearl_memory.has_value());
++
++    // Memories expire rather than pulling a collector toward stale food forever.
++    pearl_memory = PearlMemory{Position(10, 4), 100, 100};
++    scenario.round_num = 109;
++    assert(remembered_pearl_value(controller, scenario, Position(5, 4)) == 0);
++}

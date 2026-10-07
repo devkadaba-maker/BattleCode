@@ -1,54 +1,222 @@
-# UNSW Battlecode Python sonar bot
+# BattleCode bot and improvement lab
 
-The production bot is `main.py`; `helper.py` implements the engine protocol.
-Run commands from this directory:
+The current candidate is **`cpp_bot/`**, tested with the official `unswbc 1.2.9`
+engine. The root Python bot and other Python opponents remain available for
+comparison. The original C++ baseline is commit `29245ea`.
+
+The candidate limits each parent's planned splits to **3**, then favors growth.
+Emergency splits may exceed this cap when no safe move exists; they also increment
+the counter. New children start their own counter because each runs a fresh bot
+process. Movement evaluates reachable squares in the visible 7×7 graph using
+current pearls, spawn countdowns at estimated arrival time, nearby friendly and
+enemy dragons (excluding self), and actual kelp edges. Existing collision,
+reachable-area and queen protections still decide whether a step is allowed.
+
+The vision weight is **6**, with a **0-weight fallback for Weakhold's 40×15
+geometry**. That fallback repairs a repeated queen death in a narrow border
+corridor. On Schooltime's unique 60×40 geometry, move-order-aware enemy-heading
+handling allows an earlier dragon to consider a square projected by a later-ID
+enemy. Free pearl sprinting, disabling queen splits, and queen hunting were
+tested but remain disabled by default.
+
+The latest verified repair protects queens on UNSW's starting footprint. It
+keeps a checked food-free loop and uses moving-body escape search when needed.
+Against the previous champion it scored **85–15 on 100 independent both-side
+UNSW games** (Wilson 95% 76.72–90.69%; paired-seed p=2.76e-10).
+All 42 comparisons on the other 21 maps exactly matched champion controls;
+both judge-sandbox checks passed below 25M maximum CPU points per turn.
+See [the full verification and reproduction report](benchmarks/persistent-queen-cycle-report.md).
+
+## Setup
+
+From a checkout, install the environment with one command (Python 3.11+):
 
 ```sh
-unswbc run maps/default.map . .
-unswbc run maps/default.map . practice_bot
+python scripts/setup.py
 ```
 
-The strategy combines a protected flagship swarm with 50/50 collector and
-hunter roles. It uses pearl seeking, flood-fill and mobility safety checks,
-controlled splitting, late survival priorities, and compact validated sonar
-target reports. Sonar is only a hint: local occupancy, turn order, and reachable
-space checks always take priority. Portal use remains conservative.
+This creates `.venv`, installs the pinned toolkit, refreshes the C++ helper and
+bundled maps, and checks the machine. The toolkit carries the engine and judge
+sandbox C++ compiler. On Linux/macOS the CLI is `.venv/bin/unswbc`; on Windows it
+is `.venv/Scripts/unswbc.exe`. Use the web visualiser for replays if no editor
+viewer is installed.
 
-## Final acceptance matrix
+```sh
+.venv/bin/unswbc run maps/arena.map cpp_bot hard_bot_v2 --sandbox --seed 505
+```
 
-The fixed matrix contains 20 games per opponent, with no timeouts or crashes:
+## Measured results
 
-| Opponent | Wins | Losses | Rate |
+The October 4 iteration ran **316 recorded native screening/validation games**,
+all without runtime faults or invalid actions, plus two successful sandbox
+matches. The selected candidate played 108 of the recorded games:
+
+| Opponent / batch | Wins | Losses | Draws |
 | --- | ---: | ---: | ---: |
-| baseline | 20 | 0 | 100% |
-| practice | 18 | 2 | 90% |
-| hard | 17 | 3 | 85% |
-| hard v2 | 20 | 0 | 100% |
-| unseen | 20 | 0 | 100% |
+| Original C++ baseline, initial eight maps / seed 101 | 14 | 2 | 0 |
+| Original C++ baseline, fresh seeds 202 and 303 / eight maps | 22 | 10 | 0 |
+| Original C++ baseline, 14 additional official maps / seed 404 | 12 | 15 | 1 |
+| Hard Python v2 / eight maps, both sides | 16 | 0 | 0 |
+| Root Python bot / eight maps, both sides | 16 | 0 | 0 |
 
-All five opponents pass the 80% acceptance gate. The 100 replay files and the
-full report are in `replays/sonar-final/`:
+The subsequent fresh gate played **220 games across all 22 official maps**, both
+sides, using seeds 505, 606, 707, 808 and 909. The same selected policy scored
+**131 wins, 84 losses and 5 draws: 60.68%** counting draws as half a win. All
+games were valid. The 95% Wilson interval for wins among decisive games is
+54.27–67.21%; map/seed outcomes can be correlated, so this is descriptive local
+evidence rather than a guarantee about competition Elo.
 
-- `easy (100%)/`
-- `medium (90%)/`
-- `hard (85%)/`
-- `hard v2 (100%)/`
-- `unseen (100%)/`
-- `full-report.txt`
+This supports retaining the vision6/split3 champion over the original repository
+baseline. Weakhold returned **0–5–5**, with the candidate's B-side queen trapped
+and dead on turn 188 in every seed. Stronghold, Trauma and UNSW returned 4–6
+each. Current online losses and active-submission status remain unavailable;
+the repository baseline is not verified as the active competition submission.
 
-Each score-labelled folder contains 20 numbered `.replay` files. A copy is
-also stored at `~/Desktop/applications/battlecode/replays/sonar-final/`.
+The next version is a targeted Weakhold repair. Against the previous champion,
+it returned **5 wins, 5 draws and no losses** on ten fresh Weakhold games. Its
+all-map regression batch returned **22–21–1**: the **42 games on the other 21
+maps exactly matched champion self-play controls** for scores, death counts,
+queen diagnostics, population peaks and faults. A separate all-map comparison
+against the original C++ bot returned **24–18–2**. The promoted native binary
+is byte-identical to the tested Weakhold variant. Its Weakhold sandbox match
+won with queen length 4 against 0 and a 14.5M maximum CPU-point cost per turn.
 
-## Verification
+This is a map-specific repair, not a statistically established broad strength
+increase over the previous champion. The fallback identifies the current
+official Weakhold map by dimensions. The wider sprint variant was rejected
+after a fresh **44–44** comparison against the champion despite a 31–13 screen.
 
-From `BattleCode/`:
+The selected vision policy completed a Big Empty judge-sandbox match with a
+maximum of **23.8 million CPU points per turn**, below the 100 million limit.
+See [`benchmarks/README.md`](benchmarks/README.md) and raw JSONL records for all
+variants, losses, seeds, sides and queen-death diagnostics.
+
+## Repeatable experiments
+
+Materialize and compile the unchanged baseline with the current helper:
 
 ```sh
-python3 tests/test_strategy.py
-python3 -m py_compile main.py helper.py
-git diff --check
-graft build
+.venv/bin/python scripts/build_variant.py baseline --ref 29245ea --compile
+.venv/bin/python scripts/build_variant.py candidate --split-limit 3 --vision-weight 6 --compile
+.venv/bin/python scripts/benchmark.py --candidates .experiments/candidate --opponents .experiments/baseline --seeds 505 606 --output benchmarks/next-validation.jsonl --workers 2 --loss-replays .experiments/losses
+.venv/bin/python scripts/report.py benchmarks/next-validation.jsonl
+.venv/bin/python scripts/check_records.py benchmarks/next-validation.jsonl
 ```
 
-These final gates passed after the acceptance matrix. Replay validation was
-structural and marker-scanned; visual viewer inspection remains optional.
+Each map/seed is played from both starting sides. `--resume` requires identical
+inputs and binaries. Each match runs in a separate process; threads only supervise
+those processes. Native games screen
+strategy; judge-sandbox runs are required before an online submission. Keep
+fresh seeds and comparisons against the previous champion, rather than selecting
+changes solely on the tuning sample.
+
+Use `scripts/report.py --by-map` to inspect regressions as well as the aggregate
+score. New policies must beat the previous champion on fresh validation games
+before replacing it. Website sign-in attempts are paused; verified improvements
+and their evidence are published to the continuation GitHub branch and PR #1.
+
+## Checks and submission
+
+```sh
+g++ -std=c++20 -O2 tests/vision_target_smoke.cpp -o /tmp/vision-test && /tmp/vision-test
+g++ -std=c++20 -O2 tests/corner_split_smoke.cpp -o /tmp/corner-test && /tmp/corner-test
+g++ -std=c++20 -O2 tests/free_sprint_smoke.cpp -o /tmp/sprint-test && /tmp/sprint-test
+git diff --check
+.venv/bin/unswbc submit cpp_bot -n vision6-split3-weakhold -d "Three planned splits; visible-graph scoring with Weakhold corridor fallback"
+```
+
+Submitting requires competition authentication. Use the CLI's secure local key
+configuration or the signed-in website; never commit API keys. Check the server
+build and unranked scrims before activating. No online submission or Elo change
+was made during this iteration. The original Python test suite has a pre-existing
+population-target assertion failure; the new C++ strategy tests pass.
+
+The subsequent queen-escape experiment was **not promoted**. Its fresh
+88-game comparison against the current Weakhold champion returned 50–34–4
+(59.09%; decisive Wilson lower bound 48.83%), missing the verification target.
+The champion remains unchanged. Reproducible experiment patches, loss traces,
+raw records and sandbox checks are in `benchmarks/`.
+
+Two subsequent escape-budget variants were also rejected: saturating at three
+moves scored 16–26–2, and saturating at body length plus one (maximum six) scored
+22–20–2 against the champion across all 22 maps and both sides. These are
+screening results, not validation or Elo. The active bot remains unchanged.
+`scripts/trace_loss.py` can reproduce a matrix case with verified native hashes
+and retain the turns before queen deaths; its Colosseum reproduction matched
+the original game exactly. See the benchmark notes for usage and evidence.
+
+A later pre-emptive queen split saved UNSW queens from the repeated turn-5 wall
+death, but it did not improve final results reliably. The strict trigger scored
+6–4 in tuning and then **4–6 on five fresh seeds from both sides** after being
+frozen to UNSW. It is archived but disabled. The active champion is unchanged;
+all 1,773 accepted local matches remain fault-free and are not Elo measurements.
+
+A direct queen split-cap-two screen was also rejected. Across all 22 maps and
+both sides of tuning seed 5959, one of 44 games recorded a candidate-side
+invalid action. The remaining 43 rows were only 21–20–2 (51.16%). An exact
+rerun did not reproduce the invalid action and changed that game from a win to
+a loss, so the whole matrix is retained under `benchmarks/research/failed/`
+and excluded from accepted evidence. The split-cap-three champion remains
+unchanged.
+
+Large-map population ceilings of 32, 44 and 48 were then screened against the
+champion on every official map larger than 1,000 tiles. They scored 8–10, 7–11
+and 9–9 respectively. Although target 48 slightly improved average final total
+and longest-dragon length, it did not improve match results, so the champion's
+target of 40 remains active. These 54 complete valid games bring the accepted
+local evidence corpus to 1,653 records.
+
+A focused teammate-congestion forecast then penalized moving into a visible
+friendly head's straight-ahead destination. Penalties 240 and 720 scored 10–6
+and 11–5 on the eight-map tuning set, but the frozen 720 candidate failed its
+fresh all-map gate at **40–44–4** (47.73%; decisive Wilson 95% 37.28–58.17%).
+It reduced aggregate head deaths without improving final match strength, so it
+is reproducible but disabled. The accepted local corpus now contains 1,773
+complete valid games; the champion remains unchanged.
+
+A deterministic lower-ID right-of-way experiment was also rejected before
+fresh validation. Penalty 120 scored only 9–7 on the tuning maps; penalty 360
+had just 5–9 across its valid rows and two additional Schooltime games with
+opponent-side invalid actions. Neither fault reproduced, and one exact rerun
+changed a recorded win to a loss. The entire matrix is isolated under failed
+diagnostics; the accepted 1,773-game corpus and active champion are unchanged.
+
+A pearl-allocation experiment assigned each visible pearl to the nearest
+friendly head, breaking equal-distance ties by lower snake ID. Discounting
+claimed pearls to 25% screened at 10–6, but the frozen candidate returned
+**49–34–5 over 88 fresh all-map, both-side games: 58.52%, with a 48.29% Wilson
+lower bound among decisive games**. It missed both promotion thresholds, with
+1–3 regressions on Colosseum, Islands and Maze. The policy is archived but
+disabled; the champion binary remains byte-identical and the accepted corpus
+now contains 1,893 complete valid games.
+
+A population-cap tactical-hunter experiment was rejected at screening. A
+hashed quarter of eligible non-flagship snakes scored 7–9, while a more
+selective eighth scored 4–12 across the standard eight maps. All 32 games were
+valid, but neither policy justified fresh validation. The exact patch and raw
+matrix are archived; the accepted corpus is now 1,925 games and the active
+champion remains unchanged.
+
+Arrival-time-aware route guidance was also rejected. Exact spawn timing scored
+8–8; allowing two turns of slack produced 6–9 across valid rows plus one
+Schooltime game with invalid actions. A supervised rerun was valid but changed
+the result and death diagnostics, so it does not replace the failed row. The
+entire 32-row combined matrix is isolated under failed diagnostics and the
+accepted corpus remains 1,925 games. The champion is unchanged.
+
+A conservative portal policy initially looked promising but was not promoted.
+Forcing portals only when trapped returned 10–5 across valid rows plus one
+opponent-side invalid game; limiting portals to one use scored 9–7. A separate
+clean frozen confirmation of the trapped-only policy scored 9–7, below the
+fresh-gate threshold. The failed 32-row matrix is isolated, the 16 clean games
+raise accepted evidence to 1,941, and the champion remains unchanged.
+
+The next promoted change is narrowly scoped to Schooltime. A broad move-order-
+aware enemy-heading policy screened 12–4 but missed the broad fresh gate at
+48–36–4 (56.82%; decisive Wilson lower bound 46.48%) and regressed Australia
+and Stripes to 0–4. The frozen Schooltime-only policy then scored **9–1** on
+five new seeds from both sides. All **42** games on the other 21 maps exactly
+matched champion self-play controls across results and diagnostics. A judge-
+sandbox Schooltime match won with a 23.2M candidate maximum points per turn,
+below the 100M limit. This is a scoped repair, not a broad statistical strength
+claim or a measured Elo change.

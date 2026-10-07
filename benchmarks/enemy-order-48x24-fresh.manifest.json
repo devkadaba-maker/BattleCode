@@ -1,0 +1,23 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/enemy-order-48x24"
+  ],
+  "opponents": [
+    ".experiments/champion-rebuild"
+  ],
+  "maps": [
+    "maze",
+    "stronghold",
+    "trauma"
+  ],
+  "seeds": [
+    10015,
+    10016,
+    10017,
+    10018,
+    10019
+  ],
+  "games": 30,
+  "sha256": {}
+}

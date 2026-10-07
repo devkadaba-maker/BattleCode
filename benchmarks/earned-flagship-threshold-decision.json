@@ -1,0 +1,54 @@
+{
+  "experiment": "earned flagship length threshold",
+  "status": "failed matrix; rejected at screening; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "The default length-16 rule may promote too many medium-long collectors into protected, pearl-only flagship behavior. Raising it could preserve the intended hashed flagships while letting other collectors retain normal phase movement.",
+  "matrix": "research/failed/earned-flagship-threshold-screen.jsonl",
+  "manifest": "research/failed/earned-flagship-threshold-screen.manifest.json",
+  "seed": 10046,
+  "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+  "both_sides": true,
+  "threshold_20": {
+    "native_sha256": "321eeac6a109082a5800a601c9ed60f1800b74d02533a57f4cffcba3dc5c132d",
+    "raw_outcomes": {"wins": 7, "losses": 9, "draws": 0},
+    "valid_games": 9,
+    "valid_outcomes": {"wins": 5, "losses": 4, "draws": 0},
+    "invalid_games": 7
+  },
+  "threshold_24": {
+    "native_sha256": "c889dccd6dab9eb73a347d7db1b41f179872420196d795f4f5838515804ecaed",
+    "raw_outcomes": {"wins": 9, "losses": 7, "draws": 0},
+    "valid_games": 11,
+    "valid_outcomes": {"wins": 6, "losses": 5, "draws": 0},
+    "invalid_games": 5
+  },
+  "invalid_summary": {
+    "games": 12,
+    "candidate_side_games": 9,
+    "opponent_side_games": 8,
+    "both_sides_games": 5,
+    "note": "Counts overlap when both teams recorded invalid actions. The complete shared matrix is excluded; no invalid row or incomplete valid subset is strength evidence."
+  },
+  "decision": "The threshold-20 and threshold-24 valid subsets were only 5-4 and 6-5, while 12 of 32 games recorded invalid actions. This provides no reliable positive signal and does not justify a clean rerun, confirmation, fresh gate, diverse opponents or sandbox execution.",
+  "verification": {
+    "screen_check_records": "expected failure: invalid-action games",
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "smoke_test": "passed",
+    "fresh_gate": "not run after failed screen",
+    "diverse_opponents": "not run after failed screen",
+    "judge_sandbox": "not run after failed screen"
+  },
+  "accepted_record_total": 3029,
+  "failed_diagnostic_total": 448,
+  "failed_invalid_game_total": 42,
+  "new_seen_seeds": [10046],
+  "reproduction": {
+    "patch": "research/earned-flagship-threshold.patch",
+    "threshold_20_build": "python scripts/build_variant.py earnedflag20 --earned-flagship-length 20 --compile",
+    "threshold_24_build": "python scripts/build_variant.py earnedflag24 --earned-flagship-length 24 --compile"
+  }
+}

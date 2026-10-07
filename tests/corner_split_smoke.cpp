@@ -41,6 +41,7 @@ std::string turn_output(bool north_open, int unit_count = 1, bool roomy_north_ex
     ct = &controller;
     history.clear();
     target_memory.reset();
+    parent_split_count = 0;
 
     std::ostringstream output;
     auto* old_buffer = std::cout.rdbuf(output.rdbuf());

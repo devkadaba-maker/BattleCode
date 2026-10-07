@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/queenclaim25",
+    ".experiments/queenclaim0"
+  ],
+  "opponents": [
+    ".experiments/queenclaim100"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    10049
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/queenclaim25/.unswbc-build/bot": "3b1e4d4c270e5a2c2255de5bbb0c4b6dd5350364b95aff149cc68a5240f9992b",
+    ".experiments/queenclaim0/.unswbc-build/bot": "8997cd9f2d205e92957301b76dc51593fa8e7eb86a0433a11fca02488f670b78",
+    ".experiments/queenclaim100/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

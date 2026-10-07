@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_after_scoped_fresh_validation",
+  "active_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Do not apply the soft enemy-head proximity penalty to later-ID enemy heads that can react after our lower-ID dragon moves.",
+  "standard_screen": {
+    "seed": 9090,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "both_sides": true,
+    "all_dragons": {
+      "wins": 8, "losses": 8, "draws": 0,
+      "native_sha256": "967a0e69ae9414aced68c42c206381c31b59410819fb0bc70c951f529209135f",
+      "default": "2-0", "default_small": "2-0", "big_empty": "0-2", "schooltime": "0-2"
+    },
+    "non_flagships_only": {
+      "wins": 8, "losses": 8, "draws": 0,
+      "native_sha256": "981b0310234f02595f1c940dab0d8a152b6655fffad5997fc29246f86e9d4a24"
+    },
+    "valid_games": 32
+  },
+  "scoped_default_validation": {
+    "scope": "unique 32x32 Default geometry",
+    "frozen_before_validation": true,
+    "seeds": [9191, 9292, 9393, 9494, 9595],
+    "both_sides": true,
+    "wins": 3, "losses": 7, "draws": 0,
+    "valid_games": 10,
+    "native_sha256": "a1171c38a78f0f694ac956b82a3a6fe10b325f17ac1d2cf89979b364a2937cd7"
+  },
+  "runtime_or_invalid_action_faults": 0,
+  "unaffected_map_controls": "not_run_after_scoped_validation_failed",
+  "diverse_opponents": "not_run",
+  "judge_sandbox": "not_run",
+  "reason": "Both broad screens were flat at 8-8. The apparent 2-0 Default tuning result reversed to 3-7 on five fresh both-side seeds, so the scoped repair failed before controls or sandbox.",
+  "reproduction": {
+    "base_commit": "6f3f3f2df87a6ccd6b4a4a738028f7c92b0764f4",
+    "patch": "benchmarks/research/enemy-proximity-order.patch",
+    "build_flags": ["--enemy-proximity-order-aware 1", "--enemy-proximity-order-aware 2", "--enemy-proximity-order-aware 3"]
+  },
+  "accepted_matrix_games_after": 2397,
+  "failed_diagnostic_rows_after": 192,
+  "failed_diagnostic_invalid_games_after": 9,
+  "local_results_are_measured_elo": false
+}

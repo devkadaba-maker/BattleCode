@@ -1,0 +1,113 @@
+{
+  "decision": "retain champion; deterministic lower-ID right-of-way failed tuning and the combined matrix contained two invalid games",
+  "champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "champion_native_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypothesis": "higher-ID friendly snakes can yield when a lower-ID friendly head can legally enter the same square, giving queens and older snakes deterministic priority",
+  "policy": "for each candidate move, count lower-ID friendly heads that can reach the destination without reversing or using a portal and apply a configurable penalty",
+  "failed_matrix": {
+    "records": "research/failed/teammate-priority-screen.jsonl",
+    "manifest": "research/failed/teammate-priority-screen.manifest.json",
+    "seed": 6464,
+    "standard_eight_maps": true,
+    "both_sides": true,
+    "rows": 32,
+    "valid_rows": 30,
+    "invalid_rows": 2,
+    "accepted_as_strength_evidence": false,
+    "variants": {
+      "priority120": {
+        "native_sha256": "0a27a0e3d647652a86ec3b705a9cb2ebc6cf5c331678d16da743f5edb13e33fa",
+        "rows": 16,
+        "valid_rows": 16,
+        "valid_outcomes": {
+          "win": 9,
+          "loss": 7,
+          "draw": 0
+        },
+        "diagnostic_score_percent": 56.25
+      },
+      "priority360": {
+        "native_sha256": "7aa2e67156c3b98bf4fc00936a0fc98c8419abf59b055b082dea3b8f143e5203",
+        "rows": 16,
+        "valid_rows": 14,
+        "valid_outcomes": {
+          "win": 5,
+          "loss": 9,
+          "draw": 0
+        },
+        "invalid_recorded_outcomes": {
+          "win": 2
+        }
+      }
+    },
+    "invalid_cases": [
+      {
+        "map": "schooltime",
+        "side": "A",
+        "invalid_team": "B",
+        "invalid_team_is_opponent": true,
+        "recorded_outcome": "win"
+      },
+      {
+        "map": "schooltime",
+        "side": "B",
+        "invalid_team": "A",
+        "invalid_team_is_opponent": true,
+        "recorded_outcome": "win"
+      }
+    ]
+  },
+  "diagnostic_reproductions": {
+    "schooltime_A": {
+      "path": "research/teammate-priority-schooltime-A-reproduction.json",
+      "valid": true,
+      "outcome": "win",
+      "matches_original": false,
+      "different_fields": [
+        "valid",
+        "result",
+        "deaths"
+      ]
+    },
+    "schooltime_B": {
+      "path": "research/teammate-priority-schooltime-B-reproduction.json",
+      "valid": true,
+      "outcome": "loss",
+      "matches_original": false,
+      "different_fields": [
+        "outcome",
+        "valid",
+        "result",
+        "deaths"
+      ]
+    },
+    "interpretation": "neither opponent invalid action reproduced; one rerun also flipped the candidate result, so reruns cannot replace the failed rows"
+  },
+  "promotion_gate": {
+    "fresh_validation_run": false,
+    "diverse_opponents_run": false,
+    "judge_sandbox_run": false,
+    "reason": "the policy did not pass tuning and its matrix was invalid"
+  },
+  "reproducibility": {
+    "build_flag": "--friendly-priority-claim-penalty",
+    "default_build_identical_to_champion": true,
+    "smoke_test_passed": true
+  },
+  "corpus": {
+    "accepted_complete_valid_records": 1773,
+    "accepted_total_changed": false,
+    "failed_diagnostic_matrix_records_before": 64,
+    "failed_diagnostic_matrix_records_added": 32,
+    "failed_diagnostic_matrix_records_after": 96,
+    "invalid_games_across_failed_matrices_after": 6
+  },
+  "seen_seeds_added": [
+    6464
+  ],
+  "limitations": [
+    "the priority120 rows are a complete valid candidate subset but belong to a failed combined matrix and do not justify promotion",
+    "diagnostic reruns are excluded from matrix evidence",
+    "local games do not measure competition Elo"
+  ]
+}

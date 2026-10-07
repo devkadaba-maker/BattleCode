@@ -1,0 +1,53 @@
+{
+  "experiment": "short off-screen pearl-target memory",
+  "status": "rejected at screening; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "A collector could continue toward a recently seen current or imminent pearl for eight rounds after it left the 7x7 view, but only when no useful resource remained visible and only in collect or balanced mode.",
+  "matrix": "research/failed/pearl-memory-screen.jsonl",
+  "manifest": "research/failed/pearl-memory-screen.manifest.json",
+  "seed": 10039,
+  "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+  "both_sides": true,
+  "memory_weight_48": {
+    "native_sha256": "addf06a0da3806e663243e0d0985f4ea8dc25698cdcff70b27fb208b98795689",
+    "raw_outcomes": {"wins": 9, "losses": 7, "draws": 0},
+    "valid_games": 11,
+    "valid_outcomes": {"wins": 6, "losses": 5, "draws": 0},
+    "invalid_games": 5
+  },
+  "memory_weight_96": {
+    "native_sha256": "3be7836a9217adfdecc1c1e791fc959fa23e94f303d47ee45152d4b06333b9c3",
+    "raw_outcomes": {"wins": 7, "losses": 9, "draws": 0},
+    "valid_games": 14,
+    "valid_outcomes": {"wins": 6, "losses": 8, "draws": 0},
+    "invalid_games": 2
+  },
+  "invalid_summary": {
+    "games": 7,
+    "maps": ["big_empty", "schooltime", "trophy"],
+    "candidate_side_games": 1,
+    "opponent_side_games": 7,
+    "note": "One Big Empty row contained invalid actions on both teams. No invalid row is counted as strength evidence."
+  },
+  "decision": "The lower weight had only a weak raw signal and five invalid games; the higher weight was negative and had two invalid games. The entire 32-row shared matrix is quarantined and excluded rather than selecting a valid subset.",
+  "verification": {
+    "screen_check_records": "expected failure: runtime or invalid-action failure",
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "fresh_gate": "not run after failed screen",
+    "diverse_opponents": "not run after failed screen",
+    "judge_sandbox": "not run after failed screen"
+  },
+  "accepted_record_total": 2861,
+  "failed_diagnostic_total": 384,
+  "failed_invalid_game_total": 28,
+  "new_seen_seeds": [10039],
+  "reproduction": {
+    "patch": "research/pearl-memory.patch",
+    "weight_48_build": "python scripts/build_variant.py memory48 --pearl-memory-weight 48 --pearl-memory-ttl 8 --compile",
+    "weight_96_build": "python scripts/build_variant.py memory96 --pearl-memory-weight 96 --pearl-memory-ttl 8 --compile"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/final"
+  ],
+  "opponents": [
+    ".experiments/bin/final"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades",
+    "australia",
+    "autarky",
+    "devil",
+    "dilemma",
+    "islands",
+    "maze",
+    "portals",
+    "slithery_fight",
+    "stripes",
+    "stronghold",
+    "tower_defense",
+    "trauma",
+    "unsw"
+  ],
+  "seeds": [
+    2323
+  ],
+  "games": 21,
+  "sha256": {
+    ".experiments/bin/final": "657d4b67104b0771583f73eecad7bef042312630b08ed58c5e511b69e5e91664"
+  },
+  "sides": [
+    "A"
+  ]
+}

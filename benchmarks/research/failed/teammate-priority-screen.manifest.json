@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/priority120",
+    ".experiments/bin/priority360"
+  ],
+  "opponents": [
+    ".experiments/bin/champion43"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    6464
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/bin/priority120": "0a27a0e3d647652a86ec3b705a9cb2ebc6cf5c331678d16da743f5edb13e33fa",
+    ".experiments/bin/priority360": "7aa2e67156c3b98bf4fc00936a0fc98c8419abf59b055b082dea3b8f143e5203",
+    ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}

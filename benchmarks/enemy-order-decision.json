@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-05",
+  "decision": "promote_scoped_schooltime_repair",
+  "previous_champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "previous_champion_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypothesis": "A dragon acting before a later-ID enemy can consider that enemy's projected straight-ahead square because the later dragon must avoid occupied space.",
+  "broad_tuning": {"seed": 7575, "games": 16, "wins": 12, "losses": 4, "draws": 0, "native_sha256": "6d451b89debfcf0f5a81bf712ee3d8f6bc1e0e3aafe9219c5ff161c6cc4dbf91"},
+  "broad_fresh_gate": {
+    "seeds": [7676, 7777], "maps": 22, "games": 88,
+    "wins": 48, "losses": 36, "draws": 4, "score_percent": 56.82,
+    "decisive_wilson_95_percent": [46.48, 67.18],
+    "runtime_or_invalid_faults": 0,
+    "decision": "reject broad policy",
+    "regressions": {"australia": "0-4", "stripes": "0-4"}
+  },
+  "schooltime_scope_selection": "Schooltime returned 2-0 in tuning and 4-0 in the broad fresh matrix; the scoped binary was frozen before separate validation.",
+  "scoped_fresh_validation": {
+    "seeds": [7878, 7979, 8080, 8181, 8282],
+    "games": 10, "wins": 9, "losses": 1, "draws": 0,
+    "runtime_or_invalid_faults": 0
+  },
+  "unaffected_regression": {
+    "seed": 8383, "maps": 21, "candidate_games": 42, "champion_control_games": 42,
+    "exact_matches": 42, "mismatches": 0,
+    "fields": ["result", "deaths", "queen_deaths", "peak_population", "faults", "notices"]
+  },
+  "judge_sandbox": {"seed": 8484, "won": true, "candidate_max_points_millions": 23.2, "overall_max_points_millions": 24.4, "limit_millions": 100},
+  "tested_scoped_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "broad_reproduction": "Apply research/enemy-order-broad.patch to d1d1ef9 and build with --enemy-heading-order-aware 1.",
+  "accepted_matrix_records_after_iteration": 2259,
+  "failed_diagnostic_rows_after_iteration": 160,
+  "note": "This is a narrow Schooltime repair, not a statistically established broad strength gain and not measured Elo."
+}

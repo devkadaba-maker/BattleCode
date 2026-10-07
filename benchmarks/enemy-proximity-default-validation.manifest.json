@@ -1,0 +1,24 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/proximity-order-default/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/champion-ref10/.unswbc-build/bot"
+  ],
+  "maps": [
+    "default"
+  ],
+  "seeds": [
+    9191,
+    9292,
+    9393,
+    9494,
+    9595
+  ],
+  "games": 10,
+  "sha256": {
+    ".experiments/proximity-order-default/.unswbc-build/bot": "a1171c38a78f0f694ac956b82a3a6fe10b325f17ac1d2cf89979b364a2937cd7",
+    ".experiments/champion-ref10/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

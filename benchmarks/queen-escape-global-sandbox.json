@@ -1,0 +1,23 @@
+{
+  "toolkit": "unswbc 1.2.9",
+  "map": "devil",
+  "seed": 4141,
+  "sandbox": true,
+  "candidate": {
+    "project": ".experiments/escape-global",
+    "queen_escape_weight": 4000,
+    "queen_escape_rounds": 500,
+    "queen_escape_scope": 0,
+    "native_sha256": "351f8e5098b3d831ed0be1e6d4a8738391b3babeb3658c353518483be45a16d0"
+  },
+  "opponent_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "cpu_limit": 100000000,
+  "log_tail": [
+    "team A wins after 500 rounds (longest dragon, 9 to 7) (26.8s)",
+    "team A points per turn: p50 4.2M  p99 15.3M  mean 4.9M  max 22.0M  (11036 turns)",
+    "team B points per turn: p50 4.2M  p99 15.7M  mean 4.7M  max 22.0M  (14441 turns)",
+    "wrote replay: .experiments/escape-global-devil.replay"
+  ],
+  "candidate_max_points_per_turn": 22000000,
+  "opponent_max_points_per_turn": 22000000
+}

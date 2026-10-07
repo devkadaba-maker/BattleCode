@@ -1,0 +1,28 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/split3"
+  ],
+  "opponents": [
+    ".experiments/bin/baseline"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    202,
+    303
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/bin/split3": "8a8da988b5ff7af1db7ad2a460add7bfee287460214389ad9a0377bd63b28c7d",
+    ".experiments/bin/baseline": "0a2d515e2c83918b1e4f458ec00843346cdb23111bfe089b5b5605892ebab263"
+  }
+}

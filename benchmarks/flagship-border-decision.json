@@ -1,0 +1,53 @@
+{
+  "experiment": "extra flagship perimeter cost",
+  "status": "rejected at screening; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Several saved queen-death traces ended at perimeter walls or in border corridors. Adding a flagship-only penalty to the existing fixed edge cost might make long-term scoring dragons avoid dangerous border entries without changing ordinary collectors.",
+  "matrix": "flagship-border-screen.jsonl",
+  "manifest": "flagship-border-screen.manifest.json",
+  "seed": 10040,
+  "maps": ["weakhold", "unsw", "devil", "queen_of_spades", "Colosseum", "maze", "trauma", "stronghold"],
+  "both_sides": true,
+  "penalty_200": {
+    "native_sha256": "1e57c1bc3dc0cbc3625c4f515e109c39fdf32c6372dd31080ddca3108fd6f7c1",
+    "games": 16,
+    "wins": 8,
+    "losses": 6,
+    "draws": 2,
+    "score_percent": 56.25,
+    "decisive_wilson_95": [32.59, 78.62],
+    "by_map": {"weakhold": "0-0-2", "unsw": "1-1", "devil": "2-0", "queen_of_spades": "0-2", "Colosseum": "1-1", "maze": "0-2", "trauma": "2-0", "stronghold": "2-0"}
+  },
+  "penalty_500": {
+    "native_sha256": "24e27179b068545c2b13a76352ffcc7e68f49ddb5942c20e3becc1f9ea4f0e39",
+    "games": 16,
+    "wins": 8,
+    "losses": 6,
+    "draws": 2,
+    "score_percent": 56.25,
+    "decisive_wilson_95": [32.59, 78.62],
+    "by_map": {"weakhold": "0-0-2", "unsw": "1-1", "devil": "1-1", "queen_of_spades": "1-1", "Colosseum": "0-2", "maze": "2-0", "trauma": "1-1", "stronghold": "2-0"}
+  },
+  "decision": "Both variants had the same modest aggregate result and traded map-specific outcomes. The single-seed 2-0 Devil result is not enough to establish a scoped repair or justify map selection. Neither candidate advances to fresh validation, diverse-opponent matches or sandbox.",
+  "verification": {
+    "matrix_check": "32 complete, unique, valid matches; no invalid actions or runtime faults",
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "fresh_gate": "not run after inconclusive screen",
+    "diverse_opponents": "not run",
+    "judge_sandbox": "not run"
+  },
+  "accepted_record_total": 2893,
+  "failed_diagnostic_total": 384,
+  "failed_invalid_game_total": 28,
+  "new_seen_seeds": [10040],
+  "reproduction": {
+    "patch": "research/flagship-border.patch",
+    "smoke": "tests/flagship_border_smoke.cpp",
+    "penalty_200_build": "python scripts/build_variant.py border-200 --flagship-border-extra-penalty 200 --compile",
+    "penalty_500_build": "python scripts/build_variant.py border-500 --flagship-border-extra-penalty 500 --compile"
+  }
+}

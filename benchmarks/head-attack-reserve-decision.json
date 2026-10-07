@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_before_broad_validation",
+  "active_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Delay expendable head trades until the team has enough surviving dragons to retain a reserve.",
+  "standard_screen": {
+    "seed": 8888,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "both_sides": true,
+    "minimum_4_units": {
+      "wins": 8, "losses": 8, "draws": 0,
+      "native_sha256": "f6f81b82b883bde1b5e6408a69f0ad2447bc1df5b92db3ca4dc8f774928f2615"
+    },
+    "minimum_6_units": {
+      "wins": 7, "losses": 9, "draws": 0,
+      "native_sha256": "a44c24fb8719fcb7654beca71205cd2dbd2e6d9564ac8bb40885a54e4464262b"
+    },
+    "valid_games": 32
+  },
+  "contact_heavy_confirmation": {
+    "candidate": "minimum_4_units",
+    "seed": 8989,
+    "maps": ["Colosseum", "stronghold", "slithery_fight", "trophy", "schooltime", "devil", "default", "unsw"],
+    "both_sides": true,
+    "wins": 8, "losses": 8, "draws": 0,
+    "valid_games": 16
+  },
+  "runtime_or_invalid_action_faults": 0,
+  "fresh_all_map_validation": "not_run_after_flat_confirmation",
+  "diverse_opponents": "not_run",
+  "judge_sandbox": "not_run",
+  "reason": "The six-unit reserve regressed at screening, including 0-2 on Schooltime. The frozen four-unit rule remained exactly 8-8 on a contact-heavy confirmation and provided no match-strength signal.",
+  "reproduction": {
+    "base_commit": "b2a47aeeface44477d69fb2cdd4cd328ed4b6bb8",
+    "patch": "benchmarks/research/head-attack-reserve.patch",
+    "build_flags": ["--head-attack-min-units 4", "--head-attack-min-units 6"]
+  },
+  "accepted_matrix_games_after": 2355,
+  "failed_diagnostic_rows_after": 192,
+  "failed_diagnostic_invalid_games_after": 9,
+  "local_results_are_measured_elo": false
+}

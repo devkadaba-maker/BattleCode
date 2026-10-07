@@ -1,0 +1,68 @@
+{
+  "experiment": "combat-state pearl-drive weight",
+  "status": "rejected at screening; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Keeping more pearl-drive weight during pressure and hunt modes would repair the population and length deficit seen in a round-limit enemy-memory loss while preserving pursuit.",
+  "matrix": "research/failed/combat-pearl-screen.jsonl",
+  "manifest": "research/failed/combat-pearl-screen.manifest.json",
+  "seed": 10038,
+  "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+  "both_sides": true,
+  "hunt_only_weight_3": {
+    "native_sha256": "4e1b2231570764d4cd150baa1dce03d627190f643bfa30ba875a1b6126b2c9f7",
+    "valid_games": 16,
+    "wins": 7,
+    "losses": 9,
+    "draws": 0,
+    "mean_candidate_minus_champion": {
+      "queen_length": -0.375,
+      "longest_length": -0.062,
+      "total_length": -5.5,
+      "dragons": -1.5
+    }
+  },
+  "pressure_and_hunt_weight_3": {
+    "native_sha256": "457ee4b2e566333d4a7ee5533f476760c32bf0e79e979f7cc8f6a28304a520cc",
+    "valid_games": 15,
+    "wins": 6,
+    "losses": 9,
+    "draws": 0,
+    "invalid_games": 1,
+    "invalid_case": "Big Empty seed 10038 side B, candidate-side invalid action",
+    "mean_candidate_minus_champion_over_valid_games": {
+      "queen_length": -0.667,
+      "longest_length": -0.4,
+      "total_length": -5.6,
+      "dragons": -2.867
+    }
+  },
+  "diagnostic_rerun": {
+    "file": "research/failed/combat-pearl-big-empty-10038-B-rerun.json",
+    "native_hashes_verified": true,
+    "valid": true,
+    "outcome": "win",
+    "matches_original": false,
+    "different_fields": ["outcome", "valid", "result", "deaths", "queen_deaths"],
+    "evidence_status": "diagnostic only; it neither reproduces nor replaces the invalid matrix row"
+  },
+  "decision": "Both candidates underperformed and the combined matrix contains an invalid action. The whole 32-row matrix is quarantined and excluded from accepted strength evidence.",
+  "verification": {
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "fresh_gate": "not run after failed screen",
+    "diverse_opponents": "not run after failed screen",
+    "judge_sandbox": "not run after failed screen"
+  },
+  "accepted_record_total": 2861,
+  "failed_diagnostic_total": 352,
+  "failed_invalid_action_total": 21,
+  "new_seen_seeds": [10038],
+  "reproduction": {
+    "patch": "research/combat-pearl.patch",
+    "hunt_only_build": "python scripts/build_variant.py growth-hunt3 --hunt-pearl-weight 3 --compile",
+    "pressure_and_hunt_build": "python scripts/build_variant.py growth-combat3 --hunt-pearl-weight 3 --pressure-pearl-weight 3 --compile"
+  }
+}

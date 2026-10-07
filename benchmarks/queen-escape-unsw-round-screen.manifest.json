@@ -1,0 +1,28 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/escape-unsw-r1",
+    ".experiments/bin/escape-unsw-r2",
+    ".experiments/bin/escape-unsw-r4"
+  ],
+  "opponents": [
+    ".experiments/bin/champion43"
+  ],
+  "maps": [
+    "unsw"
+  ],
+  "seeds": [
+    4242,
+    4343,
+    4444,
+    4545,
+    4646
+  ],
+  "games": 30,
+  "sha256": {
+    ".experiments/bin/escape-unsw-r1": "ed35b52100f8d20284a949b7b1cf8116ce78fcae346c13e1fa8d48f66992d3d2",
+    ".experiments/bin/escape-unsw-r2": "34114aeb5e5c7ddb4991b0199abeae782365d7ee2b2da8444bc0240a19e66dd1",
+    ".experiments/bin/escape-unsw-r4": "2fe54f1cc7212314a852f77994110c0f3e3cecd5712dcad7c751ba7588d2dc8b",
+    ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}

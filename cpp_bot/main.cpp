@@ -1,5 +1,17 @@
 #include "helper.hpp"
 
+#ifndef HEAD_ATTACK_VISIBLE_MARGIN
+#define HEAD_ATTACK_VISIBLE_MARGIN 4
+#endif
+
+#ifndef HEAD_ATTACK_LAST_ROUND
+#define HEAD_ATTACK_LAST_ROUND 500
+#endif
+
+#ifndef HEAD_ATTACK_TARGET_ROLE
+#define HEAD_ATTACK_TARGET_ROLE 0
+#endif
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -13,6 +25,103 @@
 using namespace unswbc;
 
 namespace {
+
+#ifndef PARENT_SPLIT_LIMIT
+#define PARENT_SPLIT_LIMIT 3
+#endif
+#ifndef VISION_TARGET_WEIGHT
+#define VISION_TARGET_WEIGHT 6
+#endif
+#ifndef WEAKHOLD_VISION_WEIGHT
+#define WEAKHOLD_VISION_WEIGHT 0
+#endif
+#ifndef FREE_PEARL_SPRINT
+#define FREE_PEARL_SPRINT 0
+#endif
+#ifndef QUEEN_SPLIT_LIMIT
+#define QUEEN_SPLIT_LIMIT PARENT_SPLIT_LIMIT
+#endif
+#ifndef CHILD_SPLIT_LIMIT
+#define CHILD_SPLIT_LIMIT PARENT_SPLIT_LIMIT
+#endif
+#ifndef PLANNED_SPLIT_MIN_LENGTH
+#define PLANNED_SPLIT_MIN_LENGTH 4
+#endif
+#ifndef SPLIT_VISIBLE_PEARL_REQUIREMENT
+#define SPLIT_VISIBLE_PEARL_REQUIREMENT 0
+#endif
+#ifndef RECENT_REGION_PENALTY
+#define RECENT_REGION_PENALTY 0
+#endif
+#ifndef QUEEN_HUNT
+#define QUEEN_HUNT 0
+#endif
+#ifndef LARGE_POPULATION_TARGET
+#define LARGE_POPULATION_TARGET 40
+#endif
+#ifndef FRIENDLY_HEAD_DESTINATION_PENALTY
+#define FRIENDLY_HEAD_DESTINATION_PENALTY 0
+#endif
+#ifndef FRIENDLY_PRIORITY_CLAIM_PENALTY
+#define FRIENDLY_PRIORITY_CLAIM_PENALTY 0
+#endif
+#ifndef ENEMY_HEADING_ORDER_AWARE
+#define ENEMY_HEADING_ORDER_AWARE 2
+#endif
+#ifndef ENEMY_MEMORY_ROUNDS
+#define ENEMY_MEMORY_ROUNDS 24
+#endif
+#ifndef SPECIAL_ENEMY_MEMORY_ROUNDS
+#define SPECIAL_ENEMY_MEMORY_ROUNDS 18
+#endif
+#ifndef SCHOOLTIME_CONTACT_MEMORY
+#define SCHOOLTIME_CONTACT_MEMORY 0
+#endif
+#ifndef HUNT_PEARL_WEIGHT
+#define HUNT_PEARL_WEIGHT 2
+#endif
+#ifndef PRESSURE_PEARL_WEIGHT
+#define PRESSURE_PEARL_WEIGHT 2
+#endif
+#ifndef FLAGSHIP_BORDER_EXTRA_PENALTY
+#define FLAGSHIP_BORDER_EXTRA_PENALTY 0
+#endif
+#ifndef NEW_CHILD_CLEARANCE_WEIGHT
+#define NEW_CHILD_CLEARANCE_WEIGHT 0
+#endif
+#ifndef LATE_HARVEST_MODE
+#define LATE_HARVEST_MODE 0
+#endif
+#ifndef LATE_HARVEST_ROUND
+#define LATE_HARVEST_ROUND 400
+#endif
+#ifndef EARNED_FLAGSHIP_LENGTH
+#define EARNED_FLAGSHIP_LENGTH 16
+#endif
+#ifndef PEARL_CLUSTER_GRAPH_MODE
+#define PEARL_CLUSTER_GRAPH_MODE 0
+#endif
+#ifndef QUEEN_PEARL_CLAIM_PERCENT
+#define QUEEN_PEARL_CLAIM_PERCENT 100
+#endif
+#ifndef PEARL_TARGET_MODE
+#define PEARL_TARGET_MODE 0
+#endif
+#ifndef COMBAT_CONTACT_THRESHOLD
+#define COMBAT_CONTACT_THRESHOLD 1
+#endif
+
+int parent_split_count = 0;
+std::array<int, 4> vision_target_bonuses{};
+
+int vision_weight(Game const& state) {
+    if constexpr (WEAKHOLD_VISION_WEIGHT != VISION_TARGET_WEIGHT) {
+        // The official Weakhold geometry has narrow border corridors. The
+        // short visible target horizon can lure its queen into a closed end.
+        if (state.width == 40 && state.height == 15) return WEAKHOLD_VISION_WEIGHT;
+    }
+    return VISION_TARGET_WEIGHT;
+}
 
 constexpr int INT_MIN_SCORE = std::numeric_limits<int>::min() / 4;
 constexpr int HUNTER_MAX_LENGTH = 6;
@@ -79,6 +188,14 @@ bool enemy_head_ahead(Controller const& controller, Position target) {
     for (auto const& tile : controller.get_tiles()) {
         auto const* dragon = tile.get_dragon();
         if (!dragon || dragon->get_team() == controller.get_team() || !dragon->is_head()) continue;
+#if ENEMY_HEADING_ORDER_AWARE > 0
+        // A later enemy has not moved yet. If we take its projected square
+        // first, it must choose another move or collide with occupied space.
+        bool enabled = ENEMY_HEADING_ORDER_AWARE == 1 ||
+            (ENEMY_HEADING_ORDER_AWARE >= 2 && game && game->width == 60 && game->height == 40) ||
+            (ENEMY_HEADING_ORDER_AWARE == 3 && game && game->width == 48 && game->height == 24);
+        if (enabled && dragon->get_id() > controller.get_id()) continue;
+#endif
         if (dragon->get_position().add_dir(dragon->get_dir()) == target) return true;
     }
     return false;
@@ -140,14 +257,14 @@ int population_target(Game const& game_state) {
     if (area <= 1000) return std::min(game_state.unit_limit, 48);
     // On Big Empty, 64 dragons tied up pearl access without growing the
     // tiebreak flagship: we reached 64 but only length 32.
-    return std::min(game_state.unit_limit, 40);
+    return std::min(game_state.unit_limit, LARGE_POPULATION_TARGET);
 }
 
 int special_population_target(Game const& game_state) {
     int area = game_state.width * game_state.height;
     if (area <= 300) return std::min(game_state.unit_limit, 32);
     if (area <= 1000) return std::min(game_state.unit_limit, 48);
-    return std::min(game_state.unit_limit, 40);
+    return std::min(game_state.unit_limit, LARGE_POPULATION_TARGET);
 }
 
 bool colosseum_like(Controller const& controller, Game const& game_state) {
@@ -174,6 +291,10 @@ Role role_for_controller(Controller const& controller, Game const& game_state) {
     if (controller.get_id() == 1 && colosseum_like(controller, game_state)) return Role::COLLECTOR;
     return role_for(controller.get_id());
 }
+
+#if EARNED_FLAGSHIP_LENGTH != 16
+bool earned_flagship(int length) { return length >= EARNED_FLAGSHIP_LENGTH; }
+#endif
 
 bool special_pressure_policy(Controller const& controller, Game const& game_state) {
     return ((game_state.width == 11 && game_state.height == 11 && controller.get_team() == Team(Team::A)) ||
@@ -222,13 +343,21 @@ Role movement_role(Controller const& controller, Game const& game_state, bool sp
 
 bool special_is_flagship(Controller const& controller, Game const& game_state) {
     Role role = special_pressure_role(controller, game_state);
+#if EARNED_FLAGSHIP_LENGTH == 16
     return role == Role::COLLECTOR && (controller.get_id() < 2 || controller.get_length() >= 16 ||
+#else
+    return role == Role::COLLECTOR && (controller.get_id() < 2 || earned_flagship(controller.get_length()) ||
+#endif
         role_hash(controller.get_id()) % special_population_target(game_state) < flagship_target(game_state) - 1);
 }
 
 bool is_flagship(Controller const& controller, Game const& game_state) {
     Role role = role_for_controller(controller, game_state);
+#if EARNED_FLAGSHIP_LENGTH == 16
     return role == Role::COLLECTOR && (controller.get_id() < 2 || controller.get_length() >= 16 ||
+#else
+    return role == Role::COLLECTOR && (controller.get_id() < 2 || earned_flagship(controller.get_length()) ||
+#endif
         role_hash(controller.get_id()) % population_target(controller, game_state) < flagship_target(game_state) - 1);
 }
 
@@ -253,6 +382,12 @@ bool should_force_portal(Controller const& controller, Game const& game_state) {
 
 Mode strategy_mode(int unit_count, std::optional<int> enemy_count, int population_cap) {
     if (!enemy_count.has_value() || *enemy_count <= 0 || unit_count < *enemy_count) return Mode::COLLECT;
+#if COMBAT_CONTACT_THRESHOLD > 1
+    // A local sighting is only a lower bound on the enemy team population.
+    // Do not compare our global population with a lone visible head and infer
+    // that the whole team should leave collection mode.
+    if (*enemy_count < COMBAT_CONTACT_THRESHOLD) return Mode::COLLECT;
+#endif
     if (unit_count >= population_cap) return Mode::HUNT;
     if (unit_count > *enemy_count) return Mode::PRESSURE;
     return Mode::BALANCED;
@@ -260,25 +395,37 @@ Mode strategy_mode(int unit_count, std::optional<int> enemy_count, int populatio
 
 Mode combat_mode(Controller const& controller, Game const& game_state) {
     int visible = visible_enemy_count(controller), round = game_state.get_round_num();
+    int memory_rounds = SCHOOLTIME_CONTACT_MEMORY && game_state.width == 60 && game_state.height == 40
+        ? 0 : ENEMY_MEMORY_ROUNDS;
     if (visible) { enemy_memory_count = std::max(enemy_memory_count, visible); enemy_memory_round = round; }
-    else if (round - enemy_memory_round > 24) { enemy_memory_count = std::max(0, enemy_memory_count - 1); enemy_memory_round = round; }
+    else if (round - enemy_memory_round > memory_rounds) { enemy_memory_count = std::max(0, enemy_memory_count - 1); enemy_memory_round = round; }
     return strategy_mode(controller.get_unit_count(), enemy_memory_count ? std::optional<int>(enemy_memory_count) : std::nullopt, population_target(controller, game_state));
 }
 
 Mode special_combat_mode(Controller const& controller, Game const& game_state) {
     int visible = visible_enemy_count(controller), round = game_state.get_round_num();
     if (visible) { enemy_memory_count = std::max(enemy_memory_count, visible); enemy_memory_round = round; }
-    else if (round - enemy_memory_round > 18) { enemy_memory_count = std::max(0, enemy_memory_count - 1); enemy_memory_round = round; }
+    else if (round - enemy_memory_round > SPECIAL_ENEMY_MEMORY_ROUNDS) { enemy_memory_count = std::max(0, enemy_memory_count - 1); enemy_memory_round = round; }
     return strategy_mode(controller.get_unit_count(), enemy_memory_count ? std::optional<int>(enemy_memory_count) : std::nullopt, special_population_target(game_state));
 }
 
 std::pair<int, int> strategy_weights(Mode mode) {
-    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 1}; case Mode::PRESSURE: return {2, 2}; default: return {2, 3}; }
+    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 1}; case Mode::PRESSURE: return {PRESSURE_PEARL_WEIGHT, 2}; default: return {HUNT_PEARL_WEIGHT, 3}; }
 }
 
 std::pair<int, int> special_strategy_weights(Mode mode) {
-    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 2}; case Mode::PRESSURE: return {2, 3}; default: return {2, 4}; }
+    switch (mode) { case Mode::COLLECT: return {3, 0}; case Mode::BALANCED: return {2, 2}; case Mode::PRESSURE: return {PRESSURE_PEARL_WEIGHT, 3}; default: return {HUNT_PEARL_WEIGHT, 4}; }
 }
+
+#if LATE_HARVEST_MODE > 0
+std::pair<int, int> late_harvest_weights(Game const& game_state, bool flagship,
+                                         std::pair<int, int> weights) {
+    if (flagship || game_state.get_round_num() < LATE_HARVEST_ROUND) return weights;
+    weights.second = 0;
+    if constexpr (LATE_HARVEST_MODE == 2) weights.first = std::max(weights.first, 3);
+    return weights;
+}
+#endif
 
 bool favourable_head_attack(Controller const& controller, Game const& game_state, Position target,
                            std::optional<int> target_id, bool local_visible,
@@ -289,6 +436,11 @@ bool favourable_head_attack(Controller const& controller, Game const& game_state
     auto const* enemy = tile ? tile->get_dragon() : nullptr;
     if (!enemy || enemy->get_team() == controller.get_team() || !enemy->is_head() ||
         (target_id.has_value() && enemy->get_id() != *target_id)) return false;
+    if constexpr (HEAD_ATTACK_TARGET_ROLE == 1) {
+        if (enemy->get_id() >= 2) return false;
+    } else if constexpr (HEAD_ATTACK_TARGET_ROLE == 2) {
+        if (enemy->get_id() < 2) return false;
+    }
 
     int our_length = controller.get_length();
     int enemy_visible_segments = 0;
@@ -298,6 +450,14 @@ bool favourable_head_attack(Controller const& controller, Game const& game_state
     }
     // Protect the long-term tiebreak dragon and avoid trading larger collectors.
     if (our_length < 2 || our_length >= 10 || is_flagship(controller, game_state)) return false;
+    if constexpr (HEAD_ATTACK_LAST_ROUND < 500) {
+        if (game_state.get_round_num() > HEAD_ATTACK_LAST_ROUND) return false;
+    }
+    // A small expendable collector can remove the opponent's primary score,
+    // even when the enemy queen is still short. Our own queen never trades.
+    if constexpr (QUEEN_HUNT > 0) {
+        if (enemy->get_id() < 2 && controller.get_id() >= 2 && controller.get_unit_count() > 1) return true;
+    }
 
     // Visible body segments give a conservative lower bound for enemy size.
     // A small collector may trade only when the enemy is already visibly large.
@@ -306,7 +466,7 @@ bool favourable_head_attack(Controller const& controller, Game const& game_state
         controller.get_unit_count() < population_target(controller, game_state)) return false;
     int worthwhile_length = std::max(6, our_length * 2);
     if (enemy_visible_segments >= worthwhile_length) return true;
-    return enemy_visible_segments >= our_length + 4;
+    return enemy_visible_segments >= our_length + HEAD_ATTACK_VISIBLE_MARGIN;
 }
 
 std::uint32_t sonar_checksum(std::uint32_t payload) {
@@ -368,7 +528,9 @@ std::optional<TargetMemory> visible_target(Controller const& controller, Game co
 
 std::optional<TargetMemory> received_target(Controller const& controller, Game const& game_state) {
     std::optional<TargetMemory> best;
-    for (std::uint32_t message : controller.get_sonar_messages()) {
+    for (auto message : controller.get_sonar_messages()) {
+        // Our compact packet is 32-bit; do not truncate unrelated v3 sonar.
+        if (message > std::numeric_limits<std::uint32_t>::max()) continue;
         auto packet = unpack_target(message);
         if (!packet.has_value() || !is_target_packet_fresh(packet, game_state.get_round_num(), game_state)) continue;
         if (!best.has_value() || target_packet_age(packet, game_state.get_round_num()) < target_packet_age(best->packet, game_state.get_round_num())) best = TargetMemory{*packet, std::nullopt, false};
@@ -419,6 +581,33 @@ bool visible_pearl_near(Controller const& controller, Game const& game_state, Po
     return false;
 }
 
+#if PEARL_TARGET_MODE > 0
+bool direct_pearl_target(Tile const* tile) {
+    if (!tile) return false;
+    if (tile->has_pearl()) return true;
+    if constexpr (PEARL_TARGET_MODE >= 2) return tile->get_pearl_time() == 0;
+    return false;
+}
+#endif
+
+#if QUEEN_PEARL_CLAIM_PERCENT < 100
+// Preserve the engine's first round-limit tiebreak without assigning every
+// pearl to a teammate. An ordinary collector yields only when a visible
+// friendly queen is at least as close to that specific pearl.
+bool pearl_claimed_by_visible_queen(Controller const& controller,
+                                    Game const& game_state, Position pearl) {
+    if (controller.get_id() < 2) return false;
+    int our_distance = distance(controller.get_position(), pearl, game_state);
+    for (auto const& tile : controller.get_tiles()) {
+        auto const* dragon = tile.get_dragon();
+        if (!dragon || !dragon->is_head() || dragon->get_team() != controller.get_team() ||
+            dragon->get_id() >= 2) continue;
+        if (distance(dragon->get_position(), pearl, game_state) <= our_distance) return true;
+    }
+    return false;
+}
+#endif
+
 bool has_enemy_near(Controller const& controller, Game const& game_state, Position centre, int radius) {
     for (auto const& tile : controller.get_tiles()) {
         auto const* dragon = tile.get_dragon();
@@ -465,15 +654,41 @@ int pearl_value(Controller const& controller, Game const& game_state, Position s
     for (auto const& tile : controller.get_tiles()) if (tile.has_pearl()) {
         int d = distance(start, tile.get_position(), game_state), candidate = std::max(0, 100 - d * 10);
         if (tile.get_pearl_time() <= 2 && d <= 3) candidate += 30;
+#if QUEEN_PEARL_CLAIM_PERCENT == 100
         value = std::max(value, candidate);
+#else
+        if (pearl_claimed_by_visible_queen(controller, game_state, tile.get_position()))
+            candidate = candidate * QUEEN_PEARL_CLAIM_PERCENT / 100;
+        value = std::max(value, candidate);
+#endif
     }
     return value;
 }
+
+#if PEARL_CLUSTER_GRAPH_MODE > 0
+std::unordered_map<Position, int, PositionHash> visible_route_distances(
+        Controller const& controller, Game const& game_state, Position start) {
+    std::unordered_map<Position, int, PositionHash> distances{{start, 0}};
+    if (!controller.get_tile(start)) return distances;
+    std::deque<Position> queue{start};
+    while (!queue.empty()) {
+        Position current = queue.front(); queue.pop_front();
+        int steps = distances.at(current);
+        for (Direction direction : Direction::get_direction_list()) {
+            if (!safe_step(controller, game_state, current, direction)) continue;
+            Position next = current.add_dir(direction);
+            if (distances.emplace(next, steps + 1).second) queue.push_back(next);
+        }
+    }
+    return distances;
+}
+#endif
 
 // Prefer a route that enters a dense pearl pocket instead of chasing one
 // isolated pearl.  The visible window is small, so this remains cheap even
 // when the population has reached the large-map cap.
 int pearl_cluster_value(Controller const& controller, Game const& game_state, Position start) {
+#if PEARL_CLUSTER_GRAPH_MODE == 0
     int best = 0;
     for (auto const& centre : controller.get_tiles()) {
         if (!centre.has_pearl()) continue;
@@ -483,9 +698,46 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
         }
         int approach = std::max(0, 12 - distance(start, centre.get_position(), game_state));
         int imminent = centre.get_pearl_time() <= 2 ? 24 : 0;
+#if QUEEN_PEARL_CLAIM_PERCENT == 100
         best = std::max(best, cluster * 70 + approach * 8 + imminent);
+#else
+        int candidate = cluster * 70 + approach * 8 + imminent;
+        if (pearl_claimed_by_visible_queen(controller, game_state, centre.get_position()))
+            candidate = candidate * QUEEN_PEARL_CLAIM_PERCENT / 100;
+        best = std::max(best, candidate);
+#endif
     }
     return best;
+#else
+    auto const reachable = visible_route_distances(controller, game_state, start);
+    int best = 0;
+    for (auto const& centre : controller.get_tiles()) {
+        if (!centre.has_pearl()) continue;
+        auto const centre_route = reachable.find(centre.get_position());
+        if (centre_route == reachable.end()) continue;
+        int cluster = 0;
+        for (auto const& tile : controller.get_tiles()) {
+            if (!tile.has_pearl() || distance(centre.get_position(), tile.get_position(), game_state) > 3) continue;
+            if (!reachable.contains(tile.get_position())) continue;
+            ++cluster;
+        }
+#if PEARL_CLUSTER_GRAPH_MODE >= 2
+        int approach = std::max(0, 12 - centre_route->second);
+#else
+        int approach = std::max(0, 12 - distance(start, centre.get_position(), game_state));
+#endif
+        int imminent = centre.get_pearl_time() <= 2 ? 24 : 0;
+#if QUEEN_PEARL_CLAIM_PERCENT == 100
+        best = std::max(best, cluster * 70 + approach * 8 + imminent);
+#else
+        int candidate = cluster * 70 + approach * 8 + imminent;
+        if (pearl_claimed_by_visible_queen(controller, game_state, centre.get_position()))
+            candidate = candidate * QUEEN_PEARL_CLAIM_PERCENT / 100;
+        best = std::max(best, candidate);
+#endif
+    }
+    return best;
+#endif
 }
 
 int enemy_pressure(Controller const& controller, Game const& game_state, Position start) {
@@ -539,6 +791,36 @@ int friendly_pressure(Controller const& controller, Game const& game_state, Posi
     return score;
 }
 
+int friendly_head_destinations(Controller const& controller, Position target) {
+    int count = 0;
+    for (auto const& tile : controller.get_tiles()) {
+        auto const* dragon = tile.get_dragon();
+        if (!dragon || !dragon->is_head() || dragon->get_team() != controller.get_team() ||
+            dragon->get_id() == controller.get_id()) continue;
+        if (dragon->get_position().add_dir(dragon->get_dir()) == target) ++count;
+    }
+    return count;
+}
+
+int lower_id_friendly_claims(Controller const& controller, Position target) {
+    int count = 0;
+    for (auto const& tile : controller.get_tiles()) {
+        auto const* dragon = tile.get_dragon();
+        if (!dragon || !dragon->is_head() || dragon->get_team() != controller.get_team() ||
+            dragon->get_id() >= controller.get_id()) continue;
+        for (Direction direction : Direction::get_direction_list()) {
+            if (direction == dragon->get_dir().get_opposite()) continue;
+            auto const& edge = tile.get_edge(direction);
+            if (edge.is_passable() && !edge.is_portal() &&
+                dragon->get_position().add_dir(direction) == target) {
+                ++count;
+                break;
+            }
+        }
+    }
+    return count;
+}
+
 int special_friendly_pressure(Controller const& controller, Game const& game_state, Position start) {
     int score = 0;
     for (auto const& tile : controller.get_tiles()) {
@@ -548,6 +830,78 @@ int special_friendly_pressure(Controller const& controller, Game const& game_sta
         if (d <= 1) score -= 150; else if (d == 2) score -= dragon->is_head() ? 60 : 28; else if (d == 3 && dragon->is_head()) score -= 14;
     }
     return score;
+}
+
+#if NEW_CHILD_CLEARANCE_WEIGHT > 0
+int new_child_clearance_adjustment(Controller const& controller, Game const& game_state,
+                                   Position target, bool special) {
+    if (controller.get_id() < 2 || history.size() != 1) return 0;
+    int pressure = special ? special_friendly_pressure(controller, game_state, target) :
+                             friendly_pressure(controller, game_state, target);
+    return pressure * NEW_CHILD_CLEARANCE_WEIGHT;
+}
+#endif
+
+// Search the actual visible graph, rather than steering through kelp towards
+// a geometrically close pearl. Score every reachable square at its arrival
+// round, including soon-to-spawn food and other dragons (never our own body).
+int visible_target_value(Controller const& controller, Game const& game_state,
+                         Tile const& target, int arrival_steps) {
+    if (occupied(&target)) return INT_MIN_SCORE;
+    int timer = target.get_pearl_time();
+    int arrival_round = arrival_steps - 1;
+    int food = target.has_pearl() ? 1000 :
+        timer >= 0 && timer <= arrival_round ? 720 :
+        timer >= 0 && timer <= arrival_round + 3 ? 360 - 90 * (timer - arrival_round) : 0;
+    if (food == 0) return INT_MIN_SCORE;
+    int pocket = 0;
+    for (auto const& tile : controller.get_tiles()) {
+        if (occupied(&tile) || distance(target.get_position(), tile.get_position(), game_state) > 2) continue;
+        if (tile.has_pearl()) pocket += 45;
+        else if (tile.get_pearl_time() >= 0 && tile.get_pearl_time() <= arrival_round + 2) pocket += 20;
+    }
+    int exits = 0;
+    for (Direction direction : Direction::get_direction_list()) {
+        auto const& edge = target.get_edge(direction);
+        if (edge.is_passable() && !edge.is_portal()) ++exits;
+    }
+    int congestion = friendly_pressure(controller, game_state, target.get_position()) +
+        enemy_pressure(controller, game_state, target.get_position()) * 2;
+#if QUEEN_PEARL_CLAIM_PERCENT == 100
+    return food + pocket + congestion - (4 - exits) * 45 -
+        (exits <= 1 ? 220 : 0) - arrival_steps * 95;
+#else
+    int value = food + pocket + congestion - (4 - exits) * 45 -
+        (exits <= 1 ? 220 : 0) - arrival_steps * 95;
+    if (pearl_claimed_by_visible_queen(controller, game_state, target.get_position()))
+        value = value * QUEEN_PEARL_CLAIM_PERCENT / 100;
+    return value;
+#endif
+}
+
+std::array<int, 4> visible_target_scores(Controller const& controller, Game const& game_state) {
+    std::array<int, 4> scores{};
+    for (Direction first : Direction::get_direction_list()) {
+        if (!safe_step(controller, game_state, controller.get_position(), first)) continue;
+        Position start = controller.get_position().add_dir(first);
+        std::deque<std::pair<Position, int>> queue{{start, 1}};
+        std::unordered_set<Position, PositionHash> seen{start};
+        int best = 0;
+        while (!queue.empty()) {
+            auto [position, steps] = queue.front(); queue.pop_front();
+            auto const* tile = controller.get_tile(position);
+            if (!tile) continue;
+            best = std::max(best, visible_target_value(controller, game_state, *tile, steps));
+            if (steps >= 12) continue;
+            for (Direction direction : Direction::get_direction_list()) {
+                if (!safe_step(controller, game_state, position, direction)) continue;
+                Position next = position.add_dir(direction);
+                if (seen.insert(next).second) queue.emplace_back(next, steps + 1);
+            }
+        }
+        scores[direction_index(first)] = best;
+    }
+    return scores;
 }
 
 int sonar_intercept_value(Controller const& controller, Game const& game_state, Position start) {
@@ -579,6 +933,8 @@ int sonar_receiver_value(Controller const& controller, Game const& game_state, P
 }
 
 void reset_target_state() {
+    parent_split_count = 0;
+    vision_target_bonuses = {};
     target_memory.reset();
     last_relay_round = -10000;
     role_map_game = nullptr;
@@ -595,6 +951,24 @@ bool recent_collision(Position target) {
     int begin = std::max(0, static_cast<int>(history.size()) - ct->get_length());
     return std::find(history.begin() + begin, history.end(), target) != history.end();
 }
+
+int recent_region_visits(Game const& game_state, Position target) {
+    int count = 0;
+    int begin = std::max(0, static_cast<int>(history.size()) - 24);
+    for (auto it = history.begin() + begin; it != history.end(); ++it) {
+        if (distance(*it, target, game_state) <= 2) ++count;
+    }
+    return count;
+}
+
+#if FLAGSHIP_BORDER_EXTRA_PENALTY > 0
+int extra_flagship_border_penalty(Controller const& controller, Game const& game_state, Position target) {
+        bool border = target.x == 0 || target.y == 0 ||
+            target.x == game_state.width - 1 || target.y == game_state.height - 1;
+        if (border && is_flagship(controller, game_state)) return FLAGSHIP_BORDER_EXTRA_PENALTY;
+    return 0;
+}
+#endif
 
 bool portal_allowed(Edge const& edge) {
     if (!edge.is_portal()) return true;
@@ -643,8 +1017,17 @@ int score_move(Direction direction) {
     Role role = movement_role(controller, game_state, special);
     bool head_attack = favourable_head_attack(controller, game_state, target, std::nullopt, true, special ? std::optional<Role>(role) : std::nullopt);
     if (!ahead || (occupied(ahead) && !head_attack) || enemy_head_ahead(controller, target) || recent_collision(target)) return INT_MIN_SCORE;
-    if (head_attack) return 1800;
+    if (head_attack) {
+        auto const* enemy = ahead->get_dragon();
+        return QUEEN_HUNT > 0 && enemy && enemy->get_id() < 2 ? 10000 : 1800;
+    }
+#if PEARL_TARGET_MODE == 0
     bool pearl_target = visible_pearl_near(controller, game_state, target, 1);
+#else
+    // Experimental modes reserve the pocket/safety exemptions for food on
+    // the landing square instead of any pearl merely adjacent to it.
+    bool pearl_target = direct_pearl_target(ahead);
+#endif
     bool small_map = game_state.width * game_state.height <= 144;
     bool flagship = special ? special_is_flagship(controller, game_state) : is_flagship(controller, game_state);
     if (flagship && portal_arrival_square(controller, target)) return INT_MIN_SCORE;
@@ -674,7 +1057,13 @@ int score_move(Direction direction) {
         pearl_weight = 8;
         chase_weight = 0;
     }
+#if LATE_HARVEST_MODE > 0
+    std::tie(pearl_weight, chase_weight) =
+        late_harvest_weights(game_state, flagship, {pearl_weight, chase_weight});
+#endif
     int score = area * 12 + future_mobility * 12;
+    if constexpr (RECENT_REGION_PENALTY > 0)
+        score -= recent_region_visits(game_state, target) * RECENT_REGION_PENALTY;
     if (role == Role::COLLECTOR) {
         // A pearl tile is worth pursuing even when it is beside kelp or in a
         // narrow pocket.  The old mobility gate made the bot walk past those
@@ -695,14 +1084,27 @@ int score_move(Direction direction) {
     }
     if (future_mobility == 1) score -= 80;
     score += special ? special_friendly_pressure(controller, game_state, target) : friendly_pressure(controller, game_state, target);
+#if NEW_CHILD_CLEARANCE_WEIGHT > 0
+    score += new_child_clearance_adjustment(controller, game_state, target, special);
+#endif
+    if constexpr (FRIENDLY_HEAD_DESTINATION_PENALTY > 0)
+        score -= friendly_head_destinations(controller, target) * FRIENDLY_HEAD_DESTINATION_PENALTY;
+    if constexpr (FRIENDLY_PRIORITY_CLAIM_PENALTY > 0)
+        score -= lower_id_friendly_claims(controller, target) * FRIENDLY_PRIORITY_CLAIM_PENALTY;
     if (enemy_collision_risk(controller, game_state, target)) {
         score -= special ? (role == Role::HUNTER ? 260 : 550) : (role == Role::HUNTER ? 300 : 500);
     }
-    if (target.x == 0 || target.y == 0 || target.x == game_state.width - 1 || target.y == game_state.height - 1) score -= special ? (role == Role::COLLECTOR ? 220 : 120) : 150;
+    if (target.x == 0 || target.y == 0 || target.x == game_state.width - 1 || target.y == game_state.height - 1) {
+        score -= special ? (role == Role::COLLECTOR ? 220 : 120) : 150;
+#if FLAGSHIP_BORDER_EXTRA_PENALTY > 0
+        score -= extra_flagship_border_penalty(controller, game_state, target);
+#endif
+    }
     if (here->get_edge(direction).is_portal()) score -= 55;
     if (direction == controller.get_dir()) score += 5; else if (direction == controller.get_dir().get_opposite()) score -= 10;
     auto directions = Direction::get_direction_list();
     if (direction == directions[static_cast<std::size_t>(role_hash(controller.get_id()) % 4)]) score += flagship ? 3 : 9;
+    score += vision_target_bonuses[direction_index(direction)] * vision_weight(game_state);
     return score;
 }
 
@@ -719,6 +1121,43 @@ bool safe_sprint(Direction direction, int steps) {
     return every_step_has_pearl;
 }
 
+// Use only the free steps granted by the current length. All intermediate
+// tiles must be empty in this turn's snapshot, and the landing square must
+// have an exit outside the body trail we are about to lay down.
+std::vector<Direction> free_pearl_route(Direction first) {
+    int budget = std::min(3, (ct->get_length() + 3) / 4);
+    if (budget < 2 || !safe_step(*ct, *game, ct->get_position(), first)) return {};
+    struct Path { Position position; std::vector<Direction> moves; std::vector<Position> trail; int pearls; };
+    Position start = ct->get_position().add_dir(first);
+    auto const* first_tile = ct->get_tile(start);
+    std::deque<Path> queue{{start, {first}, {ct->get_position(), start}, first_tile && first_tile->has_pearl() ? 1 : 0}};
+    std::vector<Direction> best;
+    int best_value = 0;
+    while (!queue.empty()) {
+        Path path = queue.front(); queue.pop_front();
+        if (enemy_collision_risk(*ct, *game, path.position) || recent_collision(path.position)) continue;
+        int exits = 0;
+        for (Direction direction : Direction::get_direction_list()) {
+            Position next = path.position.add_dir(direction);
+            if (!safe_step(*ct, *game, path.position, direction) ||
+                std::find(path.trail.begin(), path.trail.end(), next) != path.trail.end()) continue;
+            ++exits;
+            if (static_cast<int>(path.moves.size()) < budget) {
+                auto moves = path.moves; moves.push_back(direction);
+                auto trail = path.trail; trail.push_back(next);
+                auto const* tile = ct->get_tile(next);
+                queue.push_back({next, std::move(moves), std::move(trail), path.pearls + (tile && tile->has_pearl())});
+            }
+        }
+        auto const* landing = ct->get_tile(path.position);
+        if (path.moves.size() < 2 || !landing || !landing->has_pearl() || exits < 2) continue;
+        if (open_area(*ct, path.position) < std::min(30, ct->get_length() + 4)) continue;
+        int value = path.pearls * 450 + exits * 50 - static_cast<int>(path.moves.size()) * 25;
+        if (value > best_value) { best_value = value; best = path.moves; }
+    }
+    return best;
+}
+
 bool relay_target(bool safe_action) {
     if (!safe_action || !target_memory.has_value() || !is_target_packet_fresh(target_memory->packet, game->get_round_num(), *game) || game->get_round_num() - last_relay_round < SONAR_RELAY_INTERVAL) return false;
     int target_id = target_memory->target_id.value_or(target_memory->packet.target_id_modulo);
@@ -730,7 +1169,24 @@ bool relay_target(bool safe_action) {
 
 int split_size(int target) {
     int round = game->get_round_num();
+    int split_limit = PARENT_SPLIT_LIMIT;
+    if constexpr (CHILD_SPLIT_LIMIT != PARENT_SPLIT_LIMIT) {
+        if (ct->get_id() >= 2) split_limit = CHILD_SPLIT_LIMIT;
+    }
+    if (parent_split_count >= split_limit) return 0;
+    if (ct->get_id() < 2 && parent_split_count >= QUEEN_SPLIT_LIMIT) return 0;
     if (round >= 460 || ct->get_unit_count() >= target || !ct->can_split(2)) return 0;
+    if constexpr (PLANNED_SPLIT_MIN_LENGTH > 4) {
+        if (ct->get_length() < PLANNED_SPLIT_MIN_LENGTH) return 0;
+    }
+    if constexpr (SPLIT_VISIBLE_PEARL_REQUIREMENT > 0) {
+        int nearby_resources = 0;
+        for (auto const& tile : ct->get_tiles()) {
+            if (tile.has_pearl() || (tile.get_pearl_time() >= 0 && tile.get_pearl_time() <= 2))
+                ++nearby_resources;
+        }
+        if (nearby_resources < SPLIT_VISIBLE_PEARL_REQUIREMENT) return 0;
+    }
     // Split at length four (the first legal two-segment child), rather than
     // waiting for a long ramp. This lets collectors form before the opponent's
     // early split wave overruns us, but designated flagships must keep their
@@ -750,7 +1206,175 @@ int split_size(int target) {
     return 2;
 }
 
+
+bool dynamic_queen_map = false, dynamic_queen_classified = false;
+
+std::vector<Position> visible_queen_body() {
+    int length=ct->get_length();
+    std::vector<Position> body{ct->get_position()};
+    int visible=0;
+    for (auto const& tile:ct->get_tiles()) {
+        auto const* part=tile.get_dragon();
+        if (part && part->get_id()==ct->get_id()) ++visible;
+    }
+    if (visible != length) {
+        if (static_cast<int>(history.size())<length) return {};
+        std::vector<Position> remembered;
+        for (int i=0;i<length;++i) remembered.push_back(history[history.size()-1-i]);
+        for (int i=1;i<length;++i) {
+            if ((std::abs(remembered[i].x-remembered[i-1].x)+std::abs(remembered[i].y-remembered[i-1].y))!=1) return {};
+            auto const* tile=ct->get_tile(remembered[i]);
+            if (tile && (!tile->get_dragon() || tile->get_dragon()->get_id()!=ct->get_id())) return {};
+        }
+        return remembered;
+    }
+    while (static_cast<int>(body.size())<length) {
+        bool found=false;
+        for (auto const& tile:ct->get_tiles()) {
+            auto const* part=tile.get_dragon();
+            if (!part || part->get_id()!=ct->get_id() || part->is_head()) continue;
+            Position pos=part->get_position();
+            if (std::find(body.begin(),body.end(),pos)!=body.end() || pos.add_dir(part->get_dir())!=body.back()) continue;
+            body.push_back(pos);found=true;break;
+        }
+        if (!found) return {};
+    }
+    return body;
+}
+
+bool queen_body_step(std::vector<Position>& body, std::vector<Position>& eaten,
+                     Direction direction, int cost, bool actual_action, int arrival_round = 0) {
+    auto const* here=ct->get_tile(body.front());
+    if (!here || !here->get_edge(direction).is_passable() || here->get_edge(direction).is_portal()) return false;
+    Position next=body.front().add_dir(direction);
+    auto const* ahead=ct->get_tile(next);
+    if (!ahead || std::find(body.begin(),body.end(),next)!=body.end()) return false;
+    auto const* part=ahead->get_dragon();
+    if (part && part->get_id()!=ct->get_id()) return false;
+    if (actual_action && enemy_head_ahead(*ct,next)) return false;
+    if (portal_arrival_square(*ct,next)) return false;
+    bool food=(ahead->has_pearl() || (!actual_action && ahead->get_pearl_time()>=0 && ahead->get_pearl_time()<=arrival_round)) &&
+        std::find(eaten.begin(),eaten.end(),next)==eaten.end();
+    int length=static_cast<int>(body.size())+food-cost;
+    if (length<2) return false;
+    if (food) eaten.push_back(next);
+    body.insert(body.begin(),next);body.resize(length);
+    return true;
+}
+
+int moving_queen_depth(std::vector<Position> const& body, std::vector<Position> const& eaten, int remaining, int arrival_round = 1) {
+    if (!remaining) return 0;
+    auto const* here=ct->get_tile(body.front());
+    if (!here) return remaining;
+    int best=0;
+    for (Direction direction:Direction::get_direction_list()) {
+        if (!here->get_edge(direction).is_passable() || here->get_edge(direction).is_portal()) continue;
+        Position next=body.front().add_dir(direction);
+        if (!ct->get_tile(next)) continue;
+        auto next_body=body;auto next_eaten=eaten;
+        if (!queen_body_step(next_body,next_eaten,direction,0,false,arrival_round)) continue;
+        best=std::max(best,1+moving_queen_depth(next_body,next_eaten,remaining-1,arrival_round+1));
+        if (best==remaining) break;
+    }
+    return best;
+}
+
+std::deque<Direction> quiet_route;
+std::vector<Direction> quiet_loop;
+Position quiet_expected{};
+bool quiet_active=false;
+std::vector<Direction> quiet_queen_cycle(std::vector<Position> const& body) {
+    if (quiet_active && body.front()==quiet_expected && body.size()<quiet_loop.size()) {
+        Direction next=quiet_route.front();
+        auto next_body=body;std::vector<Position> eaten;
+        auto const* tile=ct->get_tile(body.front().add_dir(next));
+        if (tile && !tile->has_pearl() && tile->get_pearl_time()<0 && queen_body_step(next_body,eaten,next,0,true)) {
+            quiet_route.pop_front();
+            if (quiet_route.empty()) quiet_route.assign(quiet_loop.begin(),quiet_loop.end());
+            quiet_expected=next_body.front();
+            return {next};
+        }
+    }
+    quiet_active=false;quiet_route.clear();quiet_loop.clear();
+    struct Route {std::vector<Position> body,positions; std::vector<Direction> moves;};
+    std::vector<Route> queue{{body,{body.front()}, {}}};
+    int nodes=0;
+    while (!queue.empty() && ++nodes<=2500) {
+        Route route=std::move(queue.back());queue.pop_back();
+        if (route.moves.size()>=14) continue;
+        for (Direction direction:Direction::get_direction_list()) {
+            auto next_body=route.body;std::vector<Position> eaten;
+            auto const* tile=ct->get_tile(next_body.front().add_dir(direction));
+            if (!tile || tile->has_pearl() || tile->get_pearl_time()>=0) continue;
+            if (!queen_body_step(next_body,eaten,direction,0,true)) continue;
+            auto moves=route.moves;moves.push_back(direction);
+            auto found=std::find(route.positions.begin(),route.positions.end(),next_body.front());
+            if (found!=route.positions.end()) {
+                int cycle_size=route.positions.end()-found;
+                if (cycle_size>static_cast<int>(body.size())) {
+                    int start=found-route.positions.begin();
+                    quiet_loop.assign(moves.begin()+start,moves.end());
+                    quiet_route.assign(moves.begin()+1,moves.end());
+                    if (quiet_route.empty()) quiet_route.assign(quiet_loop.begin(),quiet_loop.end());
+                    quiet_expected=body.front().add_dir(moves.front());
+                    quiet_active=true;
+                    return {moves.front()};
+                }
+                continue;
+            }
+            auto positions=route.positions;positions.push_back(next_body.front());
+            queue.push_back({std::move(next_body),std::move(positions),std::move(moves)});
+        }
+    }
+    return {};
+}
+
+std::vector<Direction> dynamic_queen_escape(Direction baseline) {
+    if (!dynamic_queen_map || ct->get_id()>=2 || ct->get_length()>24) return {};
+    auto body=visible_queen_body();
+    if (body.empty()) return {};
+    auto cycle=quiet_queen_cycle(body);
+    if (!cycle.empty()) return {cycle.front()};
+    int horizon=std::min(12,std::max(0,499-game->get_round_num()));
+    auto base_body=body;std::vector<Position> base_eaten;
+    int baseline_depth=queen_body_step(base_body,base_eaten,baseline,0,true)
+        ? moving_queen_depth(base_body,base_eaten,horizon) : -1;
+    if (baseline_depth==horizon) return {};
+    int best_depth=baseline_depth;
+    std::vector<Direction> best;
+    for (Direction direction:Direction::get_direction_list()) {
+        auto next_body=body;std::vector<Position> eaten;
+        if (!queen_body_step(next_body,eaten,direction,0,true)) continue;
+        int depth=moving_queen_depth(next_body,eaten,horizon);
+        if (depth>best_depth) {best_depth=depth;best={direction};}
+    }
+    if (best_depth==horizon || ct->get_length()<3 || ct->get_length()>12) return best;
+    int free_steps=(ct->get_length()+3)/4;
+    struct Route {std::vector<Position> body,eaten;std::vector<Direction> moves;};
+    std::deque<Route> queue{{body,{},{}}};
+    while (!queue.empty()) {
+        Route route=std::move(queue.front());queue.pop_front();
+        if (static_cast<int>(route.moves.size())==free_steps+1) {
+            int depth=moving_queen_depth(route.body,route.eaten,horizon);
+            if (depth>best_depth) {best_depth=depth;best=route.moves;}
+            continue;
+        }
+        for (Direction direction:Direction::get_direction_list()) {
+            auto next_body=route.body;auto eaten=route.eaten;
+            int cost=static_cast<int>(route.moves.size())>=free_steps ? 1 : 0;
+            if (!queen_body_step(next_body,eaten,direction,cost,true) || !eaten.empty()) continue;
+            auto moves=route.moves;moves.push_back(direction);
+            queue.push_back({std::move(next_body),std::move(eaten),std::move(moves)});
+        }
+    }
+    return best;
+}
+
 void execute_turn() {
+    if (!dynamic_queen_classified) {
+        dynamic_queen_classified=true;
+        dynamic_queen_map=ct->get_id()<2 && game->width==64 && game->height==64 && ct->get_unit_count()==10;
+    }
     update_target_memory(*ct, *game);
     history.push_back(ct->get_position());
     // A capped 256-step history stops protecting long dragons from revisiting
@@ -768,9 +1392,17 @@ void execute_turn() {
         return;
     }
     int target_population = special_pressure_active(*ct, *game) ? special_population_target(*game) : population_target(*ct, *game);
-    int planned = split_size(target_population); if (planned) { ct->do_split(planned); relay_target(true); return; }
+    int planned = split_size(target_population); if (planned) { ct->do_split(planned); ++parent_split_count; relay_target(true); return; }
+    if (vision_weight(*game) > 0) vision_target_bonuses = visible_target_scores(*ct, *game);
+    else vision_target_bonuses.fill(0);
     Direction best = ct->get_dir(); int best_score = INT_MIN_SCORE;
     for (Direction direction : Direction::get_direction_list()) { int score = score_move(direction); if (score > best_score) { best = direction; best_score = score; } }
+    auto escape=dynamic_queen_escape(best);
+    if (!escape.empty()) {
+        Position position=ct->get_position();
+        for (std::size_t i=0;i+1<escape.size();++i) {position=position.add_dir(escape[i]);history.push_back(position);}
+        ct->make_moves(escape);relay_target(true);return;
+    }
     bool attack_step = favourable_head_attack(*ct, *game, ct->get_position().add_dir(best));
     if (best_score != INT_MIN_SCORE && !safe_step(*ct, *game, ct->get_position(), best, false, attack_step)) best_score = INT_MIN_SCORE;
     if (best_score == INT_MIN_SCORE) {
@@ -797,6 +1429,7 @@ void execute_turn() {
         if (emergency_score == INT_MIN_SCORE && game->get_round_num() < 500 &&
             ct->get_unit_count() < game->unit_limit && ct->can_split(2)) {
             ct->do_split(2);
+            ++parent_split_count;
             relay_target(true);
             return;
         }
@@ -818,7 +1451,17 @@ void execute_turn() {
     // replaces its length cost with a pearl. Larger maps keep the tested
     // one-step behavior; the same sprint rule hurt there in matchup tests.
     bool sprint = game->width * game->height <= 144 && ct->get_length() >= 4 && safe_sprint(best, 2);
-    if (sprint) ct->make_moves({best, best}); else ct->make_move(best);
+    std::vector<Direction> route;
+    if constexpr (FREE_PEARL_SPRINT > 0) {
+        if (FREE_PEARL_SPRINT == 1 || ct->get_id() < 2) route = free_pearl_route(best);
+    }
+    if (!route.empty()) {
+        Position position = ct->get_position();
+        for (std::size_t i = 0; i + 1 < route.size(); ++i) {
+            position = position.add_dir(route[i]); history.push_back(position);
+        }
+        ct->make_moves(route);
+    } else if (sprint) ct->make_moves({best, best}); else ct->make_move(best);
     relay_target(best_score != INT_MIN_SCORE && safe_step(*ct, *game, ct->get_position(), best));
 }
 
@@ -828,4 +1471,5 @@ int main() {
     reset_target_state();
     auto [controller, game_state] = unswbc::init();
     while (unswbc::update(controller, game_state)) { execute_turn(); unswbc::end_turn(); }
+    return 0;
 }

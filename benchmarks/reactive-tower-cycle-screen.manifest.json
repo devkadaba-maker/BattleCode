@@ -1,0 +1,25 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/reactive-tower-cycle/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/champion-reactive/.unswbc-build/bot"
+  ],
+  "maps": [
+    "tower_defense"
+  ],
+  "seeds": [
+    10585,
+    10586,
+    10587,
+    10588,
+    10589
+  ],
+  "games": 10,
+  "sha256": {
+    ".experiments/reactive-tower-cycle/.unswbc-build/bot": "50a7c2893b7037b9846b0cfef7dd9a702f888bb4cb5afd571c8d0689a2c85455",
+    ".experiments/champion-reactive/.unswbc-build/bot": "e790e2ab49da5dda35397ceb5973712735cb16a79c01de3f02907ba5ee525bec"
+  },
+  "explicit_endturn": true
+}

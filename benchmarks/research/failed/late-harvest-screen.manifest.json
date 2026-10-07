@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/lateharvest1/.unswbc-build/bot",
+    ".experiments/lateharvest2/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/lateharvest0/.unswbc-build/bot"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    10045
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/lateharvest1/.unswbc-build/bot": "2393b6f8f5980eba844b5bdbb09c4bfad04320080cafb63fc0a9c639d2e1c6d1",
+    ".experiments/lateharvest2/.unswbc-build/bot": "fb49f0b118d7979f04f2ca9d5d5855b624eee73acd866f1dd21f0d7ada43f3a8",
+    ".experiments/lateharvest0/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

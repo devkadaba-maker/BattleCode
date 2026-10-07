@@ -1,0 +1,134 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index f5470dd..9f31280 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -41,6 +41,9 @@ namespace {
+ #ifndef FRIENDLY_PRIORITY_CLAIM_PENALTY
+ #define FRIENDLY_PRIORITY_CLAIM_PENALTY 0
+ #endif
++#ifndef PEARL_CLAIM_PERCENT
++#define PEARL_CLAIM_PERCENT 100
++#endif
+ 
+ int parent_split_count = 0;
+ std::array<int, 4> vision_target_bonuses{};
+@@ -466,6 +469,23 @@ bool visible_pearl_near(Controller const& controller, Game const& game_state, Po
+     return false;
+ }
+ 
++#if PEARL_CLAIM_PERCENT < 100
++// Assign each visible pearl to the closest friendly head. Stable lower-ID
++// tie-breaking keeps nearby collectors from all choosing the same food.
++bool pearl_claimed_by_friend(Controller const& controller, Game const& game_state, Position pearl) {
++    int our_distance = distance(controller.get_position(), pearl, game_state);
++    for (auto const& tile : controller.get_tiles()) {
++        auto const* dragon = tile.get_dragon();
++        if (!dragon || !dragon->is_head() || dragon->get_team() != controller.get_team() ||
++            dragon->get_id() == controller.get_id()) continue;
++        int their_distance = distance(dragon->get_position(), pearl, game_state);
++        if (their_distance < our_distance ||
++            (their_distance == our_distance && dragon->get_id() < controller.get_id())) return true;
++    }
++    return false;
++}
++#endif
++
+ bool has_enemy_near(Controller const& controller, Game const& game_state, Position centre, int radius) {
+     for (auto const& tile : controller.get_tiles()) {
+         auto const* dragon = tile.get_dragon();
+@@ -512,6 +532,10 @@ int pearl_value(Controller const& controller, Game const& game_state, Position s
+     for (auto const& tile : controller.get_tiles()) if (tile.has_pearl()) {
+         int d = distance(start, tile.get_position(), game_state), candidate = std::max(0, 100 - d * 10);
+         if (tile.get_pearl_time() <= 2 && d <= 3) candidate += 30;
++#if PEARL_CLAIM_PERCENT < 100
++        if (pearl_claimed_by_friend(controller, game_state, tile.get_position()))
++            candidate = candidate * PEARL_CLAIM_PERCENT / 100;
++#endif
+         value = std::max(value, candidate);
+     }
+     return value;
+@@ -530,7 +554,12 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
+         }
+         int approach = std::max(0, 12 - distance(start, centre.get_position(), game_state));
+         int imminent = centre.get_pearl_time() <= 2 ? 24 : 0;
+-        best = std::max(best, cluster * 70 + approach * 8 + imminent);
++        int candidate = cluster * 70 + approach * 8 + imminent;
++#if PEARL_CLAIM_PERCENT < 100
++        if (pearl_claimed_by_friend(controller, game_state, centre.get_position()))
++            candidate = candidate * PEARL_CLAIM_PERCENT / 100;
++#endif
++        best = std::max(best, candidate);
+     }
+     return best;
+ }
+@@ -652,8 +681,13 @@ int visible_target_value(Controller const& controller, Game const& game_state,
+     }
+     int congestion = friendly_pressure(controller, game_state, target.get_position()) +
+         enemy_pressure(controller, game_state, target.get_position()) * 2;
+-    return food + pocket + congestion - (4 - exits) * 45 -
++    int value = food + pocket + congestion - (4 - exits) * 45 -
+         (exits <= 1 ? 220 : 0) - arrival_steps * 95;
++#if PEARL_CLAIM_PERCENT < 100
++    if (pearl_claimed_by_friend(controller, game_state, target.get_position()))
++        value = value * PEARL_CLAIM_PERCENT / 100;
++#endif
++    return value;
+ }
+ 
+ std::array<int, 4> visible_target_scores(Controller const& controller, Game const& game_state) {
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 08a2816..c9072a1 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -24,6 +24,7 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
+ parser.add_argument('--large-population-target', type=int)
+ parser.add_argument('--friendly-head-destination-penalty', type=int)
+ parser.add_argument('--friendly-priority-claim-penalty', type=int)
++parser.add_argument('--pearl-claim-percent', type=int)
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -34,6 +35,8 @@ if args.friendly_head_destination_penalty is not None and args.friendly_head_des
+     parser.error('--friendly-head-destination-penalty must be non-negative')
+ if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
+     parser.error('--friendly-priority-claim-penalty must be non-negative')
++if args.pearl_claim_percent is not None and not 0 <= args.pearl_claim_percent <= 100:
++    parser.error('--pearl-claim-percent must be between 0 and 100')
+ destination = ROOT / '.experiments' / args.name
+ destination.mkdir(parents=True, exist_ok=True)
+ if args.ref:
+@@ -46,6 +49,7 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
+ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
++defines['PEARL_CLAIM_PERCENT'] = args.pearl_claim_percent
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):
+diff --git a/tests/vision_target_smoke.cpp b/tests/vision_target_smoke.cpp
+index 0f93b02..13227e5 100644
+--- a/tests/vision_target_smoke.cpp
++++ b/tests/vision_target_smoke.cpp
+@@ -64,6 +64,22 @@ int main() {
+     assert(lower_id_friendly_claims(controller, Position(3,4)) == 0);
+     neighbour->dragon_part.reset();
+ 
++#if PEARL_CLAIM_PERCENT < 100
++    // Visible pearls belong to the nearest friendly head, with lower ID
++    // breaking equal-distance ties. Enemies never claim our food.
++    Position claimed_pearl(4,2);
++    neighbour = controller.get_tile(Position(3,2));
++    neighbour->dragon_part = DragonPart(Position(3,2),6,Team(Team::A),Direction::EAST,true);
++    assert(pearl_claimed_by_friend(controller, scenario, claimed_pearl));
++    neighbour->dragon_part = DragonPart(Position(3,3),2,Team(Team::A),Direction::EAST,true);
++    assert(pearl_claimed_by_friend(controller, scenario, claimed_pearl));
++    neighbour->dragon_part = DragonPart(Position(3,3),6,Team(Team::A),Direction::EAST,true);
++    assert(!pearl_claimed_by_friend(controller, scenario, claimed_pearl));
++    neighbour->dragon_part = DragonPart(Position(3,2),2,Team(Team::B),Direction::EAST,true);
++    assert(!pearl_claimed_by_friend(controller, scenario, claimed_pearl));
++    neighbour->dragon_part.reset();
++#endif
++
+     // Repeated turns increment the individual parent's counter, then move.
+     reset_target_state(); history.clear();
+     std::ostringstream output;

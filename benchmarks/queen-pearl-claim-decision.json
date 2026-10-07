@@ -1,0 +1,81 @@
+{
+  "experiment": "visible-queen pearl priority",
+  "status": "rejected at screening; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Because queen length is the first round-limit score component, ordinary collectors could yield only a specifically contested visible pearl to a friendly queen without imposing the previously rejected nearest-friendly ownership rule on every teammate.",
+  "matrix": "queen-pearl-claim-screen.jsonl",
+  "manifest": "queen-pearl-claim-screen.manifest.json",
+  "seed": 10049,
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "both_sides": true,
+  "residual_25_percent": {
+    "native_sha256": "3b1e4d4c270e5a2c2255de5bbb0c4b6dd5350364b95aff149cc68a5240f9992b",
+    "wins": 7,
+    "losses": 9,
+    "draws": 0,
+    "score_percent": 43.75,
+    "decisive_wilson95": [23.10, 66.82],
+    "mean_candidate_minus_champion": {
+      "queen_length": -1.375,
+      "longest_length": -0.812,
+      "total_length": -29.312,
+      "dragons": -4.0
+    },
+    "serious_map_results": {
+      "big_empty": "0-2",
+      "queen_of_spades": "0-2"
+    }
+  },
+  "residual_0_percent": {
+    "native_sha256": "8997cd9f2d205e92957301b76dc51593fa8e7eb86a0433a11fca02488f670b78",
+    "wins": 6,
+    "losses": 10,
+    "draws": 0,
+    "score_percent": 37.5,
+    "decisive_wilson95": [18.48, 61.36],
+    "mean_candidate_minus_champion": {
+      "queen_length": -1.688,
+      "longest_length": -0.688,
+      "total_length": -0.5,
+      "dragons": -0.25
+    },
+    "serious_map_results": {
+      "big_empty": "0-2",
+      "schooltime": "0-2",
+      "queen_of_spades": "0-2"
+    }
+  },
+  "decision": "Both candidates underperformed, including the intended queen-length proxy. Neither advances to confirmation, fresh all-map validation, diverse opponents or judge sandbox.",
+  "verification": {
+    "record_check": "passed: 32 complete unique valid fault-free games",
+    "smoke_test": "passed: only a friendly visible queen can claim a contested pearl",
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "fresh_all_map_gate": "not run after negative screen",
+    "diverse_opponents": "not run after negative screen",
+    "judge_sandbox": "not run after negative screen"
+  },
+  "accepted_record_total": 3125,
+  "failed_diagnostic_total": 448,
+  "failed_invalid_game_total": 42,
+  "new_seen_seeds": [10049],
+  "reproduction": {
+    "base_commit": "d841e1d49cdf98b4e54fad35ef3b1b38352d4d47",
+    "patch": "research/queen-pearl-claim.patch",
+    "residual_25_build": "python scripts/build_variant.py queenclaim25 --queen-pearl-claim-percent 25 --compile",
+    "residual_0_build": "python scripts/build_variant.py queenclaim0 --queen-pearl-claim-percent 0 --compile"
+  },
+  "local_results_are_measured_elo": false
+}

@@ -1,0 +1,35 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index fa6b132..1067819 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -88,0 +89,3 @@ namespace {
++#ifndef NEW_CHILD_CLEARANCE_WEIGHT
++#define NEW_CHILD_CLEARANCE_WEIGHT 0
++#endif
+@@ -692,0 +696,10 @@ int special_friendly_pressure(Controller const& controller, Game const& game_sta
++#if NEW_CHILD_CLEARANCE_WEIGHT > 0
++int new_child_clearance_adjustment(Controller const& controller, Game const& game_state,
++                                   Position target, bool special) {
++    if (controller.get_id() < 2 || history.size() != 1) return 0;
++    int pressure = special ? special_friendly_pressure(controller, game_state, target) :
++                             friendly_pressure(controller, game_state, target);
++    return pressure * NEW_CHILD_CLEARANCE_WEIGHT;
++}
++#endif
++
+@@ -916,0 +930,3 @@ int score_move(Direction direction) {
++#if NEW_CHILD_CLEARANCE_WEIGHT > 0
++    score += new_child_clearance_adjustment(controller, game_state, target, special);
++#endif
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 45f2c07..bdc5840 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -44,0 +45,2 @@ parser.add_argument('--flagship-border-extra-penalty', type=int,
++parser.add_argument('--new-child-clearance-weight', type=int,
++                    help='extra friendly-pressure multiplier on a new child first move (default: 0)')
+@@ -78,0 +81,2 @@ if args.flagship_border_extra_penalty is not None and args.flagship_border_extra
++if args.new_child_clearance_weight is not None and args.new_child_clearance_weight < 0:
++    parser.error('--new-child-clearance-weight must be non-negative')
+@@ -105,0 +110 @@ defines['FLAGSHIP_BORDER_EXTRA_PENALTY'] = args.flagship_border_extra_penalty
++defines['NEW_CHILD_CLEARANCE_WEIGHT'] = args.new_child_clearance_weight

@@ -1,0 +1,93 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index f5470dd..be44c1e 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -41,6 +41,9 @@ namespace {
+ #ifndef FRIENDLY_PRIORITY_CLAIM_PENALTY
+ #define FRIENDLY_PRIORITY_CLAIM_PENALTY 0
+ #endif
++#ifndef TACTICAL_HUNTER_MODULO
++#define TACTICAL_HUNTER_MODULO 0
++#endif
+ 
+ int parent_split_count = 0;
+ std::array<int, 4> vision_target_bonuses{};
+@@ -254,9 +257,17 @@ Role special_pressure_role(Controller const& controller, Game const& game_state)
+ }
+ 
+ Role movement_role(Controller const& controller, Game const& game_state, bool special) {
+-    (void)controller;
+-    (void)game_state;
+-    (void)special;
++#if TACTICAL_HUNTER_MODULO > 0
++    if (!special && controller.get_id() >= 2 && controller.get_length() < 16 &&
++        controller.get_unit_count() >= population_target(controller, game_state) &&
++        role_hash(controller.get_id()) % TACTICAL_HUNTER_MODULO == 0) {
++        for (auto const& tile : controller.get_tiles()) {
++            auto const* dragon = tile.get_dragon();
++            if (dragon && dragon->is_head() && dragon->get_team() != controller.get_team())
++                return Role::HUNTER;
++        }
++    }
++#endif
+     return Role::COLLECTOR;
+ }
+ 
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 08a2816..4ba4403 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -24,6 +24,7 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
+ parser.add_argument('--large-population-target', type=int)
+ parser.add_argument('--friendly-head-destination-penalty', type=int)
+ parser.add_argument('--friendly-priority-claim-penalty', type=int)
++parser.add_argument('--tactical-hunter-modulo', type=int)
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -34,6 +35,8 @@ if args.friendly_head_destination_penalty is not None and args.friendly_head_des
+     parser.error('--friendly-head-destination-penalty must be non-negative')
+ if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
+     parser.error('--friendly-priority-claim-penalty must be non-negative')
++if args.tactical_hunter_modulo is not None and args.tactical_hunter_modulo < 0:
++    parser.error('--tactical-hunter-modulo must be non-negative')
+ destination = ROOT / '.experiments' / args.name
+ destination.mkdir(parents=True, exist_ok=True)
+ if args.ref:
+@@ -46,6 +49,7 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
+ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
++defines['TACTICAL_HUNTER_MODULO'] = args.tactical_hunter_modulo
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):
+diff --git a/tests/vision_target_smoke.cpp b/tests/vision_target_smoke.cpp
+index 0f93b02..0a54e7a 100644
+--- a/tests/vision_target_smoke.cpp
++++ b/tests/vision_target_smoke.cpp
+@@ -64,6 +64,24 @@ int main() {
+     assert(lower_id_friendly_claims(controller, Position(3,4)) == 0);
+     neighbour->dragon_part.reset();
+ 
++#if TACTICAL_HUNTER_MODULO > 0
++    // Only a deterministic non-flagship subset becomes tactical hunters, and
++    // only after reaching the population target with an enemy head visible.
++    controller.unit_count = population_target(controller, scenario);
++    controller.head.dragon_id = 2;
++    while (role_hash(controller.get_id()) % TACTICAL_HUNTER_MODULO != 0 ||
++           role_hash(controller.get_id()) % population_target(controller, scenario) < flagship_target(scenario) - 1)
++        ++controller.head.dragon_id;
++    neighbour = controller.get_tile(Position(2,3));
++    neighbour->dragon_part = DragonPart(Position(2,3),7,Team(Team::B),Direction::EAST,true);
++    assert(movement_role(controller, scenario, false) == Role::HUNTER);
++    assert(movement_role(controller, scenario, true) == Role::COLLECTOR);
++    neighbour->dragon_part.reset();
++    assert(movement_role(controller, scenario, false) == Role::COLLECTOR);
++    controller.head.dragon_id = 4;
++    controller.unit_count = 1;
++#endif
++
+     // Repeated turns increment the individual parent's counter, then move.
+     reset_target_state(); history.clear();
+     std::ostringstream output;

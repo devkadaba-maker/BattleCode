@@ -1,0 +1,87 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index d5764d7..c66fc3d 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -53,6 +53,9 @@ namespace {
+ #ifndef RECENT_REGION_PENALTY
+ #define RECENT_REGION_PENALTY 0
+ #endif
++#ifndef TRAUMA_FLAGSHIP_PEARL_WEIGHT
++#define TRAUMA_FLAGSHIP_PEARL_WEIGHT 8
++#endif
+ #ifndef QUEEN_HUNT
+ #define QUEEN_HUNT 0
+ #endif
+@@ -123,6 +126,7 @@ std::unordered_map<int, int> portal_uses;
+ int last_portal_round = -10000;
+ const Game* role_map_game = nullptr;
+ std::optional<bool> role_map_colosseum;
++std::optional<bool> role_map_trauma;
+ int special_pressure_sample_round = -1, special_pressure_sample_count = 0, special_pressure_visible_sum = 0;
+ bool special_pressure_enabled = false;
+ 
+@@ -237,6 +241,18 @@ bool colosseum_like(Controller const& controller, Game const& game_state) {
+     return *role_map_colosseum;
+ }
+ 
++bool trauma_like(Controller const& controller, Game const& game_state) {
++    if (role_map_game == &game_state && role_map_trauma.has_value()) return *role_map_trauma;
++    if (game_state.width != 48 || game_state.height != 24 || controller.get_id() >= 2) {
++        role_map_trauma = false;
++        return false;
++    }
++    int visible_pearls = 0;
++    for (auto const& tile : controller.get_tiles()) if (tile.has_pearl()) ++visible_pearls;
++    role_map_trauma = visible_pearls == 0;
++    return *role_map_trauma;
++}
++
+ int population_target(Controller const& controller, Game const& game_state) {
+     if (game_state.width * game_state.height <= 300 && colosseum_like(controller, game_state))
+         return std::min(game_state.unit_limit, 40);
+@@ -758,6 +774,7 @@ void reset_target_state() {
+     last_relay_round = -10000;
+     role_map_game = nullptr;
+     role_map_colosseum.reset();
++    role_map_trauma.reset();
+     special_pressure_sample_round = -1;
+     special_pressure_sample_count = 0;
+     special_pressure_visible_sum = 0;
+@@ -858,7 +875,7 @@ int score_move(Direction direction) {
+     // Keep the four-to-five tiebreak flagships collecting pearls in every
+     // phase; only smaller dragons switch fully to hunting at the cap.
+     if (flagship) {
+-        pearl_weight = 8;
++        pearl_weight = trauma_like(controller, game_state) ? TRAUMA_FLAGSHIP_PEARL_WEIGHT : 8;
+         chase_weight = 0;
+     }
+     int score = area * 12 + future_mobility * 12;
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index ccd6484..e780866 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -24,6 +24,7 @@ parser.add_argument('--child-split-limit', type=int)
+ parser.add_argument('--planned-split-min-length', type=int)
+ parser.add_argument('--split-visible-pearl-requirement', type=int)
+ parser.add_argument('--recent-region-penalty', type=int)
++parser.add_argument('--trauma-flagship-pearl-weight', type=int)
+ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
+ parser.add_argument('--large-population-target', type=int)
+ parser.add_argument('--friendly-head-destination-penalty', type=int)
+@@ -50,6 +51,8 @@ if args.split_visible_pearl_requirement is not None and args.split_visible_pearl
+     parser.error('--split-visible-pearl-requirement must be non-negative')
+ if args.recent_region_penalty is not None and args.recent_region_penalty < 0:
+     parser.error('--recent-region-penalty must be non-negative')
++if args.trauma_flagship_pearl_weight is not None and args.trauma_flagship_pearl_weight < 0:
++    parser.error('--trauma-flagship-pearl-weight must be non-negative')
+ if args.friendly_head_destination_penalty is not None and args.friendly_head_destination_penalty < 0:
+     parser.error('--friendly-head-destination-penalty must be non-negative')
+ if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
+@@ -71,6 +74,7 @@ defines['CHILD_SPLIT_LIMIT'] = args.child_split_limit
+ defines['PLANNED_SPLIT_MIN_LENGTH'] = args.planned_split_min_length
+ defines['SPLIT_VISIBLE_PEARL_REQUIREMENT'] = args.split_visible_pearl_requirement
+ defines['RECENT_REGION_PENALTY'] = args.recent_region_penalty
++defines['TRAUMA_FLAGSHIP_PEARL_WEIGHT'] = args.trauma_flagship_pearl_weight
+ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty

@@ -1,0 +1,18 @@
+{
+  "seed": 2323,
+  "maps_checked": 21,
+  "candidate_games_checked": 42,
+  "fields": [
+    "result",
+    "deaths",
+    "queen_deaths",
+    "peak_population",
+    "faults",
+    "notices"
+  ],
+  "mismatches": [],
+  "sha256": {
+    "benchmarks/weakhold-routing-regression.jsonl": "8c458fc46ee86ea1532b8534653c22ef47c838fad039b746af38b2933d8b0c0d",
+    "benchmarks/champion-selfplay-control.jsonl": "ed5c9970fece9e1f3edc9cb31e550f8cd2a203e2d542f3e417750860bc160687"
+  }
+}

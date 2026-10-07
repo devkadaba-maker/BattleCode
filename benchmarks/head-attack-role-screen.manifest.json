@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/attack-role-queen/.unswbc-build/bot",
+    ".experiments/attack-role-worker/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/attack-role-all/.unswbc-build/bot"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    9898
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/attack-role-queen/.unswbc-build/bot": "d06d24347dec8cdb2e9598853fb74b18f0567a7b3b7bc27f7490d1ad9c5c6319",
+    ".experiments/attack-role-worker/.unswbc-build/bot": "dd1cdfd1b028cdbf05c17cb61feb784244812b904211c0194eb5b72fcc1aab69",
+    ".experiments/attack-role-all/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

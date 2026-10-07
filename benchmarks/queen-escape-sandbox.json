@@ -1,0 +1,35 @@
+{
+  "toolkit": "unswbc 1.2.9",
+  "map": "unsw",
+  "seed": 3838,
+  "sandbox": true,
+  "candidate": {
+    "project": ".experiments/escape-long",
+    "queen_escape_weight": 4000,
+    "queen_escape_rounds": 500,
+    "queen_escape_scope": 1,
+    "sha256": "cc8f3b713dbee3a9a87dc7d273ee867405c3c6137c2d8a944310a1ecc156b3b9"
+  },
+  "opponent": {
+    "project": ".experiments/champion43",
+    "commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+    "sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  },
+  "result": "candidate A won after 500 rounds; longest dragon 16 vs 14",
+  "candidate_points_per_turn": {
+    "p50": 5300000,
+    "p99": 21900000,
+    "mean": 6500000,
+    "max": 24500000,
+    "turns": 26198
+  },
+  "opponent_points_per_turn": {
+    "p50": 5200000,
+    "p99": 22800000,
+    "mean": 6300000,
+    "max": 24100000,
+    "turns": 25177
+  },
+  "cpu_limit": 100000000,
+  "promotion_evidence": false
+}

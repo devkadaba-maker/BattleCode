@@ -1,0 +1,69 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index f5470dd..83b0a6a 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -41,6 +41,9 @@ namespace {
+ #ifndef FRIENDLY_PRIORITY_CLAIM_PENALTY
+ #define FRIENDLY_PRIORITY_CLAIM_PENALTY 0
+ #endif
++#ifndef FUTURE_ROUTE_SLACK
++#define FUTURE_ROUTE_SLACK -1
++#endif
+ 
+ int parent_split_count = 0;
+ std::array<int, 4> vision_target_bonuses{};
+@@ -484,6 +487,10 @@ int visible_pearl_route_distance(Controller const& controller, Game const& game_
+         auto const* tile = controller.get_tile(current);
+         if (!tile) continue;
+         if (tile->has_pearl()) return steps;
++#if FUTURE_ROUTE_SLACK >= 0
++        int timer = tile->get_pearl_time();
++        if (timer >= 0 && timer <= steps + FUTURE_ROUTE_SLACK) return steps;
++#endif
+         for (Direction direction : Direction::get_direction_list()) {
+             auto const& edge = tile->get_edge(direction);
+             if (!edge.is_passable() || edge.is_portal() ||
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index 08a2816..8aa8be8 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -24,6 +24,7 @@ parser.add_argument('--queen-hunt', type=int, choices=[0,1])
+ parser.add_argument('--large-population-target', type=int)
+ parser.add_argument('--friendly-head-destination-penalty', type=int)
+ parser.add_argument('--friendly-priority-claim-penalty', type=int)
++parser.add_argument('--future-route-slack', type=int)
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -34,6 +35,8 @@ if args.friendly_head_destination_penalty is not None and args.friendly_head_des
+     parser.error('--friendly-head-destination-penalty must be non-negative')
+ if args.friendly_priority_claim_penalty is not None and args.friendly_priority_claim_penalty < 0:
+     parser.error('--friendly-priority-claim-penalty must be non-negative')
++if args.future_route_slack is not None and args.future_route_slack < -1:
++    parser.error('--future-route-slack must be -1 or greater')
+ destination = ROOT / '.experiments' / args.name
+ destination.mkdir(parents=True, exist_ok=True)
+ if args.ref:
+@@ -46,6 +49,7 @@ defines = {'PARENT_SPLIT_LIMIT':args.split_limit, 'VISION_TARGET_WEIGHT':args.vi
+ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
++defines['FUTURE_ROUTE_SLACK'] = args.future_route_slack
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):
+diff --git a/tests/vision_target_smoke.cpp b/tests/vision_target_smoke.cpp
+index 0f93b02..f0aad2c 100644
+--- a/tests/vision_target_smoke.cpp
++++ b/tests/vision_target_smoke.cpp
+@@ -27,6 +27,10 @@ int main() {
+     controller.get_tile(Position(6,4))->pearl_time = 1;
+     auto values = visible_target_scores(controller, scenario);
+     assert(values[direction_index(Direction::EAST)] > values[direction_index(Direction::WEST)]);
++#if FUTURE_ROUTE_SLACK >= 0
++    assert(visible_pearl_route_distance(controller, scenario, controller.get_position()) == 2);
++    assert(pearl_drive(controller, scenario, Position(5,4)) > 0);
++#endif
+ 
+     // A target fully enclosed by kelp contributes no reachable reward.
+     controller.get_tile(Position(6,4))->edges.fill(Edge(false, EdgeType::KELP));

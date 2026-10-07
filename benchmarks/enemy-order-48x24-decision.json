@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-06",
+  "decision": "reject_48x24_scope",
+  "active_champion_commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+  "active_champion_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "hypothesis": "Extend the proven Schooltime move-order-aware enemy-heading rule to the official 48x24 geometry family, where the rejected broad candidate had previously scored 9-3 across Maze, Stronghold and Trauma.",
+  "selection_only_evidence": {
+    "source": "benchmarks/enemy-order-fresh-gate.jsonl",
+    "seeds": [7676, 7777],
+    "games": 12,
+    "wins": 9,
+    "losses": 3,
+    "draws": 0,
+    "note": "Seen broad-policy games selected the scope and are not promotion evidence."
+  },
+  "frozen_candidate": {
+    "build_flag": "--enemy-heading-order-aware 3",
+    "native_sha256": "2eab6f189dfa5695de0e93384f4da3376d9bb19854b16cc86269916c7dae0060",
+    "maps_changed": ["maze", "stronghold", "trauma", "schooltime"],
+    "schooltime_behavior": "Identical to the active champion's already-promoted scoped rule."
+  },
+  "fresh_scoped_validation": {
+    "record": "benchmarks/enemy-order-48x24-fresh.jsonl",
+    "seeds": [10015, 10016, 10017, 10018, 10019],
+    "maps": ["maze", "stronghold", "trauma"],
+    "games": 30,
+    "wins": 14,
+    "losses": 16,
+    "draws": 0,
+    "score_percent": 46.67,
+    "decisive_wilson_95_percent": [30.23, 63.86],
+    "runtime_or_invalid_faults": 0,
+    "per_map": {
+      "maze": "4-6",
+      "stronghold": "5-5",
+      "trauma": "5-5"
+    }
+  },
+  "followup_gates": {
+    "unaffected_controls": "not run after failed scoped validation",
+    "diverse_opponents": "not run after failed scoped validation",
+    "judge_sandbox": "not run after failed scoped validation"
+  },
+  "production_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "accepted_matrix_records_after_iteration": 2711,
+  "failed_diagnostic_rows_after_iteration": 320,
+  "failed_diagnostic_invalid_actions_after_iteration": 20,
+  "note": "The new-seed result reversed the selected 9-3 signal. The Schooltime-only champion remains active; these local games are not Elo measurements."
+}

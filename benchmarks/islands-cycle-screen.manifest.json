@@ -1,0 +1,25 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/islands-cycle/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/champion-next/.unswbc-build/bot"
+  ],
+  "maps": [
+    "islands"
+  ],
+  "seeds": [
+    10580,
+    10581,
+    10582,
+    10583,
+    10584
+  ],
+  "games": 10,
+  "sha256": {
+    ".experiments/islands-cycle/.unswbc-build/bot": "dd2a59af446ab05e6022946504adee0e1871b514ea0330b80f34d3f9984d5d46",
+    ".experiments/champion-next/.unswbc-build/bot": "e790e2ab49da5dda35397ceb5973712735cb16a79c01de3f02907ba5ee525bec"
+  },
+  "explicit_endturn": true
+}

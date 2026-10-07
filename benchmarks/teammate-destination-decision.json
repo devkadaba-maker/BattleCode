@@ -1,0 +1,104 @@
+{
+  "decision": "retain champion; friendly straight-head destination avoidance passed tuning but failed fresh all-map validation",
+  "champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "champion_native_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "hypothesis": "penalizing a square that a visible friendly head is currently pointing toward may reduce teammate head collisions and congestion",
+  "policy": "count only friendly heads other than self whose current straight-ahead destination equals the candidate move; do not forecast turns or enemy heads",
+  "tuning": {
+    "records": "teammate-destination-screen.jsonl",
+    "seed": 6161,
+    "maps": [
+      "arena",
+      "default_small",
+      "default",
+      "big_empty",
+      "schooltime",
+      "trophy",
+      "Colosseum",
+      "queen_of_spades"
+    ],
+    "both_sides": true,
+    "variants": {
+      "penalty240": {
+        "native_sha256": "234f45e341c53a5715178a672b7855e1ef368569c580683ab1fe431f6c7a05ba",
+        "outcomes": {
+          "win": 10,
+          "loss": 6,
+          "draw": 0
+        },
+        "score_percent": 62.5
+      },
+      "penalty720": {
+        "native_sha256": "9ecaffb11867cfd16bdbe33af4d130d81bfbdf0ae9a0b7bb5f6464bba9ee6296",
+        "outcomes": {
+          "win": 11,
+          "loss": 5,
+          "draw": 0
+        },
+        "score_percent": 68.75
+      }
+    },
+    "selected_for_validation": "penalty720"
+  },
+  "fresh_validation": {
+    "records": "teammate-destination-validation.jsonl",
+    "seeds": [
+      6262,
+      6363
+    ],
+    "all_22_official_maps": true,
+    "both_sides": true,
+    "games": 88,
+    "outcomes": {
+      "win": 40,
+      "loss": 44,
+      "draw": 4
+    },
+    "score_percent": 47.72727272727273,
+    "decisive_wilson95_percent": [
+      37.28,
+      58.17
+    ],
+    "invalid_or_runtime_faults": 0,
+    "candidate_head_deaths": 4292,
+    "champion_head_deaths": 4762,
+    "candidate_total_deaths": 15522,
+    "champion_total_deaths": 16685,
+    "mean_final_total_length_delta": 3.772727272727273,
+    "mean_final_longest_delta": -0.875,
+    "interpretation": "the candidate reduced aggregate head and total deaths and slightly improved total length, but lost more games and reduced mean longest-dragon advantage"
+  },
+  "promotion_gate": {
+    "passed": false,
+    "fresh_score_requirement_met": false,
+    "wilson_lower_requirement_met": false,
+    "diverse_opponents_run": false,
+    "judge_sandbox_run": false,
+    "reason": "fresh champion comparison failed before later gates"
+  },
+  "reproducibility": {
+    "build_flag": [
+      "--friendly-head-destination-penalty",
+      "720"
+    ],
+    "reproduced_binary_identical": true,
+    "default_build_identical_to_champion": true,
+    "smoke_test_passed": true
+  },
+  "corpus": {
+    "accepted_complete_valid_records_before": 1653,
+    "accepted_complete_valid_records_added": 120,
+    "accepted_complete_valid_records_after": 1773,
+    "failed_diagnostic_matrix_records": 64
+  },
+  "seen_seeds_added": [
+    6161,
+    6262,
+    6363
+  ],
+  "limitations": [
+    "aggregate death counts include strategic interactions between both policies and are descriptive rather than causal proof",
+    "the straight-ahead forecast does not know a teammate's scored choice or later turn",
+    "local games do not measure competition Elo"
+  ]
+}

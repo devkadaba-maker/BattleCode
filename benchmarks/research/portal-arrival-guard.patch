@@ -1,0 +1,93 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 62db418..a49fde0 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -44,6 +44,9 @@ namespace {
+ #ifndef ENEMY_HEADING_ORDER_AWARE
+ #define ENEMY_HEADING_ORDER_AWARE 2
+ #endif
++#ifndef PORTAL_ARRIVAL_GUARD
++#define PORTAL_ARRIVAL_GUARD 0
++#endif
+ 
+ int parent_split_count = 0;
+ std::array<int, 4> vision_target_bonuses{};
+@@ -96,7 +99,9 @@ std::vector<Position> history;
+ std::optional<TargetMemory> target_memory;
+ int enemy_memory_count = 0, enemy_memory_round = -10000, last_relay_round = -10000;
+ std::unordered_map<int, int> portal_uses;
++std::unordered_set<int> unsafe_portals;
+ int last_portal_round = -10000;
++int last_portal_id = -1;
+ const Game* role_map_game = nullptr;
+ std::optional<bool> role_map_colosseum;
+ int special_pressure_sample_round = -1, special_pressure_sample_count = 0, special_pressure_visible_sum = 0;
+@@ -731,7 +736,9 @@ void reset_target_state() {
+     special_pressure_visible_sum = 0;
+     special_pressure_enabled = false;
+     portal_uses.clear();
++    unsafe_portals.clear();
+     last_portal_round = -10000;
++    last_portal_id = -1;
+ }
+ 
+ bool recent_collision(Position target) {
+@@ -742,6 +749,9 @@ bool recent_collision(Position target) {
+ bool portal_allowed(Edge const& edge) {
+     if (!edge.is_portal()) return true;
+     if (game->get_round_num() == last_portal_round + 1) return false;
++    if constexpr (PORTAL_ARRIVAL_GUARD > 0) {
++        if (unsafe_portals.contains(edge.get_portal_id())) return false;
++    }
+     auto const uses = portal_uses.find(edge.get_portal_id());
+     return uses == portal_uses.end() || uses->second < PORTAL_USE_LIMIT;
+ }
+@@ -942,6 +952,17 @@ int split_size(int target) {
+ 
+ void execute_turn() {
+     update_target_memory(*ct, *game);
++    if constexpr (PORTAL_ARRIVAL_GUARD > 0) {
++        if (last_portal_id >= 0 && game->get_round_num() == last_portal_round + 1) {
++            Position arrival = ct->get_position();
++            bool unsafe = mobility(*ct, *game, arrival) < 2;
++            if constexpr (PORTAL_ARRIVAL_GUARD > 1) {
++                unsafe = unsafe || open_area(*ct, arrival) < 6 ||
++                    enemy_collision_risk(*ct, *game, arrival);
++            }
++            if (unsafe) unsafe_portals.insert(last_portal_id);
++        }
++    }
+     history.push_back(ct->get_position());
+     // A capped 256-step history stops protecting long dragons from revisiting
+     // older segments of their own body. Keep at least one full body-length.
+@@ -951,7 +972,8 @@ void execute_turn() {
+         auto const* here = ct->get_tile(ct->get_position());
+         if (here) {
+             last_portal_round = game->get_round_num();
+-            ++portal_uses[here->get_edge(*portal).get_portal_id()];
++            last_portal_id = here->get_edge(*portal).get_portal_id();
++            ++portal_uses[last_portal_id];
+         }
+         ct->make_move(*portal);
+         relay_target(true);
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index d59fd12..718a837 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -26,6 +26,8 @@ parser.add_argument('--friendly-head-destination-penalty', type=int)
+ parser.add_argument('--friendly-priority-claim-penalty', type=int)
+ parser.add_argument('--enemy-heading-order-aware', type=int, choices=[0,1,2],
+                     help='0 off, 1 all maps, 2 Schooltime 60x40 only')
++parser.add_argument('--portal-arrival-guard', type=int, choices=[0,1,2],
++                    help='0 off, 1 reject learned one-exit arrivals, 2 also reject cramped or enemy-pressured arrivals')
+ parser.add_argument('--compile', action='store_true', help='Build native executable using the installed C++ compiler')
+ args = parser.parse_args()
+ if not args.name.replace('-','').replace('_','').isalnum():
+@@ -49,6 +51,7 @@ defines['LARGE_POPULATION_TARGET'] = args.large_population_target
+ defines['FRIENDLY_HEAD_DESTINATION_PENALTY'] = args.friendly_head_destination_penalty
+ defines['FRIENDLY_PRIORITY_CLAIM_PENALTY'] = args.friendly_priority_claim_penalty
+ defines['ENEMY_HEADING_ORDER_AWARE'] = args.enemy_heading_order_aware
++defines['PORTAL_ARRIVAL_GUARD'] = args.portal_arrival_guard
+ prefix = ''.join(f'#define {key} {value}\n' for key,value in defines.items() if value is not None)
+ (destination/'main.cpp').write_text(prefix+source)
+ for name in ('helper.hpp','bot.toml'):

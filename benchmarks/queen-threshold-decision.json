@@ -1,0 +1,274 @@
+{
+  "decision": "retain champion; both candidates failed screening; no promotion or strength claim",
+  "champion_commit": "43ebea648048fcee176d5f9d5a524569fa1ab6c6",
+  "champion_native_sha256": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18",
+  "manifest": {
+    "toolkit": "1.2.9",
+    "candidates": [
+      ".experiments/bin/escape-threshold3",
+      ".experiments/bin/escape-threshold-body"
+    ],
+    "opponents": [
+      ".experiments/bin/champion43"
+    ],
+    "maps": [
+      "arena",
+      "australia",
+      "autarky",
+      "big_empty",
+      "Colosseum",
+      "default",
+      "default_small",
+      "devil",
+      "dilemma",
+      "islands",
+      "maze",
+      "portals",
+      "queen_of_spades",
+      "schooltime",
+      "slithery_fight",
+      "stripes",
+      "stronghold",
+      "tower_defense",
+      "trauma",
+      "trophy",
+      "unsw",
+      "weakhold"
+    ],
+    "seeds": [
+      4747
+    ],
+    "games": 88,
+    "sha256": {
+      ".experiments/bin/escape-threshold3": "b44e3687c336fc4516105b9e588cbab0cb3d6f9422cb49c287b13aadd0690e66",
+      ".experiments/bin/escape-threshold-body": "aed0e1cfb499a2794f2ed4b42000338a610ac2be9706e12a230d3dcafa8ee3e0",
+      ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+    }
+  },
+  "variants": {
+    "escape-threshold3": {
+      "threshold_mode": 1,
+      "native_sha256": "b44e3687c336fc4516105b9e588cbab0cb3d6f9422cb49c287b13aadd0690e66",
+      "frozen_main_cpp_sha256": "fa4f88ce3bc60c858bc67c9a2581d14cf892c333873f922379b7d03171c2933f",
+      "flags": [
+        "--queen-escape-weight",
+        "4000",
+        "--queen-escape-rounds",
+        "500",
+        "--queen-escape-scope",
+        "0",
+        "--queen-escape-threshold",
+        "1"
+      ],
+      "outcomes": {
+        "win": 16,
+        "loss": 26,
+        "draw": 2
+      },
+      "score_percent": 38.63636363636363,
+      "decisive_wilson95_percent": [
+        24.999520898785942,
+        53.18623178000364
+      ],
+      "reproduced_binary_identical": true,
+      "smoke_test_passed": true,
+      "maps": {
+        "arena": {
+          "win": 1,
+          "loss": 1
+        },
+        "australia": {
+          "win": 1,
+          "loss": 1
+        },
+        "autarky": {
+          "loss": 2
+        },
+        "big_empty": {
+          "loss": 2
+        },
+        "Colosseum": {
+          "loss": 2
+        },
+        "default": {
+          "loss": 2
+        },
+        "default_small": {
+          "win": 2
+        },
+        "devil": {
+          "loss": 1,
+          "win": 1
+        },
+        "dilemma": {
+          "loss": 2
+        },
+        "islands": {
+          "loss": 2
+        },
+        "maze": {
+          "win": 2
+        },
+        "portals": {
+          "loss": 1,
+          "win": 1
+        },
+        "queen_of_spades": {
+          "loss": 1,
+          "win": 1
+        },
+        "schooltime": {
+          "win": 1,
+          "loss": 1
+        },
+        "slithery_fight": {
+          "win": 1,
+          "loss": 1
+        },
+        "stripes": {
+          "loss": 2
+        },
+        "stronghold": {
+          "win": 2
+        },
+        "tower_defense": {
+          "loss": 1,
+          "win": 1
+        },
+        "trauma": {
+          "loss": 1,
+          "win": 1
+        },
+        "trophy": {
+          "loss": 2
+        },
+        "unsw": {
+          "loss": 1,
+          "win": 1
+        },
+        "weakhold": {
+          "draw": 2
+        }
+      }
+    },
+    "escape-threshold-body": {
+      "threshold_mode": 2,
+      "native_sha256": "aed0e1cfb499a2794f2ed4b42000338a610ac2be9706e12a230d3dcafa8ee3e0",
+      "frozen_main_cpp_sha256": "56ea8aece891366d20362c35731341cd330cfe3b4af601d785ddd8194c30f14d",
+      "flags": [
+        "--queen-escape-weight",
+        "4000",
+        "--queen-escape-rounds",
+        "500",
+        "--queen-escape-scope",
+        "0",
+        "--queen-escape-threshold",
+        "2"
+      ],
+      "outcomes": {
+        "loss": 20,
+        "win": 22,
+        "draw": 2
+      },
+      "score_percent": 52.27272727272727,
+      "decisive_wilson95_percent": [
+        37.72221394020704,
+        66.64063552403505
+      ],
+      "reproduced_binary_identical": true,
+      "smoke_test_passed": true,
+      "maps": {
+        "arena": {
+          "loss": 2
+        },
+        "australia": {
+          "loss": 1,
+          "win": 1
+        },
+        "autarky": {
+          "win": 2
+        },
+        "big_empty": {
+          "loss": 2
+        },
+        "Colosseum": {
+          "win": 2
+        },
+        "default": {
+          "loss": 2
+        },
+        "default_small": {
+          "win": 2
+        },
+        "devil": {
+          "win": 2
+        },
+        "dilemma": {
+          "loss": 2
+        },
+        "islands": {
+          "loss": 2
+        },
+        "maze": {
+          "win": 2
+        },
+        "portals": {
+          "loss": 1,
+          "win": 1
+        },
+        "queen_of_spades": {
+          "win": 1,
+          "loss": 1
+        },
+        "schooltime": {
+          "win": 1,
+          "loss": 1
+        },
+        "slithery_fight": {
+          "loss": 2
+        },
+        "stripes": {
+          "loss": 2
+        },
+        "stronghold": {
+          "win": 2
+        },
+        "tower_defense": {
+          "loss": 1,
+          "win": 1
+        },
+        "trauma": {
+          "win": 2
+        },
+        "trophy": {
+          "win": 1,
+          "loss": 1
+        },
+        "unsw": {
+          "win": 2
+        },
+        "weakhold": {
+          "draw": 2
+        }
+      }
+    }
+  },
+  "final_validation_run": false,
+  "sandbox_run": false,
+  "diverse_opponent_gate_run": false,
+  "accepted_new_games": 88,
+  "accepted_total_games": 1525,
+  "failed_prior_diagnostic_games": 20,
+  "correlation_limitation": "seed4747 is a tuning cohort; deterministic map/side cases can be correlated; not Elo",
+  "diagnostic_reproduction": "research/queen-threshold-colosseum-reproduction.json",
+  "diagnostic_reruns_excluded_from_matrix": true,
+  "trace_tool_checks": [
+    "exact Colosseum game reproduction",
+    "binary hash mismatch rejected before execution",
+    "ambiguous selection rejected"
+  ],
+  "compiler": "g++ -std=c++20 -O2",
+  "patch_base": "43ebea6",
+  "research_patch": "research/queen-threshold.patch",
+  "research_patch_sha256": "6c095c64a91b67a5f976603682f60f7663cba8a2ff5c504b4c6ecd3de5fbf857"
+}

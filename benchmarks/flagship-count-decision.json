@@ -1,0 +1,48 @@
+{
+  "experiment": "large-map flagship target 5 to 4",
+  "status": "rejected after neutral tuning screen; champion retained",
+  "hypothesis": "On maps with at least 600 tiles, protecting four rather than five hashed flagship dragons may leave resources for one additional collector without reducing the team's longest-dragon tiebreak score.",
+  "change": "Replace flagship_target large-map result 5 with 4; all other policy and build inputs unchanged.",
+  "baseline": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "candidate": {
+    "native_sha256": "f32d7a9fe4fd82c7cdc0a3b8626fe9836866cda22394f2dfe2c5863eeab9a366",
+    "source_patch": "research/flagship-count.patch"
+  },
+  "environment": {
+    "toolkit": "unswbc 1.2.9",
+    "compiler": "g++ -std=c++20 -O2",
+    "seed": 10013,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "sides": ["A", "B"],
+    "games": 16
+  },
+  "outcome": {
+    "wins": 8,
+    "losses": 8,
+    "draws": 0,
+    "score_percent": 50.0,
+    "all_games_valid": true,
+    "map_records": {
+      "default": "2-0-0",
+      "schooltime": "0-2-0",
+      "all_other_six_maps": "1-1-0 each"
+    }
+  },
+  "gate": "Screening only. No fresh all-map gate, diverse-opponent batch, or judge-sandbox test was run because the result was neutral and Schooltime regressed.",
+  "evidence": {
+    "records": "flagship-count-screen.jsonl",
+    "manifest": "flagship-count-screen.manifest.json",
+    "records_check": "PASS: 16 complete, unique, valid matches",
+    "accepted_valid_matrix_games_before": 2649,
+    "accepted_valid_matrix_games_after": 2665,
+    "failed_diagnostics": "320 rows / 20 invalid-action games, kept separate"
+  },
+  "limitations": [
+    "One seed and eight maps are tuning evidence, not a broad strength estimate.",
+    "All outcomes are local match results, not competition Elo.",
+    "No production policy was changed."
+  ]
+}

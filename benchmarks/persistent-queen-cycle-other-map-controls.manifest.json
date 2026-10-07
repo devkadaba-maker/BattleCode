@@ -1,0 +1,42 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/persistent-queen-cycle/.unswbc-build/bot",
+    ".experiments/contact1/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/contact1/.unswbc-build/bot"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades",
+    "australia",
+    "autarky",
+    "devil",
+    "dilemma",
+    "islands",
+    "maze",
+    "portals",
+    "slithery_fight",
+    "stripes",
+    "stronghold",
+    "tower_defense",
+    "trauma",
+    "weakhold"
+  ],
+  "seeds": [
+    10560
+  ],
+  "games": 84,
+  "sha256": {
+    ".experiments/persistent-queen-cycle/.unswbc-build/bot": "e790e2ab49da5dda35397ceb5973712735cb16a79c01de3f02907ba5ee525bec",
+    ".experiments/contact1/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "explicit_endturn": true
+}

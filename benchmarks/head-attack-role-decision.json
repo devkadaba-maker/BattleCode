@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_after_screen",
+  "active_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Normal favourable trades may be more valuable against one enemy role, so compare queen-only and non-queen-only targets without forcing otherwise-unfavourable queen attacks.",
+  "screen": {
+    "seed": 9898,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "both_sides": true,
+    "queens_only": {
+      "wins": 4,
+      "losses": 12,
+      "draws": 0,
+      "native_sha256": "d06d24347dec8cdb2e9598853fb74b18f0567a7b3b7bc27f7490d1ad9c5c6319"
+    },
+    "non_queens_only": {
+      "wins": 7,
+      "losses": 9,
+      "draws": 0,
+      "native_sha256": "dd1cdfd1b028cdbf05c17cb61feb784244812b904211c0194eb5b72fcc1aab69"
+    },
+    "valid_games": 32,
+    "runtime_or_invalid_action_faults": 0
+  },
+  "fresh_all_map_gate": "not_run_after_negative_screen",
+  "diverse_opponents": "not_run",
+  "judge_sandbox": "not_run",
+  "reason": "Queen-only favourable trades lost 4-12 and non-queen-only trades lost 7-9. Restricting either target class was weaker than the unrestricted champion.",
+  "reproduction": {
+    "base_commit": "b63a682a79e01aae963b7955426cce62d4235aa8",
+    "patch": "benchmarks/research/head-attack-role.patch",
+    "build_flags": ["--head-attack-target-role 1", "--head-attack-target-role 2"]
+  },
+  "default_build_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "accepted_matrix_games_after": 2493,
+  "failed_diagnostic_rows_after": 192,
+  "failed_diagnostic_invalid_games_after": 9,
+  "local_results_are_measured_elo": false
+}

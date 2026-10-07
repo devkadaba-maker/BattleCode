@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/sonar-collector8",
+    ".experiments/sonar-collector20"
+  ],
+  "opponents": [
+    ".experiments/trauma-restored"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    10012
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/sonar-collector8/.unswbc-build/bot": "0534c8a7ff4e79baf391a437d01baa41e1856fc863b94c4b922b4d66fb71968c",
+    ".experiments/sonar-collector20/.unswbc-build/bot": "b065fc122fb20ff5d2baf994dec25986eca999b02b0b162a933929cbd7adf70a",
+    ".experiments/trauma-restored/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

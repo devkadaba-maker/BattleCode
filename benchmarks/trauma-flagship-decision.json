@@ -1,0 +1,48 @@
+{
+  "decision": "reject_after_screen",
+  "hypothesis": "Trauma losses that reach round 500 may improve if the flagship values visible pearls more strongly and therefore wins the longest-dragon tiebreak more often.",
+  "scope": "Trauma-only flagship movement; the map detector uses the unique 48x24 opening with zero visible current pearls to distinguish Trauma from Stronghold.",
+  "base_commit": "ce689242fb1923941d2acb0cd75a6d72504aa39a",
+  "champion_commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+  "champion_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "toolkit": "unswbc 1.2.9",
+  "matrix": {
+    "record": "benchmarks/trauma-flagship-screen.jsonl",
+    "manifest": "benchmarks/trauma-flagship-screen.manifest.json",
+    "map": "trauma",
+    "sides": "both",
+    "seeds": [10007, 10008, 10009, 10010, 10011],
+    "games": 20,
+    "complete_valid_unique": 20,
+    "runtime_faults": 0,
+    "invalid_actions": 0
+  },
+  "candidates": [
+    {
+      "flagship_pearl_weight": 12,
+      "native_sha256": "b526a39114dd699cb92b1e22535f5a6bec36a6dcc5d178e586f2ca994a64d29e",
+      "wins": 5,
+      "losses": 5,
+      "draws": 0
+    },
+    {
+      "flagship_pearl_weight": 16,
+      "native_sha256": "6efdb703ec9a650c817418974d1e8948ae44532784e1560017028b6e93beda5f",
+      "wins": 5,
+      "losses": 5,
+      "draws": 0
+    }
+  ],
+  "reproduction": {
+    "patch": "benchmarks/research/trauma-flagship-weight.patch",
+    "apply": "git apply benchmarks/research/trauma-flagship-weight.patch",
+    "build_weight_12": ".venv/bin/python scripts/build_variant.py trauma-weight12 --trauma-flagship-pearl-weight 12 --compile",
+    "build_weight_16": ".venv/bin/python scripts/build_variant.py trauma-weight16 --trauma-flagship-pearl-weight 16 --compile"
+  },
+  "reason": "Both candidates split their ten games evenly against the exact champion, so neither provides evidence of a repaired Trauma loss pattern. No fresh scoped validation, unaffected-map control, diverse-opponent gate, or sandbox run was justified.",
+  "active_policy_changed": false,
+  "local_results_are_elo": false,
+  "accepted_evidence_after": 2649,
+  "failed_diagnostic_rows_after": 288,
+  "failed_invalid_games_after": 18
+}

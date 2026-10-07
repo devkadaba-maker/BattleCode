@@ -1,0 +1,26 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/release-unsw-750",
+    ".experiments/bin/release-unsw-4000"
+  ],
+  "opponents": [
+    ".experiments/bin/champion43"
+  ],
+  "maps": [
+    "unsw"
+  ],
+  "seeds": [
+    4242,
+    4343,
+    4444,
+    4545,
+    4646
+  ],
+  "games": 20,
+  "sha256": {
+    ".experiments/bin/release-unsw-750": "177305a183725223c524ae807a33e18be52e1af967e4037916ca9b228faa6ea5",
+    ".experiments/bin/release-unsw-4000": "5781f9a05c8dd24e454fdbab95946792b204a1b4ed7bc4f7a2e83d10ecad8637",
+    ".experiments/bin/champion43": "5f57c816de5ea0844b3460449407d7a1569d080a93e8e506f2affe5a6dc62b18"
+  }
+}

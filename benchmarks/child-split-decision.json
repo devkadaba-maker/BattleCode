@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-05",
+  "decision": "reject_after_screen",
+  "active_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Keep queens at the proven split cap of three while reducing descendant splits so children grow instead of repeatedly fragmenting.",
+  "diagnostic_before_games": "Sonar interception variants were not run because both candidate binaries compiled byte-identical to the champion: the active all-collector movement policy makes the hunter-only intercept path unreachable.",
+  "screen": {
+    "seed": 9999,
+    "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+    "both_sides": true,
+    "child_cap_1": {
+      "wins": 5,
+      "losses": 9,
+      "draws": 2,
+      "native_sha256": "546716072a566d6a79b02affc041c1ff361fd70b378ee226a7c01762ca746db5"
+    },
+    "child_cap_2": {
+      "wins": 6,
+      "losses": 8,
+      "draws": 2,
+      "native_sha256": "aa37d60cfe6acb1f83a5ff514ff6303a94808f966fa94393073c85a43796e68d"
+    },
+    "valid_games": 32,
+    "runtime_or_invalid_action_faults": 0
+  },
+  "fresh_all_map_gate": "not_run_after_negative_screen",
+  "diverse_opponents": "not_run",
+  "judge_sandbox": "not_run",
+  "reason": "Both child-specific caps underperformed the champion. Cap one scored 5-9-2 and cap two scored 6-8-2, so neither advanced.",
+  "reproduction": {
+    "base_commit": "4e592f094167c0b5e3744cbd18f30c2c8b50aecc",
+    "patch": "benchmarks/research/child-split-limit.patch",
+    "build_flags": ["--child-split-limit 1", "--child-split-limit 2"]
+  },
+  "default_build_native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+  "accepted_matrix_games_after": 2525,
+  "failed_diagnostic_rows_after": 192,
+  "failed_diagnostic_invalid_games_after": 9,
+  "local_results_are_measured_elo": false
+}

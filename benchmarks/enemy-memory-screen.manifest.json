@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/memory-short/.unswbc-build/bot",
+    ".experiments/memory-contact/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/memory-default2/.unswbc-build/bot"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    10020
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/memory-short/.unswbc-build/bot": "a725d09b7ef64ed16435c3d5ce18c56a76c48327a570b661b446ceb95b7993f9",
+    ".experiments/memory-contact/.unswbc-build/bot": "932c51049fcc57b68fab7f9d723c4035386d1286d289b332d1a2873ae8182b77",
+    ".experiments/memory-default2/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

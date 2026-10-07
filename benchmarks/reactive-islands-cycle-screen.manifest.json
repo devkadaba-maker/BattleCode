@@ -1,0 +1,25 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/reactive-islands-cycle/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/champion-reactive/.unswbc-build/bot"
+  ],
+  "maps": [
+    "islands"
+  ],
+  "seeds": [
+    10590,
+    10591,
+    10592,
+    10593,
+    10594
+  ],
+  "games": 10,
+  "sha256": {
+    ".experiments/reactive-islands-cycle/.unswbc-build/bot": "a953d967505ed04ad6f04545bb9ec53b46a5ae8208d2bea35033dced35010df6",
+    ".experiments/champion-reactive/.unswbc-build/bot": "e790e2ab49da5dda35397ceb5973712735cb16a79c01de3f02907ba5ee525bec"
+  },
+  "explicit_endturn": true
+}

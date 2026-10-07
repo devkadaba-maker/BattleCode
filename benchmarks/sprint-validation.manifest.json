@@ -1,0 +1,44 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/bin/sprint-vision6"
+  ],
+  "opponents": [
+    ".experiments/bin/final",
+    ".experiments/bin/baseline"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades",
+    "australia",
+    "autarky",
+    "devil",
+    "dilemma",
+    "islands",
+    "maze",
+    "portals",
+    "slithery_fight",
+    "stripes",
+    "stronghold",
+    "tower_defense",
+    "trauma",
+    "unsw",
+    "weakhold"
+  ],
+  "seeds": [
+    1313,
+    1414
+  ],
+  "games": 176,
+  "sha256": {
+    ".experiments/bin/sprint-vision6": "52b860cb31f11809540c7e4b8d8f048f3028d2779252c36b9e981b71088b5d58",
+    ".experiments/bin/final": "657d4b67104b0771583f73eecad7bef042312630b08ed58c5e511b69e5e91664",
+    ".experiments/bin/baseline": "0a2d515e2c83918b1e4f458ec00843346cdb23111bfe089b5b5605892ebab263"
+  }
+}

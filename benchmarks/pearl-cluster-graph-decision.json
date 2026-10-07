@@ -1,0 +1,66 @@
+{
+  "experiment": "graph-reachable visible pearl-cluster scoring",
+  "status": "rejected after independent tuning confirmation; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "The existing pearl-cluster bonus uses toroidal geometric distance even when kelp disconnects a visible cluster. Restricting it to the proposed move's traversable visible component could avoid steering toward unreachable food without changing the broader collection policy.",
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "both_sides": true,
+  "screen": {
+    "matrix": "pearl-cluster-graph-screen.jsonl",
+    "manifest": "pearl-cluster-graph-screen.manifest.json",
+    "seed": 10047,
+    "mode_1": {"wins": 10, "losses": 6, "draws": 0},
+    "mode_2": {"wins": 10, "losses": 6, "draws": 0}
+  },
+  "independent_confirmation": {
+    "matrix": "pearl-cluster-graph-confirmation.jsonl",
+    "manifest": "pearl-cluster-graph-confirmation.manifest.json",
+    "seed": 10048,
+    "mode_1": {"wins": 9, "losses": 7, "draws": 0},
+    "mode_2": {"wins": 8, "losses": 8, "draws": 0}
+  },
+  "mode_1": {
+    "description": "Ignore cluster centres and member pearls outside the candidate move's reachable visible component; retain geometric approach distance.",
+    "native_sha256": "25540d34ffaf0b0f0aa9c9525b8f146170ee161db8053da7bbb489c11212679b",
+    "combined": {"wins": 19, "losses": 13, "draws": 0, "score_percent": 59.375, "decisive_wilson95": [42.26, 74.48]},
+    "instability": "Schooltime was 0-2 in the screen; Big Empty was 0-2 in confirmation."
+  },
+  "mode_2": {
+    "description": "Mode 1 plus graph-route rather than geometric approach distance.",
+    "native_sha256": "1d942a1f99bf32be4e91566996c45fe41b64c4b32e538e4c3fa87f337fe8a7d1",
+    "combined": {"wins": 18, "losses": 14, "draws": 0, "score_percent": 56.25, "decisive_wilson95": [39.33, 71.83]},
+    "instability": "Default Small and Schooltime were 0-2 in the screen; Colosseum and Default were 0-2 in confirmation."
+  },
+  "decision": "Both modes screened 10-6, but neither repeated that result: mode 1 confirmed at 9-7 and mode 2 at 8-8. Their map-level gains and regressions also reversed between seeds. Neither was frozen for an all-map gate, diverse opponents or sandbox execution.",
+  "verification": {
+    "screen_check_records": "passed: 32 complete unique valid fault-free games",
+    "confirmation_check_records": "passed: 32 complete unique valid fault-free games",
+    "smoke_test": "passed: isolated visible pearls receive zero graph-aware cluster value",
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "fresh_all_map_gate": "not run after failed confirmation",
+    "diverse_opponents": "not run after failed confirmation",
+    "judge_sandbox": "not run after failed confirmation"
+  },
+  "accepted_record_total": 3093,
+  "failed_diagnostic_total": 448,
+  "failed_invalid_game_total": 42,
+  "new_seen_seeds": [10047, 10048],
+  "reproduction": {
+    "patch": "research/pearl-cluster-graph.patch",
+    "mode_1_build": "python scripts/build_variant.py clustergraph1 --pearl-cluster-graph-mode 1 --compile",
+    "mode_2_build": "python scripts/build_variant.py clustergraph2 --pearl-cluster-graph-mode 2 --compile"
+  }
+}

@@ -1,0 +1,75 @@
+diff --git a/cpp_bot/main.cpp b/cpp_bot/main.cpp
+index 9da10f0..a4ea56e 100644
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -103,0 +104,3 @@ namespace {
++#ifndef QUEEN_PEARL_CLAIM_PERCENT
++#define QUEEN_PEARL_CLAIM_PERCENT 100
++#endif
+@@ -568,0 +572,18 @@ bool visible_pearl_near(Controller const& controller, Game const& game_state, Po
++#if QUEEN_PEARL_CLAIM_PERCENT < 100
++// Preserve the engine's first round-limit tiebreak without assigning every
++// pearl to a teammate. An ordinary collector yields only when a visible
++// friendly queen is at least as close to that specific pearl.
++bool pearl_claimed_by_visible_queen(Controller const& controller,
++                                    Game const& game_state, Position pearl) {
++    if (controller.get_id() < 2) return false;
++    int our_distance = distance(controller.get_position(), pearl, game_state);
++    for (auto const& tile : controller.get_tiles()) {
++        auto const* dragon = tile.get_dragon();
++        if (!dragon || !dragon->is_head() || dragon->get_team() != controller.get_team() ||
++            dragon->get_id() >= 2) continue;
++        if (distance(dragon->get_position(), pearl, game_state) <= our_distance) return true;
++    }
++    return false;
++}
++#endif
++
+@@ -614,0 +636,5 @@ int pearl_value(Controller const& controller, Game const& game_state, Position s
++#if QUEEN_PEARL_CLAIM_PERCENT == 100
++        value = std::max(value, candidate);
++#else
++        if (pearl_claimed_by_visible_queen(controller, game_state, tile.get_position()))
++            candidate = candidate * QUEEN_PEARL_CLAIM_PERCENT / 100;
+@@ -615,0 +642 @@ int pearl_value(Controller const& controller, Game const& game_state, Position s
++#endif
+@@ -652,0 +680 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
++#if QUEEN_PEARL_CLAIM_PERCENT == 100
+@@ -653,0 +682,6 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
++#else
++        int candidate = cluster * 70 + approach * 8 + imminent;
++        if (pearl_claimed_by_visible_queen(controller, game_state, centre.get_position()))
++            candidate = candidate * QUEEN_PEARL_CLAIM_PERCENT / 100;
++        best = std::max(best, candidate);
++#endif
+@@ -674,0 +709 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
++#if QUEEN_PEARL_CLAIM_PERCENT == 100
+@@ -675,0 +711,6 @@ int pearl_cluster_value(Controller const& controller, Game const& game_state, Po
++#else
++        int candidate = cluster * 70 + approach * 8 + imminent;
++        if (pearl_claimed_by_visible_queen(controller, game_state, centre.get_position()))
++            candidate = candidate * QUEEN_PEARL_CLAIM_PERCENT / 100;
++        best = std::max(best, candidate);
++#endif
+@@ -807,0 +849 @@ int visible_target_value(Controller const& controller, Game const& game_state,
++#if QUEEN_PEARL_CLAIM_PERCENT == 100
+@@ -809,0 +852,7 @@ int visible_target_value(Controller const& controller, Game const& game_state,
++#else
++    int value = food + pocket + congestion - (4 - exits) * 45 -
++        (exits <= 1 ? 220 : 0) - arrival_steps * 95;
++    if (pearl_claimed_by_visible_queen(controller, game_state, target.get_position()))
++        value = value * QUEEN_PEARL_CLAIM_PERCENT / 100;
++    return value;
++#endif
+diff --git a/scripts/build_variant.py b/scripts/build_variant.py
+index bf293a9..3a8cf45 100644
+--- a/scripts/build_variant.py
++++ b/scripts/build_variant.py
+@@ -54,0 +55,2 @@ parser.add_argument('--pearl-cluster-graph-mode', type=int, choices=[0,1,2],
++parser.add_argument('--queen-pearl-claim-percent', type=int,
++                    help='residual pearl value when a visible friendly queen is at least as close')
+@@ -94,0 +97,2 @@ if args.earned_flagship_length is not None and args.earned_flagship_length < 2:
++if args.queen_pearl_claim_percent is not None and not 0 <= args.queen_pearl_claim_percent <= 100:
++    parser.error('--queen-pearl-claim-percent must be between 0 and 100')
+@@ -126,0 +131 @@ defines['PEARL_CLUSTER_GRAPH_MODE'] = args.pearl_cluster_graph_mode
++defines['QUEEN_PEARL_CLAIM_PERCENT'] = args.queen_pearl_claim_percent

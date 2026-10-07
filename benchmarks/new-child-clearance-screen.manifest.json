@@ -1,0 +1,29 @@
+{
+  "toolkit": "1.2.9",
+  "candidates": [
+    ".experiments/childclear1/.unswbc-build/bot",
+    ".experiments/childclear3/.unswbc-build/bot"
+  ],
+  "opponents": [
+    ".experiments/childclear-default/.unswbc-build/bot"
+  ],
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "seeds": [
+    10041
+  ],
+  "games": 32,
+  "sha256": {
+    ".experiments/childclear1/.unswbc-build/bot": "24d125f1f297ed889ddf9c6ce310d9ca770947f3d55b11da5f1ab30e794839da",
+    ".experiments/childclear3/.unswbc-build/bot": "cc4f4434108ad9017a83fb48b5c87530221261ab90df8e73d7cec2531b957133",
+    ".experiments/childclear-default/.unswbc-build/bot": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  }
+}

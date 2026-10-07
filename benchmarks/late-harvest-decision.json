@@ -1,0 +1,55 @@
+{
+  "experiment": "round-400 objective-aware late harvesting",
+  "status": "rejected at screening; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "Because most historical losses reached the round limit, ordinary collectors could improve score-tiebreak growth by dropping enemy chase after round 400; a second mode also raises late pearl weight from two to three.",
+  "matrix": "research/failed/late-harvest-screen.jsonl",
+  "manifest": "research/failed/late-harvest-screen.manifest.json",
+  "seed": 10045,
+  "maps": ["arena", "default_small", "default", "big_empty", "schooltime", "trophy", "Colosseum", "queen_of_spades"],
+  "both_sides": true,
+  "chase_off": {
+    "native_sha256": "2393b6f8f5980eba844b5bdbb09c4bfad04320080cafb63fc0a9c639d2e1c6d1",
+    "raw_outcomes": {"wins": 9, "losses": 7, "draws": 0},
+    "valid_games": 15,
+    "valid_outcomes": {"wins": 8, "losses": 7, "draws": 0},
+    "invalid_games": 1
+  },
+  "chase_off_pearl_3": {
+    "native_sha256": "fb49f0b118d7979f04f2ca9d5d5855b624eee73acd866f1dd21f0d7ada43f3a8",
+    "raw_outcomes": {"wins": 7, "losses": 9, "draws": 0},
+    "valid_games": 15,
+    "valid_outcomes": {"wins": 7, "losses": 8, "draws": 0},
+    "invalid_games": 1
+  },
+  "invalid_summary": {
+    "games": 2,
+    "candidate_side_games": 2,
+    "cases": [
+      {"mode": "chase_off", "map": "queen_of_spades", "side": "A", "recorded_outcome": "win"},
+      {"mode": "chase_off_pearl_3", "map": "default", "side": "A", "recorded_outcome": "loss"}
+    ],
+    "note": "No invalid row is counted as strength evidence, and the complete shared matrix is excluded."
+  },
+  "decision": "The valid subsets were only 8-7 and 7-8, while both modes produced one candidate-side invalid action. The neutral-to-negative signal does not justify a clean rerun, fresh gate, diverse opponents or sandbox execution.",
+  "verification": {
+    "screen_check_records": "expected failure: invalid-action games",
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "fresh_gate": "not run after failed screen",
+    "diverse_opponents": "not run after failed screen",
+    "judge_sandbox": "not run after failed screen"
+  },
+  "accepted_record_total": 3029,
+  "failed_diagnostic_total": 416,
+  "failed_invalid_game_total": 30,
+  "new_seen_seeds": [10045],
+  "reproduction": {
+    "patch": "research/late-harvest.patch",
+    "chase_off_build": "python scripts/build_variant.py lateharvest1 --late-harvest-mode 1 --late-harvest-round 400 --compile",
+    "chase_off_pearl_3_build": "python scripts/build_variant.py lateharvest2 --late-harvest-mode 2 --late-harvest-round 400 --compile"
+  }
+}
