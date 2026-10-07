@@ -1,0 +1,22 @@
+--- a/cpp_bot/main.cpp
++++ b/cpp_bot/main.cpp
+@@ -1218,1 +1218,1 @@
+-bool dynamic_queen_map = false, dynamic_queen_classified = false;
++bool dynamic_queen_map = false, dynamic_queen_persistent = false, dynamic_queen_classified = false;
+@@ -1336,2 +1336,4 @@
+-    auto cycle=quiet_queen_cycle(body);
+-    if (!cycle.empty()) return {cycle.front()};
++    if (dynamic_queen_persistent) {
++        auto cycle=quiet_queen_cycle(body);
++        if (!cycle.empty()) return {cycle.front()};
++    }
+@@ -1343,0 +1346,4 @@
++    if (!dynamic_queen_persistent) {
++        auto cycle=quiet_queen_cycle(body);
++        if (!cycle.empty()) return {cycle.front()};
++    }
+@@ -1376,1 +1383,3 @@
+-        dynamic_queen_map=ct->get_id()<2 && game->width==64 && game->height==64 && ct->get_unit_count()==10;
++        dynamic_queen_persistent=game->width==64 && game->height==64 && ct->get_unit_count()==10;
++        bool reactive_scope=game->width==32 && game->height==16; // use 56x40 for Islands
++        dynamic_queen_map=ct->get_id()<2 && (dynamic_queen_persistent || reactive_scope);

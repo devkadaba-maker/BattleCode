@@ -1,0 +1,16 @@
+{
+  "decision": "reject",
+  "date": "2026-10-07",
+  "champion_commit": "a125de57beb91cded27ecfcea8ef400b5008c0ff",
+  "champion_sha256": "e790e2ab49da5dda35397ceb5973712735cb16a79c01de3f02907ba5ee525bec",
+  "policy": "Preserve proactive cycling on UNSW, but on the selected extra map search for a quiet cycle only after the baseline move fails the moving-body horizon.",
+  "experiments": [
+    {"scope": "Tower Defense queens (32x16)", "candidate_sha256": "50a7c2893b7037b9846b0cfef7dd9a702f888bb4cb5afd571c8d0689a2c85455", "seeds": [10585,10586,10587,10588,10589], "wins": 7, "losses": 3, "draws": 0},
+    {"scope": "Islands queens (56x40)", "candidate_sha256": "a953d967505ed04ad6f04545bb9ec53b46a5ae8208d2bea35033dced35010df6", "seeds": [10590,10591,10592,10593,10594], "wins": 4, "losses": 6, "draws": 0}
+  ],
+  "valid_games": 20,
+  "invalid_games": 0,
+  "rationale": "Reactive activation modestly improved Tower Defense tuning but remained below the scoped advancement threshold; Islands remained weaker. The family stops without independent validation, unaffected controls or sandbox.",
+  "production_changed": false,
+  "limitations": "Local matches against the frozen champion, not measured competition Elo."
+}
