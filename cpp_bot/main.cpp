@@ -107,6 +107,9 @@ namespace {
 #ifndef PEARL_TARGET_MODE
 #define PEARL_TARGET_MODE 0
 #endif
+#ifndef COMBAT_CONTACT_THRESHOLD
+#define COMBAT_CONTACT_THRESHOLD 1
+#endif
 
 int parent_split_count = 0;
 std::array<int, 4> vision_target_bonuses{};
@@ -379,6 +382,12 @@ bool should_force_portal(Controller const& controller, Game const& game_state) {
 
 Mode strategy_mode(int unit_count, std::optional<int> enemy_count, int population_cap) {
     if (!enemy_count.has_value() || *enemy_count <= 0 || unit_count < *enemy_count) return Mode::COLLECT;
+#if COMBAT_CONTACT_THRESHOLD > 1
+    // A local sighting is only a lower bound on the enemy team population.
+    // Do not compare our global population with a lone visible head and infer
+    // that the whole team should leave collection mode.
+    if (*enemy_count < COMBAT_CONTACT_THRESHOLD) return Mode::COLLECT;
+#endif
     if (unit_count >= population_cap) return Mode::HUNT;
     if (unit_count > *enemy_count) return Mode::PRESSURE;
     return Mode::BALANCED;

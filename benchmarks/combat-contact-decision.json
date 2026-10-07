@@ -1,0 +1,68 @@
+{
+  "experiment": "minimum enemy contacts for combat mode",
+  "status": "rejected at screening; active champion unchanged",
+  "toolkit": "unswbc==1.2.9",
+  "comparison_champion": {
+    "commit": "58a7d1fc6d951d905fd2eec71dda1adc876a06c5",
+    "native_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533"
+  },
+  "hypothesis": "The existing state classifier compares global friendly population with only a local enemy-head count, so one contact can incorrectly switch a large team from collection to pressure or hunt. Requiring multiple contacts could avoid that inference without changing movement weights or memory decay.",
+  "matrix": "combat-contact-screen.jsonl",
+  "manifest": "combat-contact-screen.manifest.json",
+  "seed": 10051,
+  "maps": [
+    "arena",
+    "default_small",
+    "default",
+    "big_empty",
+    "schooltime",
+    "trophy",
+    "Colosseum",
+    "queen_of_spades"
+  ],
+  "both_sides": true,
+  "threshold_2": {
+    "native_sha256": "eadbb11f8ced38c3ac380c4c079ca1413367320908185f9232b580857a09e090",
+    "wins": 9,
+    "losses": 7,
+    "draws": 0,
+    "score_percent": 56.25,
+    "decisive_wilson95": [33.18, 76.90],
+    "serious_map_results": {
+      "trophy": "0-2"
+    }
+  },
+  "threshold_3": {
+    "native_sha256": "a25c7c3b9ad0906e8c0a7a2079c830486eec69fe3dfd430a0c80fe7042e556bc",
+    "wins": 7,
+    "losses": 9,
+    "draws": 0,
+    "score_percent": 43.75,
+    "decisive_wilson95": [23.10, 66.82],
+    "serious_map_results": {
+      "default_small": "0-2",
+      "trophy": "0-2"
+    }
+  },
+  "decision": "Threshold two stopped below the established 10-6 screen threshold and threshold three was negative. Neither advances to confirmation, fresh all-map validation, diverse opponents or judge sandbox.",
+  "verification": {
+    "record_check": "passed: 32 complete unique valid fault-free games",
+    "smoke_test": "passed: threshold three preserves collect below three contacts and the original balanced/pressure/hunt transitions at or above three",
+    "default_rebuild_sha256": "74aa63378c4739a97b8bcc7f1d90083ce1341ed186b7593f828502636bf91533",
+    "fresh_all_map_gate": "not run after sub-threshold screen",
+    "diverse_opponents": "not run after sub-threshold screen",
+    "judge_sandbox": "not run after sub-threshold screen"
+  },
+  "accepted_record_total": 3189,
+  "failed_diagnostic_total": 448,
+  "failed_invalid_game_total": 42,
+  "new_seen_seeds": [10051],
+  "reproduction": {
+    "base_commit": "bb27603b2c7e1f73fb54aaa2914e2653c73d5734",
+    "patch": "research/combat-contact.patch",
+    "threshold_2_build": "python scripts/build_variant.py contact2 --combat-contact-threshold 2 --compile",
+    "threshold_3_build": "python scripts/build_variant.py contact3 --combat-contact-threshold 3 --compile",
+    "champion_control_build": "python scripts/build_variant.py contact1 --combat-contact-threshold 1 --compile"
+  },
+  "local_results_are_measured_elo": false
+}

@@ -1204,3 +1204,26 @@ experiment. Seed 10050 is now seen. Accepted evidence rises to **3,157 valid
 games**; failed diagnostics remain separately excluded at 448 rows with 42
 invalid-action games. Mode 0 rebuilds byte-identically to champion 58a7d1f, so
 production policy is unchanged.
+
+## Minimum enemy contacts for combat mode — rejected screen
+
+The ordinary state classifier compares the team's global friendly population
+with a local visible or remembered enemy-head count. A single contact can
+therefore make a large team infer pressure or hunt mode. This experiment kept
+the existing movement weights and memory decay unchanged, but required two or
+three enemy contacts before leaving collection mode.
+
+On the standard eight maps from both sides of new tuning seed 10051, threshold
+two scored **9–7** (56.25%, decisive Wilson 95% 33.18–76.90%); threshold three
+scored **7–9** (43.75%, 23.10–66.82%). Threshold two lost Trophy 0–2, while
+threshold three lost Trophy and Default Small 0–2. Neither reached the
+established 10–6 screen threshold.
+
+The matrix passes `scripts/check_records.py`; all **32 games** were complete,
+unique, valid and fault-free. Both candidates stop before confirmation, fresh
+all-map validation, diverse opponents or sandbox. The decision, exact hashes,
+manifest, smoke test and `research/combat-contact.patch` preserve the
+experiment. Seed 10051 is now seen. Accepted evidence rises to **3,189 valid
+games**; failed diagnostics remain separately excluded at 448 rows with 42
+invalid-action games. Threshold one rebuilds byte-identically to champion
+58a7d1f, so production policy is unchanged.
